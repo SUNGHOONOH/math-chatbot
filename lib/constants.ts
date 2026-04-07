@@ -1,0 +1,3 @@
+export const RAG_SIMILARITY_THRESHOLD = 0.75;
+export const DASHBOARD_TOP_N_CONCEPTS = 3;
+export const CHAT_CONTEXT_WINDOW_SIZE = 6;

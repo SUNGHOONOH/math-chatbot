@@ -1,85 +1,111 @@
 import { getSupabaseAdmin } from '@/lib/supabase/client';
-import { format } from 'date-fns';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
   const supabase = getSupabaseAdmin();
 
-  // 통계 집계 (간단 버전)
+  // ── 통계 집계 ──
   const { count: totalSessions } = await supabase
-    .from('validations')
+    .from('tutoring_sessions')
     .select('*', { count: 'exact', head: true });
 
-  const { count: parsedSessions } = await supabase
-    .from('operations')
+  const { count: totalBottlenecks } = await supabase
+    .from('learning_bottlenecks')
     .select('*', { count: 'exact', head: true });
 
-  // 최근 원문 대화 20개 가져오기
-  const { data: validations } = await supabase
-    .from('validations')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(20);
+  const { count: totalReports } = await supabase
+    .from('session_reports')
+    .select('*', { count: 'exact', head: true });
+
+  const { count: totalConceptNodes } = await supabase
+    .from('concept_nodes_reference')
+    .select('*', { count: 'exact', head: true });
+
+  const { count: nullEmbeddingCount } = await supabase
+    .from('concept_nodes_reference')
+    .select('*', { count: 'exact', head: true })
+    .is('embedding', null);
 
   return (
     <div className="p-8 lg:p-12 max-w-7xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">대시보드</h1>
-        <p className="text-zinc-500 mt-2 text-sm">전체 유저, 세션 통계 및 시스템 현황을 한눈에 파악합니다.</p>
-      </div>
+      <header className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">관리자 대시보드</h1>
+          <p className="text-zinc-500 mt-2 text-sm">전체 세션, 병목 감지, 진단 보고서 통계를 한눈에 파악합니다.</p>
+        </div>
+        <Link
+          href="/"
+          className="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-sm font-medium rounded-xl transition-all border border-zinc-200 flex items-center gap-2"
+        >
+          🏠 홈으로
+        </Link>
+      </header>
 
-      {/* 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* ── 통계 카드 ── */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-2xl p-6 border border-zinc-100 shadow-sm">
           <h3 className="text-zinc-500 text-sm font-medium">총 세션 수</h3>
           <p className="text-3xl font-bold text-zinc-900 mt-2">{totalSessions || 0}</p>
+          <Link href="/admin/sessions" className="mt-4 inline-flex text-sm font-medium text-blue-600 hover:text-blue-700">
+            세션 상세 보기
+          </Link>
         </div>
         <div className="bg-white rounded-2xl p-6 border border-zinc-100 shadow-sm">
-          <h3 className="text-zinc-500 text-sm font-medium">파싱 성공 세션</h3>
-          <p className="text-3xl font-bold text-emerald-600 mt-2">{parsedSessions || 0}</p>
+          <h3 className="text-zinc-500 text-sm font-medium">감지된 병목</h3>
+          <p className="text-3xl font-bold text-rose-600 mt-2">{totalBottlenecks || 0}</p>
+          <Link href="/admin/sessions" className="mt-4 inline-flex text-sm font-medium text-blue-600 hover:text-blue-700">
+            대화 품질 보기
+          </Link>
         </div>
         <div className="bg-white rounded-2xl p-6 border border-zinc-100 shadow-sm">
-          <h3 className="text-zinc-500 text-sm font-medium">오늘 생성된 문제 전략</h3>
-          <p className="text-3xl font-bold text-blue-600 mt-2">0</p>
+          <h3 className="text-zinc-500 text-sm font-medium">진단 보고서</h3>
+          <p className="text-3xl font-bold text-emerald-600 mt-2">{totalReports || 0}</p>
+          <Link href="/admin/sessions" className="mt-4 inline-flex text-sm font-medium text-blue-600 hover:text-blue-700">
+            리포트 흐름 보기
+          </Link>
+        </div>
+        <div className="bg-white rounded-2xl p-6 border border-zinc-100 shadow-sm">
+          <h3 className="text-zinc-500 text-sm font-medium">개념 노드 수</h3>
+          <p className="text-3xl font-bold text-blue-600 mt-2">{totalConceptNodes || 0}</p>
+          <Link href="/admin/labeling" className="mt-4 inline-flex text-sm font-medium text-blue-600 hover:text-blue-700">
+            노드/문제 은행 관리
+          </Link>
         </div>
       </div>
 
-      {/* 대화 로그 모니터링 */}
-      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-zinc-100 bg-white">
-          <h2 className="text-lg font-bold text-zinc-900">최근 대화 원문 모니터링 (Validations)</h2>
-          <p className="text-sm text-zinc-500">LLM 파싱 실패 여부와 무관하게 모든 대화가 저장됩니다.</p>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Link
+          href="/admin/labeling"
+          className="block bg-white rounded-2xl border border-zinc-100 shadow-sm p-6 hover:border-blue-200 hover:shadow-md transition-all"
+        >
+          <h2 className="text-lg font-bold text-zinc-900">라벨링 · 문제 은행</h2>
+          <p className="text-sm text-zinc-500 mt-2">
+            개념 노드 임포트, 임베딩 생성, 전략 그래프 검수와 문제 은행 관리를 한 곳으로 모았습니다.
+          </p>
+          <div className="mt-5 flex items-center gap-4 text-sm">
+            <span className="text-zinc-600">개념 노드 {totalConceptNodes || 0}개</span>
+            <span className={`font-medium ${(nullEmbeddingCount || 0) > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+              임베딩 대기 {nullEmbeddingCount || 0}개
+            </span>
+          </div>
+        </Link>
 
-        <div className="divide-y divide-zinc-100">
-          {validations?.length === 0 ? (
-            <div className="p-8 text-center text-zinc-500">아직 저장된 대화가 없습니다.</div>
-          ) : (
-            (validations as any[])?.map((v) => (
-              <details key={v.id} className="group">
-                <summary className="p-4 flex items-center justify-between cursor-pointer hover:bg-zinc-50 transition-colors list-none">
-                  <div className="flex items-center gap-4">
-                    <span className="text-xs font-mono text-zinc-400 bg-zinc-100 px-2 py-1 rounded">
-                      {v.session_id.split('-')[1] || 'Session'}
-                    </span>
-                    <span className="text-sm text-zinc-600 font-medium">
-                      {v.raw_transcript.slice(0, 40).replace(/\n/g, ' ')}...
-                    </span>
-                  </div>
-                  <span className="text-xs text-zinc-400">
-                    {format(new Date(v.created_at), 'yyyy/MM/dd HH:mm')}
-                  </span>
-                </summary>
-                <div className="p-4 bg-zinc-50 text-sm border-t border-zinc-100">
-                  <pre className="whitespace-pre-wrap font-sans text-zinc-700 leading-relaxed">
-                    {v.raw_transcript}
-                  </pre>
-                </div>
-              </details>
-            ))
-          )}
-        </div>
+        <Link
+          href="/admin/sessions"
+          className="block bg-white rounded-2xl border border-zinc-100 shadow-sm p-6 hover:border-blue-200 hover:shadow-md transition-all"
+        >
+          <h2 className="text-lg font-bold text-zinc-900">세션 · 최근 대화 로그</h2>
+          <p className="text-sm text-zinc-500 mt-2">
+            세션 상태, 최근 대화 로그, 병목 기록, 보고서 흐름을 세션 단위로 조회합니다.
+          </p>
+          <div className="mt-5 flex items-center gap-4 text-sm text-zinc-600">
+            <span>세션 {totalSessions || 0}개</span>
+            <span>병목 {totalBottlenecks || 0}개</span>
+            <span>리포트 {totalReports || 0}개</span>
+          </div>
+        </Link>
       </div>
     </div>
   );

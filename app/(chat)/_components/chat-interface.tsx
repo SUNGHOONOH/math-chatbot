@@ -2,35 +2,41 @@
 
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
-import { Bot, Send, User, ImagePlus, X, Loader2, LayoutDashboard } from 'lucide-react';
+import { Bot, Send, User, ImagePlus, X, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import posthog from 'posthog-js';
 import { cn } from '@/lib/utils';
 import { supabaseBrowser } from '@/lib/supabase/browser';
-import Link from 'next/link';
+
+// ============================================================
+// Props 인터페이스: 새 대화 vs 기존 대화 복원을 구분합니다
+// ============================================================
+interface ChatInterfaceProps {
+  sessionId?: string;          // 기존 세션 복원 시 전달
+  initialMessages?: Array<{    // 기존 대화 복원 시 전달
+    id: string;
+    role: 'user' | 'assistant';
+    content: string;
+  }>;
+  extractedText?: string;      // 문제 원문 (기존 세션)
+}
 
 // ============================================================
 // 이미지 리사이즈 헬퍼 (Canvas API)
-// ============================================================
-// 최대 1200px로 줄이고 JPEG 80% 품질로 압축
-// 수학 문제 글자를 읽는 데는 충분하며, 용량은 원본의 1/10~1/30 수준
 // ============================================================
 async function resizeImage(file: File, maxSize = 1200): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
       let { width, height } = img;
-
-      // 이미 작으면 그냥 반환
       if (width <= maxSize && height <= maxSize) {
         resolve(file);
         return;
       }
-
-      // 비율 유지하며 축소
       if (width > height) {
         height = Math.round((height * maxSize) / width);
         width = maxSize;
@@ -38,7 +44,6 @@ async function resizeImage(file: File, maxSize = 1200): Promise<Blob> {
         width = Math.round((width * maxSize) / height);
         height = maxSize;
       }
-
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
@@ -82,36 +87,55 @@ async function uploadImageToSupabase(file: File): Promise<{ url: string; path: s
 // ============================================================
 // 메인 채팅 인터페이스
 // ============================================================
-export default function ChatInterface() {
+export default function ChatInterface({
+  sessionId: initialSessionId,
+  initialMessages: serverMessages,
+  extractedText: _initialExtractedText,
+}: ChatInterfaceProps = {}) {
+  const router = useRouter();
+
+  // 세션 상태 관리
+  const [currentSessionId, setCurrentSessionId] = useState<string | undefined>(initialSessionId);
+  const [isInitializing, setIsInitializing] = useState(false);
+  const [hasStudentConsent, setHasStudentConsent] = useState(false);
+  const [consentError, setConsentError] = useState<string | null>(null);
+  const [pendingProblemSavedNotice, setPendingProblemSavedNotice] = useState<string | null>(null);
+  const [pendingFirstMessage, setPendingFirstMessage] = useState<any | null>(null);
+
   const { messages, sendMessage, status, error, regenerate } = useChat({
-    transport: new DefaultChatTransport({ api: '/api/chat' }),
+    transport: new DefaultChatTransport({
+      api: '/api/chat',
+      body: {
+        sessionId: currentSessionId,
+      },
+    }),
+    messages: serverMessages as any,
   });
 
   const [input, setInput] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const isLoading = status === 'streaming' || status === 'submitted';
 
-  // 관리자 여부 확인
+  // 메시지 추가 시 자동 스크롤
   useEffect(() => {
-    const checkAdmin = async () => {
-      const { data: { user } } = await supabaseBrowser.auth.getUser();
-      if (user && user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-        setIsAdmin(true);
-      }
-    };
-    checkAdmin();
-  }, []);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-  // PostHog: 사고 시간 추적 (AI 응답 완료 → 사용자 타이핑 시작)
+  useEffect(() => {
+    if (!currentSessionId || !pendingFirstMessage) return;
+    sendMessage(pendingFirstMessage);
+    setPendingFirstMessage(null);
+  }, [currentSessionId, pendingFirstMessage, sendMessage]);
+
+  // PostHog: 사고 시간 추적
   const aiResponseTimeRef = useRef<number | null>(null);
   const thinkingTrackedRef = useRef(false);
 
-  // AI 응답 완료 시점 기록
   useEffect(() => {
     if (status === 'ready' && messages.length > 0 && messages[messages.length - 1]?.role === 'assistant') {
       aiResponseTimeRef.current = Date.now();
@@ -119,7 +143,6 @@ export default function ChatInterface() {
     }
   }, [status, messages]);
 
-  // 에러 발생 시 PostHog 기록
   useEffect(() => {
     if (error) {
       posthog.capture('ai_generation_error', {
@@ -129,7 +152,6 @@ export default function ChatInterface() {
     }
   }, [error, messages.length]);
 
-  // 사용자 타이핑 시작 시 사고 시간 측정
   const trackThinkingTime = useCallback(() => {
     if (aiResponseTimeRef.current && !thinkingTrackedRef.current) {
       const thinkingMs = Date.now() - aiResponseTimeRef.current;
@@ -145,21 +167,16 @@ export default function ChatInterface() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        posthog.capture('focus_lost', {
-          message_count: messages.length,
-          was_loading: isLoading,
-        });
+        posthog.capture('focus_lost', { message_count: messages.length, was_loading: isLoading });
       } else {
-        posthog.capture('focus_returned', {
-          message_count: messages.length,
-        });
+        posthog.capture('focus_returned', { message_count: messages.length });
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [messages.length, isLoading]);
 
-  // 이미지를 선택했을 때 — 로컬 미리보기만 생성
+  // 이미지 선택 핸들러
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -169,101 +186,159 @@ export default function ChatInterface() {
     reader.readAsDataURL(file);
   };
 
-  // 이미지 제거
   const clearImage = () => {
     setImagePreview(null);
     setImageFile(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // 전송: 이미지 → Supabase 업로드 → URL을 텍스트로 AI에게 전달
+  // ── 핵심: 첫 메시지 전송 시 세션 자동 생성 ──
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() && !imageFile) return;
+    setConsentError(null);
+    setPendingProblemSavedNotice(null);
 
+    // 세션이 없는 경우 (새 대화): /api/problem/init 호출하여 세션 생성
+    if (!currentSessionId && imageFile) {
+      setIsInitializing(true);
+      try {
+        const { url } = await uploadImageToSupabase(imageFile);
+
+        // /api/problem/init → 세션 생성 + OCR
+        const initRes = await fetch('/api/problem/init', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageUrls: [url],
+            hasStudentConsent,
+          }),
+        });
+
+        if (!initRes.ok) {
+          const errData = await initRes.json();
+          alert(errData.error || '문제 초기화 실패');
+          setIsInitializing(false);
+          return;
+        }
+
+        const initData = await initRes.json();
+        setCurrentSessionId(initData.sessionId);
+
+        // URL을 /chat/[sessionId]로 갱신 (리로드 없이)
+        router.replace(`/chat/${initData.sessionId}`);
+
+        // 이미지+텍스트를 메시지로 전송
+        const parts: any[] = [
+          { type: 'text', text: `[첨부된 수학 문제 이미지]\n![수학 문제](${url})\n\n` },
+        ];
+        if (input.trim()) {
+          parts.push({ type: 'text', text: input });
+        }
+
+        setPendingFirstMessage({ role: 'user', parts } as any);
+        setInput('');
+        clearImage();
+        setIsInitializing(false);
+        return;
+      } catch (err) {
+        console.error('세션 초기화 실패:', err);
+        alert('세션 초기화에 실패했습니다.');
+        setIsInitializing(false);
+        return;
+      }
+    }
+
+    // 세션이 없고 이미지도 없는 경우 (텍스트만): 간이 세션 생성
+    if (!currentSessionId && !imageFile && input.trim()) {
+      setIsInitializing(true);
+      try {
+        const initRes = await fetch('/api/problem/init', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageUrls: [],
+            textInput: input.trim(),
+            hasStudentConsent,
+          }),
+        });
+
+        if (initRes.ok) {
+          const initData = await initRes.json();
+          setCurrentSessionId(initData.sessionId);
+          router.replace(`/chat/${initData.sessionId}`);
+          setPendingProblemSavedNotice('문제 원문을 세션에 저장했습니다. 이제 막힌 지점이나 현재 시도한 풀이를 적어 주세요.');
+          setInput('');
+          setIsInitializing(false);
+          return;
+        }
+      } catch {
+        console.warn('세션 생성 실패');
+      }
+      setIsInitializing(false);
+      return;
+    }
+
+    // 일반 메시지 전송
     const parts: any[] = [];
     let imagePath: string | null = null;
 
-    // 이미지가 있으면 Supabase에 업로드하고 URL을 전달
     if (imageFile) {
       setIsUploading(true);
       try {
         const { url, path } = await uploadImageToSupabase(imageFile);
         imagePath = path;
-
-        // 이미지 URL을 AI가 이해하는 형식으로 전달
-        parts.push({
-          type: 'text',
-          text: `[첨부된 수학 문제 이미지]\n![수학 문제](${url})\n\n`,
-        });
-      } catch (err: any) {
-        console.error('이미지 업로드 실패:', err);
-        alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
+        parts.push({ type: 'text', text: `[첨부된 수학 문제 이미지]\n![수학 문제](${url})\n\n` });
+      } catch {
+        alert('이미지 업로드에 실패했습니다.');
         setIsUploading(false);
         return;
       }
       setIsUploading(false);
     }
 
-    // 텍스트 part 추가
     if (input.trim()) {
       parts.push({ type: 'text', text: input });
     }
 
-    // imagePath를 body에 같이 넘겨서 서버가 onFinish에서 삭제할 수 있게 함
-    sendMessage({
-      role: 'user',
-      parts,
-    } as any);
+    sendMessage({ role: 'user', parts } as any);
 
-    // PostHog: 메시지 전송 이벤트
     posthog.capture('message_sent', {
       has_image: !!imagePath,
       message_length: input.trim().length,
       message_count: messages.length + 1,
+      session_id: currentSessionId,
     });
 
     setInput('');
     clearImage();
   };
 
-  // 메시지 텍스트 추출 헬퍼
+  // ── 메시지 텍스트 추출 헬퍼 ──
   const getMessageText = (msg: any): string => {
     if (typeof msg.content === 'string') return msg.content;
     if (msg.parts) {
-      return msg.parts
-        .filter((p: any) => p.type === 'text')
-        .map((p: any) => p.text)
-        .join('');
+      return msg.parts.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('');
     }
     return '';
   };
 
-  // 메시지에서 이미지 URL 추출 헬퍼
   const getMessageImages = (msg: any): string[] => {
     const text = getMessageText(msg);
-    // Markdown 이미지 문법에서 URL 추출
     const regex = /!\[.*?\]\((https?:\/\/[^\s)]+)\)/g;
     const urls: string[] = [];
     let match;
-    while ((match = regex.exec(text)) !== null) {
-      urls.push(match[1]);
-    }
-    // parts에 file type이 있으면 그것도 추가 (폴백)
+    while ((match = regex.exec(text)) !== null) { urls.push(match[1]); }
     if (msg.parts) {
       for (const p of msg.parts) {
-        if (p.type === 'file' && p.mimeType?.startsWith('image/')) {
-          urls.push(p.data);
-        }
+        if (p.type === 'file' && p.mimeType?.startsWith('image/')) { urls.push(p.data); }
       }
     }
     return urls;
   };
 
-  // 이미지 URL을 제외한 순수 텍스트만 추출
   const getCleanText = (msg: any): string => {
     const text = getMessageText(msg);
-    // Markdown 이미지와 [첨부된...] 라벨 제거
     return text
       .replace(/\[첨부된 수학 문제 이미지\]\n?/g, '')
       .replace(/!\[.*?\]\(https?:\/\/[^\s)]+\)\n*/g, '')
@@ -271,31 +346,36 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-3xl mx-auto border-x border-zinc-200 bg-white shadow-xl shadow-zinc-100">
-      {/* Header */}
-      <div className="border-b px-6 py-4 bg-white/50 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between">
-        <div className="flex flex-col">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            AHA Socratic Tutor
-          </h1>
-          <span className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mt-0.5">
-            Open Source AI · Vision + Math
-          </span>
-        </div>
-
-        {isAdmin && (
-          <Link
-            href="/admin"
-            className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-all text-xs font-bold shadow-lg shadow-zinc-200"
-          >
-            <LayoutDashboard size={14} />
-            대시보드
-          </Link>
-        )}
-      </div>
-
+    <div className="flex flex-col h-full bg-white">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-zinc-50/50">
+        {!currentSessionId && (
+          <div className="max-w-3xl mx-auto bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-zinc-700 space-y-3">
+            <p className="font-semibold text-zinc-900">세션 시작 전 데이터 수집 동의를 확인합니다.</p>
+            <label className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                checked={hasStudentConsent}
+                onChange={(e) => setHasStudentConsent(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span>
+                내 대화 로그와 병목 데이터를 학습 진단 및 모델 개선에 활용하는 것에 동의합니다.
+                동의하지 않아도 세션은 시작되며, 이 경우 학습용 데이터로는 사용되지 않습니다.
+              </span>
+            </label>
+            {consentError && (
+              <p className="text-xs text-red-600">{consentError}</p>
+            )}
+          </div>
+        )}
+
+        {pendingProblemSavedNotice && (
+          <div className="max-w-3xl mx-auto bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3 text-sm text-blue-700">
+            {pendingProblemSavedNotice}
+          </div>
+        )}
+
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
             <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-4">
@@ -337,21 +417,12 @@ export default function ChatInterface() {
                       : 'bg-white border border-zinc-100 text-zinc-800 rounded-tl-sm'
                   )}
                 >
-                  {/* 이미지 첨부 표시 */}
                   {m.role === 'user' && images.map((src: string, idx: number) => (
-                    <img
-                      key={idx}
-                      src={src}
-                      alt="수학 문제"
-                      className="rounded-lg mb-3 max-h-64 object-contain"
-                    />
+                    <img key={idx} src={src} alt="수학 문제" className="rounded-lg mb-3 max-h-64 object-contain" />
                   ))}
 
-                  {/* 텍스트 */}
                   {m.role === 'user' ? (
-                    cleanText && (
-                      <div className="whitespace-pre-wrap leading-relaxed text-[15px]">{cleanText}</div>
-                    )
+                    cleanText && <div className="whitespace-pre-wrap leading-relaxed text-[15px]">{cleanText}</div>
                   ) : (
                     <div className="prose prose-sm prose-zinc max-w-none text-[15px] leading-relaxed">
                       <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
@@ -384,33 +455,38 @@ export default function ChatInterface() {
           </div>
         )}
 
-        {/* 에러 상태 및 다시 시도 버튼 */}
+        {/* 초기화 중 로딩 */}
+        {isInitializing && (
+          <div className="flex items-center justify-center gap-3 p-6">
+            <Loader2 size={20} className="animate-spin text-blue-500" />
+            <span className="text-sm text-zinc-500 font-medium">문제를 분석하고 있습니다...</span>
+          </div>
+        )}
+
         {error && (
-          <div className="flex flex-col items-center gap-3 p-6 bg-red-50 rounded-2xl border border-red-100 animate-in fade-in slide-in-from-bottom-2">
-            <div className="flex items-center gap-2 text-red-600 font-medium whitespace-pre-wrap text-center text-sm">
+          <div className="flex flex-col items-center gap-3 p-6 bg-red-50 rounded-2xl border border-red-100">
+            <div className="flex items-center gap-2 text-red-600 font-medium text-sm">
               <X size={18} className="shrink-0" />
-              <span>답변을 생성하는 중에 문제가 발생했습니다. (네트워크 혹은 서버 오류)</span>
+              <span>답변을 생성하는 중에 문제가 발생했습니다.</span>
             </div>
             <button
               onClick={() => regenerate()}
               className="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all text-sm font-bold shadow-lg shadow-red-600/20 active:scale-95"
             >
-              <Loader2 size={16} className={cn(isLoading && "animate-spin")} />
+              <Loader2 size={16} className={cn(isLoading && 'animate-spin')} />
               다시 시도하기
             </button>
           </div>
         )}
+
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Image Preview */}
       {imagePreview && (
         <div className="px-4 pt-3 bg-white border-t border-zinc-100">
           <div className="relative inline-block">
-            <img
-              src={imagePreview}
-              alt="업로드할 이미지"
-              className="h-24 rounded-lg object-cover border border-zinc-200"
-            />
+            <img src={imagePreview} alt="업로드할 이미지" className="h-24 rounded-lg object-cover border border-zinc-200" />
             <button
               onClick={clearImage}
               className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-md"
@@ -435,12 +511,10 @@ export default function ChatInterface() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
+            disabled={isUploading || isInitializing}
             className={cn(
               'p-2.5 rounded-full transition-colors shrink-0',
-              imageFile
-                ? 'bg-blue-100 text-blue-600'
-                : 'bg-zinc-100 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200'
+              imageFile ? 'bg-blue-100 text-blue-600' : 'bg-zinc-100 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200'
             )}
             title="수학 문제 사진 첨부"
           >
@@ -453,17 +527,20 @@ export default function ChatInterface() {
             onChange={(e) => {
               trackThinkingTime();
               setInput(e.target.value);
+              if (pendingProblemSavedNotice) {
+                setPendingProblemSavedNotice(null);
+              }
             }}
             placeholder={imageFile ? '사진에 대해 질문하세요...' : '수학 문제를 입력해주세요...'}
-            disabled={isLoading || isUploading}
+            disabled={isLoading || isUploading || isInitializing}
           />
 
           <button
             type="submit"
-            disabled={isLoading || isUploading || (!input.trim() && !imageFile)}
+            disabled={isLoading || isUploading || isInitializing || (!input.trim() && !imageFile)}
             className="absolute right-2 p-2.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:hover:bg-blue-600 transition-colors shadow-md shadow-blue-600/20"
           >
-            {isUploading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+            {(isUploading || isInitializing) ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
           </button>
         </form>
         <div className="text-center mt-3">

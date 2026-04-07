@@ -5,7 +5,7 @@ export default function HintLogPage() {
         <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">풀이 버튼 분석</h1>
         <p className="text-zinc-500 mt-2 text-sm">
           학생들이 어떤 단계에서 병목(Wheel-spinning)을 느끼고 &apos;전체 풀이 보기&apos;를 눌렀는지 분석합니다.
-          <br />발화 유형별 힌트 수용도와 node_posterior 분포를 통해 힌트의 적절성을 검증합니다.
+          <br />병목 개념, 미해결 비율, 세션 종료 상태를 기준으로 힌트의 적절성을 검증합니다.
         </p>
       </div>
 

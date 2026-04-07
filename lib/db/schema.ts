@@ -1,3 +1,10 @@
+// ============================================================
+// AHA v5 — Supabase Database Type Definitions
+// ============================================================
+// init.sql의 6개 테이블 구조를 TypeScript로 1:1 대응시킨 타입입니다.
+// Supabase JS v2.101+ 호환 구조.
+// ============================================================
+
 export type Json =
   | string
   | number
@@ -6,114 +13,274 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
+      // ── Table 0: strategy_graphs ──
       strategy_graphs: {
         Row: {
-          id: string
-          problem_id: string
+          problem_hash: string
+          required_concepts: string[]
+          base_difficulty: number
+          intended_path: string[]
           graph_data: Json
           is_human_verified: boolean
           created_at: string
         }
         Insert: {
-          id?: string
-          problem_id: string
-          graph_data: Json
-          is_human_verified?: boolean
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          problem_id?: string
+          problem_hash: string
+          required_concepts?: string[]
+          base_difficulty: number
+          intended_path?: string[]
           graph_data?: Json
           is_human_verified?: boolean
           created_at?: string
         }
+        Update: {
+          problem_hash?: string
+          required_concepts?: string[]
+          base_difficulty?: number
+          intended_path?: string[]
+          graph_data?: Json
+          is_human_verified?: boolean
+          created_at?: string
+        }
+        Relationships: []
       }
-      operations: {
+
+      // ── Table 1: concept_nodes_reference ──
+      concept_nodes_reference: {
         Row: {
           id: string
-          session_id: string
-          student_id: string
-          chunk_index: number
-          dialog_transcript: string
-          node_posterior: Json // 확률 분포 등
+          concept_code: string
+          node_type: string
+          title: string
+          description: string
+          keywords: string[]
+          prerequisites: string[]
+          examples_of_use: string[]
+          embedding: number[] | null
           created_at: string
         }
         Insert: {
           id?: string
-          session_id: string
-          student_id: string
-          chunk_index: number
-          dialog_transcript: string
-          node_posterior?: Json
+          concept_code: string
+          node_type?: string
+          title?: string
+          description: string
+          keywords?: string[]
+          prerequisites?: string[]
+          examples_of_use?: string[]
+          embedding?: number[] | null
           created_at?: string
         }
         Update: {
           id?: string
-          session_id?: string
+          concept_code?: string
+          node_type?: string
+          title?: string
+          description?: string
+          keywords?: string[]
+          prerequisites?: string[]
+          examples_of_use?: string[]
+          embedding?: number[] | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+
+      // ── Table 2: tutoring_sessions ──
+      tutoring_sessions: {
+        Row: {
+          id: string
+          student_id: string
+          problem_hash: string
+          extracted_text: string
+          session_status: string
+          has_student_consent: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          student_id: string
+          problem_hash: string
+          extracted_text: string
+          session_status?: string
+          has_student_consent?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
           student_id?: string
-          chunk_index?: number
-          dialog_transcript?: string
-          node_posterior?: Json
+          problem_hash?: string
+          extracted_text?: string
+          session_status?: string
+          has_student_consent?: boolean
           created_at?: string
+          updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "tutoring_sessions_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tutoring_sessions_problem_hash_fkey"
+            columns: ["problem_hash"]
+            isOneToOne: false
+            referencedRelation: "strategy_graphs"
+            referencedColumns: ["problem_hash"]
+          },
+        ]
       }
-      validations: {
+
+      // ── Table 3: dialogue_logs ──
+      dialogue_logs: {
         Row: {
           id: string
           session_id: string
-          raw_transcript: string
+          speaker: string
+          message_text: string
           created_at: string
         }
         Insert: {
           id?: string
           session_id: string
-          raw_transcript: string
+          speaker: string
+          message_text: string
           created_at?: string
         }
         Update: {
           id?: string
           session_id?: string
-          raw_transcript?: string
+          speaker?: string
+          message_text?: string
           created_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "dialogue_logs_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "tutoring_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      review_queue: {
+
+      // ── Table 4: learning_bottlenecks ──
+      learning_bottlenecks: {
         Row: {
           id: string
           session_id: string
-          graph_id: string
-          status: 'pending' | 'approved' | 'rejected'
+          mapped_concept_id: string
+          candidate_matches: Json
+          struggle_description: string
+          searchable_vector: number[]
+          is_resolved_by_student: boolean
           created_at: string
         }
         Insert: {
           id?: string
           session_id: string
-          graph_id: string
-          status?: 'pending' | 'approved' | 'rejected'
+          mapped_concept_id: string
+          candidate_matches?: Json
+          struggle_description: string
+          searchable_vector: number[]
+          is_resolved_by_student?: boolean
           created_at?: string
         }
         Update: {
           id?: string
           session_id?: string
-          graph_id?: string
-          status?: 'pending' | 'approved' | 'rejected'
+          mapped_concept_id?: string
+          candidate_matches?: Json
+          struggle_description?: string
+          searchable_vector?: number[]
+          is_resolved_by_student?: boolean
           created_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "learning_bottlenecks_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "tutoring_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+
+      // ── Table 5: session_reports ──
+      session_reports: {
+        Row: {
+          id: string
+          session_id: string
+          mastered_concepts: string[]
+          aha_moments: Json
+          ai_tutor_summary: string
+          performance_metrics: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          session_id: string
+          mastered_concepts?: string[]
+          aha_moments?: Json
+          ai_tutor_summary: string
+          performance_metrics?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          session_id?: string
+          mastered_concepts?: string[]
+          aha_moments?: Json
+          ai_tutor_summary?: string
+          performance_metrics?: Json
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_reports_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "tutoring_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
+
     Views: {
       [_ in never]: never
     }
+
     Functions: {
-      [_ in never]: never
+      match_concept_nodes: {
+        Args: {
+          query_embedding: string
+          match_threshold?: number
+          match_count?: number
+        }
+        Returns: {
+          id: string
+          concept_code: string
+          description: string
+          similarity: number
+        }[]
+      }
     }
+
     Enums: {
       [_ in never]: never
     }
+
     CompositeTypes: {
       [_ in never]: never
     }

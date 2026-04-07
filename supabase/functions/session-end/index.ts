@@ -1,7 +1,7 @@
 // ============================================================
 // AHA v5 — Supabase Edge Function: session-end
 // ============================================================
-// 역할: 대화 세션 종료 시 데이터를 각 테이블로 분배하고 리포트를 생성합니다.
+// 역할: 대화 세션 종료 시 리포트 생성용 집계 데이터를 수집합니다.
 // ============================================================
 
 // @ts-ignore: Deno runtime
@@ -28,36 +28,46 @@ serve(async (req: any) => {
       { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     )
 
-    const { sessionId, studentId, messages, fullTranscript } = await req.json()
+    const { sessionId } = await req.json()
 
     console.log(`[session-end] 세션 종료 처리 중: ${sessionId}`)
 
-    // 1. [Validations] 전체 원문 대화 저장
-    const { error: validationError } = await supabaseClient
-      .from('validations')
-      .insert({
-        session_id: sessionId,
-        raw_transcript: fullTranscript || JSON.stringify(messages),
-      })
-    if (validationError) throw validationError
+    const { data: session, error: sessionError } = await supabaseClient
+      .from('tutoring_sessions')
+      .select('id, session_status')
+      .eq('id', sessionId)
+      .maybeSingle()
+    if (sessionError) throw sessionError
 
-    // 2. [Operations/Chunks] 대화 5개 덩어리 분해 (추후 논의될 분류 id 체계 반영)
-    // 예시: 0-20%, 20-40%, 40-60%, 60-80%, 80-100% 진행 상황 분동
-    // 현재는 뼈대만 구축
-    console.log('[session-end] Operations 데이터 분배 준비...')
+    const { data: logs, error: logsError } = await supabaseClient
+      .from('dialogue_logs')
+      .select('speaker, message_text, created_at')
+      .eq('session_id', sessionId)
+      .order('created_at', { ascending: true })
+    if (logsError) throw logsError
 
-    // 3. [Review Queue] LLM 생성 전략 그래프 등록 (Pending 상태)
-    // 대화 내용을 바탕으로 새로운 그래프 패턴이 발견되었을 경우 등록
-    // await supabaseClient.from('review_queue').insert({ ... })
+    const { data: bottlenecks, error: bottlenecksError } = await supabaseClient
+      .from('learning_bottlenecks')
+      .select('mapped_concept_id, struggle_description, is_resolved_by_student, created_at')
+      .eq('session_id', sessionId)
+      .order('created_at', { ascending: true })
+    if (bottlenecksError) throw bottlenecksError
 
-    // 4. [Insight Agent] Huggingface 모델을 통한 3종 리포트 생성 (가이드)
-    // ┌─ 학생용: 오늘 배운 개념 요약 및 격려
-    // ├─ 튜터용: 학생의 막힌 부분 및 다음 학습 제언
-    // └─ 학부모용: 학습 태도 및 성취도 요약
-    console.log('[session-end] Insight Agent 리포트 생성 시작...')
+    console.log('[session-end] 리포트 생성을 위한 집계 준비 완료', {
+      sessionId,
+      sessionStatus: session?.session_status,
+      logCount: logs?.length ?? 0,
+      bottleneckCount: bottlenecks?.length ?? 0,
+    })
 
     return new Response(
-      JSON.stringify({ success: true, message: '세션 데이터 처리가 완료되었습니다.' }),
+      JSON.stringify({
+        success: true,
+        message: '세션 리포트용 데이터 집계가 완료되었습니다.',
+        sessionStatus: session?.session_status ?? null,
+        logCount: logs?.length ?? 0,
+        bottleneckCount: bottlenecks?.length ?? 0,
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error: any) {

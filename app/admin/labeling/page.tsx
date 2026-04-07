@@ -1,40 +1,86 @@
-export default function LabelingPage() {
+import { getSupabaseAdmin } from '@/lib/supabase/client';
+import ConceptNodeImporter from '@/app/admin/_components/concept-node-importer';
+import EmbeddingGenerator from '@/app/admin/_components/embedding-generator';
+import StrategyVerifyList from '@/app/admin/_components/strategy-verify-list';
+
+export const dynamic = 'force-dynamic';
+
+export default async function LabelingPage() {
+  const supabase = getSupabaseAdmin();
+
+  const { count: totalConceptNodes } = await supabase
+    .from('concept_nodes_reference')
+    .select('*', { count: 'exact', head: true });
+
+  const { count: nullEmbeddingCount } = await supabase
+    .from('concept_nodes_reference')
+    .select('*', { count: 'exact', head: true })
+    .is('embedding', null);
+
+  const { data: strategyGraphs } = await supabase
+    .from('strategy_graphs')
+    .select('problem_hash, is_human_verified, required_concepts, base_difficulty, created_at')
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  const verifiedCount = strategyGraphs?.filter((item) => item.is_human_verified).length ?? 0;
+  const pendingCount = (strategyGraphs?.length ?? 0) - verifiedCount;
+
   return (
     <div className="p-8 lg:p-12 max-w-7xl mx-auto space-y-8">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">라벨링 검수 큐</h1>
+          <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">라벨링 · 문제 은행</h1>
           <p className="text-zinc-500 mt-2 text-sm max-w-2xl">
-            GPT-4o가 실시간으로 생성한 <span className="text-blue-600 font-semibold font-mono">llm_generated</span> 전략 그래프와 5덩어리 데이터를 검토합니다.
-            <br />튜터가 승인(Verify)한 데이터만 <span className="text-green-600 font-semibold font-mono">human_verified</span> 상태로 전환되며 향후 Fine-tuning 데이터셋으로 사용됩니다.
+            개념 노드 사전과 전략 그래프 문제 은행을 한 화면에서 관리합니다.
+            <br />노드 임포트, 임베딩 생성, 전략 그래프 검수를 이 경로에서 처리합니다.
           </p>
         </div>
         <div className="flex gap-2">
           <div className="bg-amber-50 border border-amber-200 px-4 py-2 rounded-xl text-center">
             <span className="text-xs text-amber-600 font-bold block">검토 대기</span>
-            <span className="text-xl font-bold text-amber-700">24</span>
+            <span className="text-xl font-bold text-amber-700">{pendingCount}</span>
           </div>
           <div className="bg-green-50 border border-green-200 px-4 py-2 rounded-xl text-center">
-            <span className="text-xs text-green-600 font-bold block">오늘 승인</span>
-            <span className="text-xl font-bold text-green-700">12</span>
+            <span className="text-xs text-green-600 font-bold block">검증 완료</span>
+            <span className="text-xl font-bold text-green-700">{verifiedCount}</span>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden min-h-[400px] flex flex-col items-center justify-center text-center p-12">
-        <div className="max-w-md space-y-4">
-          <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-2xl">🏷️</span>
-          </div>
-          <h3 className="text-lg font-semibold text-zinc-900">검토할 큐가 비어있습니다</h3>
-          <p className="text-zinc-500 text-sm">
-            현재 모든 <span className="font-mono text-xs bg-zinc-100 px-1 rounded">llm_generated</span> 세션이 검토 완료되었습니다.
-            새로운 실시간 대화 데이터가 들어오면 여기에 자동으로 등록됩니다.
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-zinc-100">
+          <h2 className="text-lg font-bold text-zinc-900">📦 개념 노드 임포터</h2>
+          <p className="text-sm text-zinc-500 mt-1">
+            JSON 배열을 붙여넣고 [DB 삽입] 버튼을 누르면 concept_nodes_reference 테이블에 upsert 됩니다.
           </p>
-          <button className="mt-4 px-6 py-2 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors">
-            강제 새로고침
-          </button>
         </div>
+        <div className="p-6 space-y-6">
+          <ConceptNodeImporter />
+
+          <div className="pt-4 border-t border-zinc-100">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="text-sm font-semibold text-zinc-700">벡터 임베딩 상태</h3>
+                <p className="text-xs text-zinc-500 mt-0.5">
+                  미생성: <span className={`font-bold ${(nullEmbeddingCount || 0) > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>{nullEmbeddingCount || 0}개</span>
+                  {' / '}전체: {totalConceptNodes || 0}개
+                </p>
+              </div>
+            </div>
+            <EmbeddingGenerator />
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-zinc-100">
+          <h2 className="text-lg font-bold text-zinc-900">🧩 문제 은행 (Strategy Graphs)</h2>
+          <p className="text-sm text-zinc-500 mt-1">
+            등록된 문제 목록입니다. 토글을 눌러 검증 상태(is_human_verified)를 즉시 변경할 수 있습니다.
+          </p>
+        </div>
+        <StrategyVerifyList initialData={strategyGraphs || []} />
       </div>
     </div>
   );
