@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "AHA Socratic Tutor",
-  description: "AI 수학 소크라틱 튜터 — 스스로 생각하며 풀 수 있도록 도와드립니다",
+  description: "AHA 소크라틱 튜터 — 정답을 주지 않습니다.",
 };
 
 export default function RootLayout({

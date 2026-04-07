@@ -12,6 +12,7 @@ import { bottleneckDetectionPrompt } from './prompts';
 import { getSupabaseAdmin } from '@/lib/supabase/client';
 import { CHAT_CONTEXT_WINDOW_SIZE, RAG_SIMILARITY_THRESHOLD } from '@/lib/constants';
 import crypto from 'crypto';
+import { after } from 'next/server';
 
 const RAG_MATCH_COUNT = 3;
 
@@ -104,6 +105,39 @@ export async function createTutoringSession({
   hasStudentConsent: boolean;
 }) {
   const supabase = getSupabaseAdmin();
+
+  // 1. 기존 진행 중인 세션들(in_progress) 찾기
+  const { data: activeSessions } = await supabase
+    .from('tutoring_sessions')
+    .select('id, problem_hash')
+    .eq('student_id', studentId)
+    .eq('session_status', 'in_progress');
+
+  // 2. 기존 세션들을 abandoned 상태로 변경하고, 배경 분석(Lazy Loading) 예약
+  if (activeSessions && activeSessions.length > 0) {
+    const activeIds = activeSessions.map(s => s.id);
+    
+    await supabase
+      .from('tutoring_sessions')
+      .update({ 
+        session_status: 'abandoned',
+        updated_at: new Date().toISOString()
+      })
+      .in('id', activeIds);
+
+    // edge/serverless 환경에서는 next/after를 사용하여 
+    // 비동기 백그라운드 태스크가 안전하게 실행되도록 보장합니다
+    after(() => {
+      activeSessions.forEach(async (session) => {
+        console.log(`[ai-service] 이전 세션 자동 일시정지 및 분석 시작: ${session.id}`);
+        await extractAndUpdateRequiredConcepts({
+          sessionId: session.id,
+          problemHash: session.problem_hash,
+        });
+      });
+    });
+  }
+
   const { data, error } = await supabase
     .from('tutoring_sessions')
     .insert({
