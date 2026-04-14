@@ -89,3 +89,10 @@ AGENTS.md
 supabase/.temp/
 supabase/storage/
 supabase/debug/
+
+# Scratch & Dev Utilities
+/scratch/
+/scripts/*.ts
+/scripts/*.js
+/scripts/data/*.json
+
