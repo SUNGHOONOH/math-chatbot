@@ -1,18 +1,8 @@
-// ============================================================
-// AHA v5 — AI Service Layer (초경량 3+1 DB 구조 대응)
-// ============================================================
-// Route 1: OCR, 전략 그래프 탐색, 세션 생성
-// Route 2: 병목 감지 (RAG 벡터 매칭 + learning_bottlenecks INSERT)
-// ============================================================
-
-import { generateText } from 'ai';
-import { huggingface } from '@ai-sdk/huggingface';
-import { VISION_MODEL, TAGGING_MODEL, EMBEDDING_MODEL } from './models';
-import { bottleneckDetectionPrompt } from './prompts';
+import { VISION_MODEL, TAGGING_MODEL, EMBEDDING_MODEL, TEXT_MODEL } from './models';
+import { buildBottleneckDetectionPrompt } from './prompts';
 import { getSupabaseAdmin } from '@/lib/supabase/client';
 import { CHAT_CONTEXT_WINDOW_SIZE, RAG_SIMILARITY_THRESHOLD } from '@/lib/constants';
 import crypto from 'crypto';
-import { after } from 'next/server';
 
 const RAG_MATCH_COUNT = 3;
 
@@ -24,26 +14,214 @@ export function generateProblemHash(text: string): string {
 }
 
 /**
+ * [Core] HuggingFace 통합 API 호출 엔진
+ */
+async function hfFetch(url: string, body: any, options?: { timeoutMs?: number }) {
+  const controller = new AbortController();
+  const timeoutMs = options?.timeoutMs;
+  const timeoutId = timeoutMs
+    ? setTimeout(() => controller.abort(`timeout:${timeoutMs}`), timeoutMs)
+    : null;
+
+  let response: Response;
+
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if ((error as any)?.name === 'AbortError') {
+      throw new Error(`요청 시간 초과 (${timeoutMs}ms)`);
+    }
+
+    throw error;
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`HF API Error: ${response.status} - ${errorText}`);
+  }
+
+  return response;
+}
+
+/**
+ * [Core] 단일 텍스트 생성 전용 헬퍼
+ */
+export async function hfGenerateText({
+  model,
+  inputs,
+  parameters = { max_new_tokens: 1024, temperature: 0.3 },
+  isVision = false,
+  system,
+  timeoutMs,
+}: {
+  model: string;
+  inputs: any;
+  parameters?: any;
+  isVision?: boolean;
+  system?: string;
+  timeoutMs?: number;
+}): Promise<string> {
+  const url = `https://router.huggingface.co/v1/chat/completions`;
+  const messages = isVision 
+    ? [
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: inputs.text || '이미지 안의 정보를 추출하세요.' },
+            { type: 'image_url', image_url: { url: inputs.image } },
+          ],
+        },
+      ]
+    : [
+        ...(system ? [{ role: 'system', content: system }] : []),
+        { role: 'user', content: typeof inputs === 'string' ? inputs : JSON.stringify(inputs) }
+      ];
+
+  try {
+    const response = await hfFetch(
+      url,
+      {
+        model,
+        messages,
+        max_tokens: parameters.max_new_tokens || 1024,
+        temperature: parameters.temperature || 0.3,
+      },
+      { timeoutMs }
+    );
+
+    const result = await response.json();
+    return result.choices?.[0]?.message?.content?.trim() || '';
+  } catch (err) {
+    throw new Error(`[hfGenerateText] 호출 실패 (${model}): ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+/**
+ * [공통] HuggingFace Inference API 스트리밍 헬퍼
+ */
+export async function hfStreamText({
+  model,
+  messages,
+  system,
+  onFinish,
+}: {
+  model: string;
+  messages: any[];
+  system?: string;
+  onFinish?: (text: string) => void;
+}): Promise<ReadableStream> {
+  const url = `https://router.huggingface.co/v1/chat/completions`;
+  
+  const formattedMessages = system 
+    ? [{ role: 'system', content: system }, ...messages]
+    : messages;
+
+  try {
+    const response = await hfFetch(url, {
+      model,
+      messages: formattedMessages,
+      max_tokens: 1024,
+      temperature: 0.7,
+      stream: true,
+    });
+
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+
+    return new ReadableStream({
+      async start(controller) {
+        if (!reader) return;
+        let fullText = '';
+        try {
+          let partialChunk = '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const chunk = partialChunk + decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n');
+            partialChunk = lines.pop() || '';
+            
+            for (const line of lines) {
+              const trimmedLine = line.trim();
+              if (!trimmedLine || trimmedLine === 'data: [DONE]') continue;
+              
+              if (trimmedLine.startsWith('data: ')) {
+                try {
+                  const data = JSON.parse(trimmedLine.slice(6));
+                  const content = data.choices?.[0]?.delta?.content || '';
+                  if (content) {
+                    fullText += content;
+                    controller.enqueue(`0:${JSON.stringify(content)}\n`);
+                  }
+                } catch (e) {
+                  // 파싱 실패시 무시
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error(`[hfStreamText] 스트림 중단 에러 (${model}):`, err);
+          controller.error(err);
+        } finally {
+          onFinish?.(fullText.trim());
+          controller.close();
+        }
+      },
+    });
+  } catch (err) {
+    throw new Error(`[hfStreamText] 초기화 실패 (${model}): ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+function isPdfUrl(url: string): boolean {
+  try {
+    const pathname = new URL(url).pathname.toLowerCase();
+    return pathname.endsWith('.pdf');
+  } catch {
+    return url.toLowerCase().split('?')[0].endsWith('.pdf');
+  }
+}
+
+/**
  * [Route 1] VISION_MODEL을 사용하여 이미지에서 LaTeX 및 텍스트 추출
  */
 export async function performOCR(imageUrls: string[]): Promise<string> {
   if (imageUrls.length === 0) return '';
 
-  const { text } = await generateText({
-    model: huggingface(VISION_MODEL),
-    messages: [
-      {
-        role: 'user',
-        content: [
-          ...imageUrls.map(url => ({ type: 'image' as const, image: new URL(url) })),
-          { type: 'text' as const, text: '이미지에서 모든 수학 문제의 텍스트와 수식을 LaTeX 형식으로 추출해 주세요. 텍스트만 출력하세요.' },
-        ],
+  try {
+    console.log(`[ai-service] OCR 시도 중 (${VISION_MODEL})...`);
+    
+    const text = await hfGenerateText({
+      model: VISION_MODEL,
+      inputs: {
+        image: imageUrls[0],
+        text: '이미지 안의 수학 문제를 가능한 한 정확히 OCR 하세요. 수식은 LaTeX로 보존하고, 문제 원문은 줄바꿈을 유지하세요. 설명 없이 문제 텍스트만 출력하세요.',
       },
-    ],
-  });
+      parameters: { max_new_tokens: 2048 },
+      isVision: true,
+      timeoutMs: 45000,
+    });
 
-  return text.trim();
+    return text.trim();
+  } catch (error) {
+    throw new Error(`OCR 분석 실패 (${VISION_MODEL}): ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
+
+export { isPdfUrl };
 
 export function normalizeProblemText(text: string): string {
   return text.trim();
@@ -113,7 +291,7 @@ export async function createTutoringSession({
     .eq('student_id', studentId)
     .eq('session_status', 'in_progress');
 
-  // 2. 기존 세션들을 abandoned 상태로 변경하고, 배경 분석(Lazy Loading) 예약
+  // 2. 기존 세션들을 abandoned 상태로 변경 (분석은 세션 리포트 조회 시 온디맨드로 처리)
   if (activeSessions && activeSessions.length > 0) {
     const activeIds = activeSessions.map(s => s.id);
     
@@ -125,17 +303,7 @@ export async function createTutoringSession({
       })
       .in('id', activeIds);
 
-    // edge/serverless 환경에서는 next/after를 사용하여 
-    // 비동기 백그라운드 태스크가 안전하게 실행되도록 보장합니다
-    after(() => {
-      activeSessions.forEach(async (session) => {
-        console.log(`[ai-service] 이전 세션 자동 일시정지 및 분석 시작: ${session.id}`);
-        await extractAndUpdateRequiredConcepts({
-          sessionId: session.id,
-          problemHash: session.problem_hash,
-        });
-      });
-    });
+    console.log(`[ai-service] 이전 세션 ${activeIds.length}개 일시정지 완료. 분석은 리포트 조회 시 수행됩니다.`);
   }
 
   const { data, error } = await supabase
@@ -226,28 +394,24 @@ export function getSlidingWindowMessages<T>(messages: T[]): T[] {
 }
 
 /**
- * HuggingFace Inference API를 사용하여 텍스트 임베딩 생성 (1536차원)
+ * HuggingFace Inference API를 사용하여 텍스트 임베딩 생성 (1024차원)
+ * multilingual-e5-large-instruct 모델은 입력 데이터의 성격에 따라 프리픽스를 붙입니다.
+ * type이 'passage'인 경우 "passage: "를, 'query'인 경우 "query: "를 붙여 매칭 성능을 최적화합니다.
  */
-export async function generateEmbedding(text: string): Promise<number[]> {
-  const response = await fetch(
-    `https://api-inference.huggingface.co/pipeline/feature-extraction/${EMBEDDING_MODEL}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ inputs: text }),
-    }
-  );
+export async function generateEmbedding(text: string, type: 'query' | 'passage' = 'passage'): Promise<number[]> {
+  const prefix = type === 'query' ? 'query: ' : 'passage: ';
+  
+  try {
+    const response = await hfFetch(`https://router.huggingface.co/v1/embeddings`, { 
+      model: EMBEDDING_MODEL,
+      input: prefix + text.trim() 
+    });
 
-  if (!response.ok) {
-    throw new Error(`임베딩 생성 실패: ${response.statusText}`);
+    const embedding = await response.json();
+    return Array.isArray(embedding[0]) ? embedding[0] : embedding;
+  } catch (err) {
+    throw new Error(`임베딩 생성 실패 (${EMBEDDING_MODEL}): ${err instanceof Error ? err.message : String(err)}`);
   }
-
-  const embedding = await response.json();
-  // HF feature-extraction은 [[...]] 형태로 반환할 수 있음
-  return Array.isArray(embedding[0]) ? embedding[0] : embedding;
 }
 
 /**
@@ -261,34 +425,48 @@ export async function generateEmbedding(text: string): Promise<number[]> {
  */
 export async function runBottleneckDetection({
   sessionId,
+  problemText,
   messages,
 }: {
   sessionId: string;
+  problemText: string;
   messages: Array<{ role: string; content: string }>;
 }) {
   try {
     // 1. Tagging LLM 호출: 대화에서 병목 지점 식별
     const turnContent = messages
-      .map(m => `${m.role}: ${m.content}`)
+      .map((m, index) => {
+        const speaker = m.role === 'assistant' ? 'AI' : '학생';
+        return `[T${index + 1}] ${speaker}: ${m.content}`;
+      })
       .join('\n');
 
-    const { text } = await generateText({
-      model: huggingface(TAGGING_MODEL),
-      system: bottleneckDetectionPrompt,
-      prompt: turnContent,
+    const text = await hfGenerateText({
+      model: TAGGING_MODEL,
+      inputs: `${buildBottleneckDetectionPrompt(problemText)}\n\n대화 내용:\n${turnContent}\n\n결과 (JSON):`,
+      parameters: { max_new_tokens: 2048, temperature: 0.1 },
     });
 
     // 2. JSON 파싱 (LLM 응답에서 구조화된 데이터 추출)
+    // 마크다운 코드블록, 앞뒤 텍스트, 중간 잘림 등에 강인하게 처리
     let detectionResult = {
       has_bottleneck: false,
+      bottleneck_type: 'UNKNOWN',
+      bottleneck_title: '',
       struggle_description: '',
+      evidence: [] as string[],
       is_resolved: false,
+      resolution_signal: '',
+      confidence: 0,
     };
 
     try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        detectionResult = JSON.parse(jsonMatch[0]);
+      const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      const rawJson = codeBlockMatch
+        ? codeBlockMatch[1]
+        : text.match(/\{[\s\S]*\}/)?.[0];
+      if (rawJson) {
+        detectionResult = JSON.parse(rawJson);
       }
     } catch (e) {
       console.error('[ai-service] Tagging JSON 파싱 에러:', e);
@@ -301,8 +479,24 @@ export async function runBottleneckDetection({
       return;
     }
 
+    const normalizedType =
+      typeof detectionResult.bottleneck_type === 'string' && detectionResult.bottleneck_type.trim()
+        ? detectionResult.bottleneck_type.trim().toUpperCase()
+        : 'UNKNOWN';
+    const normalizedTitle =
+      typeof detectionResult.bottleneck_title === 'string'
+        ? detectionResult.bottleneck_title.trim()
+        : '';
+    const normalizedDescription = detectionResult.struggle_description.trim();
+    const ragReadyDescription = normalizedDescription.includes('|')
+      ? normalizedDescription
+      : `${normalizedType} | ${normalizedDescription}`;
+    const storageDescription = normalizedTitle
+      ? `${ragReadyDescription} (${normalizedTitle})`
+      : ragReadyDescription;
+
     // 4. 임베딩 생성 (struggle_description → vector)
-    const embedding = await generateEmbedding(detectionResult.struggle_description);
+    const embedding = await generateEmbedding(storageDescription);
 
     // 5. RAG 벡터 매칭: concept_nodes_reference에서 상위 3개 후보 검색
     const supabase = getSupabaseAdmin();
@@ -338,7 +532,7 @@ export async function runBottleneckDetection({
         session_id: sessionId,
         mapped_concept_id: mappedConceptId,
         candidate_matches: candidateMatches,
-        struggle_description: detectionResult.struggle_description,
+        struggle_description: storageDescription,
         searchable_vector: embedding,
         is_resolved_by_student: detectionResult.is_resolved || false,
       });
@@ -407,18 +601,21 @@ export async function extractAndUpdateRequiredConcepts({
 
     // 4. Tagging LLM 호출: required_concepts만 추출
     const { conceptExtractionPrompt } = await import('./prompts');
-    const { text } = await generateText({
-      model: huggingface(TAGGING_MODEL),
-      system: conceptExtractionPrompt,
-      prompt: contextForLLM,
+    const text = await hfGenerateText({
+      model: TAGGING_MODEL,
+      inputs: `${conceptExtractionPrompt}\n\n컨텍스트:\n${contextForLLM}\n\n결과 (JSON):`,
+      parameters: { max_new_tokens: 2048, temperature: 0.1 },
     });
 
-    // 5. JSON 파싱
+    // 5. JSON 파싱 (마크다운 코드블록 및 앞뒤 텍스트에 강인하게 처리)
     let requiredConcepts: string[] = [];
     try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
+      const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      const rawJson = codeBlockMatch
+        ? codeBlockMatch[1]
+        : text.match(/\{[\s\S]*\}/)?.[0];
+      if (rawJson) {
+        const parsed = JSON.parse(rawJson);
         if (Array.isArray(parsed.required_concepts)) {
           requiredConcepts = parsed.required_concepts;
         }

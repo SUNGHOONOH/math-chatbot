@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { isUserAdmin } from '@/lib/auth';
+import { buildLoginPath, isUserAdmin, sanitizeRedirectPath } from '@/lib/auth';
 
 export default async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -36,18 +36,16 @@ export default async function proxy(request: NextRequest) {
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
   const isAuthCallback = request.nextUrl.pathname.startsWith('/auth/callback');
 
-  // 로그인이 안 되어 있는데 홈이나 어드민에 접근하려 하면 로그인 창으로 리다이렉트 (auth/callback은 통과)
+  // 로그인이 안 되어 있으면 로그인 후 원래 경로로 복귀할 수 있게 next 파라미터를 유지한다.
   if (!user && !isLoginRoute && !isAuthCallback) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    return NextResponse.redirect(url);
+    const nextPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
+    return NextResponse.redirect(new URL(buildLoginPath(nextPath), request.url));
   }
 
-  // 로그인 상태에서 로그인 창에 접근하려 하면 홈으로
+  // 로그인 상태에서 로그인 창에 접근하면 next 또는 홈으로 보낸다.
   if (user && isLoginRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/';
-    return NextResponse.redirect(url);
+    const nextPath = sanitizeRedirectPath(request.nextUrl.searchParams.get('next'));
+    return NextResponse.redirect(new URL(nextPath, request.url));
   }
 
   // 어드민 라우트 접근 시 관리자 이메일 확인

@@ -28,6 +28,7 @@ interface ConceptNode {
   concept_code: string;
   node_type?: string;
   title?: string;
+  definition?: string;
   description: string;
   keywords?: string[];
   prerequisites?: string[];
@@ -35,8 +36,11 @@ interface ConceptNode {
 }
 
 async function main() {
-  // 1. JSON 파일 읽기
-  const filePath = resolve(__dirname, 'concept_nodes.json');
+  // 1. 실행 시 인자로 파일명을 받을 수 있게 함 (기본값: concept_nodes_m1.json)
+  const argFile = process.argv[2];
+  const targetFile = argFile || 'concept_nodes_m1.json';
+  const filePath = resolve(__dirname, targetFile);
+  
   let nodes: ConceptNode[];
 
   try {
@@ -55,8 +59,9 @@ async function main() {
     .upsert(
       nodes.map((n) => ({
         concept_code: n.concept_code,
-        node_type: n.node_type || 'CU-PD',
+        node_type: n.node_type || 'PD',
         title: n.title || '',
+        definition: n.definition || '',
         description: n.description,
         keywords: n.keywords || [],
         prerequisites: n.prerequisites || [],

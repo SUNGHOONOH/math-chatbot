@@ -1,14 +1,16 @@
 import { createClient } from '@/lib/supabase/server';
+import { getSupabaseAdmin } from '@/lib/supabase/client';
 import type { SessionItem } from './sidebar';
 
 export default async function SessionList() {
   const supabase = await createClient();
+  const supabaseAdmin = getSupabaseAdmin();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) return null;
 
   // 1. 세션 목록 패칭 (최신순, 최대 30개)
-  const { data: rawSessions } = await supabase
+  const { data: rawSessions } = await supabaseAdmin
     .from('tutoring_sessions')
     .select('id, session_status, created_at, extracted_text')
     .eq('student_id', user.id)

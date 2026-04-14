@@ -1,17 +1,20 @@
 'use client';
 
 import { useState } from 'react';
+import { sanitizeRedirectPath } from '@/lib/auth';
 import { supabaseBrowser } from '@/lib/supabase/browser';
 import { Loader2, Mail } from 'lucide-react';
 
-export default function LoginForm() {
+interface LoginFormProps {
+  nextPath?: string;
+}
+
+export default function LoginForm({ nextPath = '/' }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // 환경 변수에서 관리자 이메일 가져오기
-  const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+  const safeNextPath = sanitizeRedirectPath(nextPath);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,25 +36,28 @@ export default function LoginForm() {
         if (signUpError) {
           setError(signUpError.message);
         } else {
-          // 회원가입 직후 무조건 홈으로 이동 (관리자 여부는 홈에서 체크)
-          window.location.href = '/';
+          window.location.href = safeNextPath;
         }
       } else {
         setError(error.message);
       }
     } else {
-      // 로그인 성공 시 무조건 홈으로 이동 (관리자 여부는 홈에서 체크)
-      window.location.href = '/';
+      window.location.href = safeNextPath;
     }
     setLoading(false);
   };
 
   const handleOAuthLogin = async (provider: 'google' | 'kakao') => {
     setLoading(true);
+    const callbackUrl = new URL('/auth/callback', window.location.origin);
+    if (safeNextPath !== '/') {
+      callbackUrl.searchParams.set('next', safeNextPath);
+    }
+
     const { error } = await supabaseBrowser.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: callbackUrl.toString(),
       },
     });
     if (error) setError(error.message);
@@ -61,10 +67,13 @@ export default function LoginForm() {
   return (
     <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl shadow-zinc-200 border border-zinc-100 p-8">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-500 bg-clip-text text-transparent">
           AHA Tutor 시작하기
         </h1>
         <p className="text-sm text-zinc-500 mt-2">나만의 소크라틱 AI 수학 선생님</p>
+        {safeNextPath !== '/' && (
+          <p className="text-xs text-zinc-400 mt-1">로그인 후 원래 보던 화면으로 돌아갑니다.</p>
+        )}
       </div>
 
       {error && (
@@ -114,7 +123,7 @@ export default function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="이메일 주소"
-            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
+            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-zinc-400"
           />
         </div>
         <div>
@@ -124,7 +133,7 @@ export default function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="비밀번호"
-            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
+            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-zinc-400"
           />
         </div>
         <button

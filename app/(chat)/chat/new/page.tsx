@@ -10,5 +10,5 @@ export const metadata = {
 };
 
 export default function NewChatPage() {
-  return <ChatInterface />;
+  return <ChatInterface key="new-chat" />;
 }

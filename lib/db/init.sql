@@ -20,13 +20,14 @@ CREATE TABLE public.strategy_graphs (
 CREATE TABLE public.concept_nodes_reference (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     concept_code text NOT NULL UNIQUE,
-    node_type text NOT NULL DEFAULT 'CU-PD',      -- CU-PD, CU-PP, IR, SM, PC
+    node_type text NOT NULL DEFAULT 'PD',         -- PD, PP, IR, SM, PC
     title text NOT NULL DEFAULT '',                -- 사람이 읽을 수 있는 짧은 제목
+    definition text NOT NULL DEFAULT '',           -- 개념의 명확한 정의/공식
     description text NOT NULL,
     keywords text[] NOT NULL DEFAULT '{}',         -- 검색/매칭용 키워드 배열
     prerequisites text[] NOT NULL DEFAULT '{}',    -- 선수 개념 concept_code 배열
     examples_of_use text[] NOT NULL DEFAULT '{}',  -- 이 개념이 쓰이는 문제 유형 예시
-    embedding vector(1536),                        -- NULL 허용: 시드 시 비워두고 배치로 채움
+    embedding vector(1024),                        -- intfloat/multilingual-e5-large-instruct (1024차원)
     created_at timestamp with time zone NOT NULL DEFAULT now()
 );
 
@@ -62,7 +63,7 @@ CREATE TABLE public.learning_bottlenecks (
     mapped_concept_id text NOT NULL, -- 매핑 실패 시 'NEW_NODE'
     candidate_matches jsonb NOT NULL DEFAULT '[]'::jsonb,
     struggle_description text NOT NULL,
-    searchable_vector vector(1536) NOT NULL,
+    searchable_vector vector(1024) NOT NULL,       -- 검색용 벡터 (1024차원)
     is_resolved_by_student boolean NOT NULL DEFAULT false,
     created_at timestamp with time zone NOT NULL DEFAULT now()
 );

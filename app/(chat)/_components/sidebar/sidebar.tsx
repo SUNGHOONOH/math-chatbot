@@ -3,11 +3,14 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { formatProblemPreviewForTitle } from '@/lib/ai/problem-preview';
+import { buildLoginPath } from '@/lib/auth';
 import {
   PanelLeftClose,
   PanelLeft,
   Plus,
   BarChart3,
+  BarChart2,
   Shield,
   MessageSquare,
   Menu,
@@ -17,7 +20,6 @@ import {
   Eye,
   LogOut,
 } from 'lucide-react';
-import { supabaseBrowser } from '@/lib/supabase/browser';
 
 // ── 세션 아이템 타입 ──
 export interface SessionItem {
@@ -27,17 +29,64 @@ export interface SessionItem {
   first_message?: string;
 }
 
-// ── 상태 아이콘 매핑 ──
-function StatusIcon({ status }: { status: string }) {
+function getSessionTitle(session: SessionItem): string {
+  if (!session.first_message) {
+    return `세션 ${session.id.slice(0, 8)}`;
+  }
+
+  return formatProblemPreviewForTitle(session.first_message);
+}
+
+function getSessionDate(createdAt: string): string {
+  return new Date(createdAt).toLocaleDateString('ko-KR', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+async function fetchSessionItems(): Promise<SessionItem[] | null> {
+  const response = await fetch('/api/sessions', { cache: 'no-store' });
+  if (response.status === 401 && typeof window !== 'undefined') {
+    window.location.href = buildLoginPath(`${window.location.pathname}${window.location.search}`);
+    return null;
+  }
+  if (!response.ok) return null;
+
+  const data = await response.json();
+  return Array.isArray(data.sessions) ? data.sessions : null;
+}
+
+// ── 세션 상태 뱃지 ──
+function StatusBadge({ status }: { status: string }) {
   switch (status) {
     case 'completed':
-      return <CheckCircle2 size={14} className="text-emerald-500" />;
+      return (
+        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-600 text-[10px] font-semibold">
+          <CheckCircle2 size={10} />
+          완료
+        </span>
+      );
     case 'viewed_answer':
-      return <Eye size={14} className="text-amber-500" />;
+      return (
+        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-600 text-[10px] font-semibold">
+          <Eye size={10} />
+          답 확인
+        </span>
+      );
     case 'abandoned':
-      return <LogOut size={14} className="text-zinc-400" />;
+      return (
+        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-400 text-[10px] font-semibold">
+          <LogOut size={10} />
+          중단
+        </span>
+      );
     default:
-      return <Clock size={14} className="text-blue-500" />;
+      return (
+        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-500 text-[10px] font-semibold">
+          <Clock size={10} />
+          진행중
+        </span>
+      );
   }
 }
 
@@ -49,6 +98,7 @@ export default function Sidebar({
   isAdmin?: boolean;
 }) {
   const pathname = usePathname();
+  const [sessionItems, setSessionItems] = useState<SessionItem[]>(sessions);
   const [isOpen, setIsOpen] = useState(true);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -57,21 +107,42 @@ export default function Sidebar({
     setIsMobileOpen(false);
   }, [pathname]);
 
+  useEffect(() => {
+    setSessionItems(sessions);
+  }, [sessions]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadSessions = async () => {
+      const nextSessions = await fetchSessionItems();
+      if (cancelled || !nextSessions) return;
+
+      setSessionItems(nextSessions);
+    };
+
+    loadSessions();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname]);
+
   // 현재 활성 세션 ID 추출
   const activeSessionId = pathname.startsWith('/chat/')
     ? pathname.split('/chat/')[1]
     : null;
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-zinc-950 text-white">
+    <div className="flex flex-col h-full bg-[#fcfcfc] text-zinc-900">
       {/* ── 로고 + 접기 버튼 ── */}
-      <div className="flex items-center justify-between px-4 py-4 border-b border-zinc-800">
+      <div className="flex items-center justify-between px-4 py-4 border-b border-zinc-200">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg shadow-emerald-500/20">
             A
           </div>
           {isOpen && (
-            <span className="font-bold text-white tracking-tight text-base truncate">
+            <span className="font-bold text-zinc-900 tracking-tight text-base truncate">
               AHA Tutor
             </span>
           )}
@@ -79,14 +150,14 @@ export default function Sidebar({
         {/* 데스크톱 접기 버튼 */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="hidden md:flex p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+          className="hidden md:flex p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900 transition-colors"
         >
           {isOpen ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
         </button>
         {/* 모바일 닫기 버튼 */}
         <button
           onClick={() => setIsMobileOpen(false)}
-          className="md:hidden p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+          className="md:hidden p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900 transition-colors"
         >
           <X size={18} />
         </button>
@@ -96,7 +167,8 @@ export default function Sidebar({
       <div className="px-3 pt-4 pb-2">
         <Link
           href="/chat/new"
-          className="flex items-center gap-2.5 w-full px-3.5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all text-sm shadow-lg shadow-emerald-600/20 active:scale-[0.98]"
+          prefetch={false}
+          className="flex items-center gap-2.5 w-full px-3.5 py-3 bg-zinc-900 hover:bg-zinc-800 text-white font-semibold rounded-xl transition-all text-sm shadow-lg shadow-zinc-900/10 active:scale-[0.98]"
         >
           <Plus size={18} />
           {isOpen && <span>새 질문</span>}
@@ -108,8 +180,8 @@ export default function Sidebar({
         <Link
           href="/dashboard"
           className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl transition-all text-sm font-medium ${pathname === '/dashboard'
-              ? 'bg-zinc-800 text-white'
-              : 'text-zinc-400 hover:bg-zinc-800/60 hover:text-white'
+              ? 'bg-zinc-100 text-zinc-900'
+              : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900'
             }`}
         >
           <BarChart3 size={18} />
@@ -120,8 +192,8 @@ export default function Sidebar({
           <Link
             href="/admin"
             className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl transition-all text-sm font-medium ${pathname === '/admin'
-                ? 'bg-zinc-800 text-white'
-                : 'text-zinc-400 hover:bg-zinc-800/60 hover:text-white'
+                ? 'bg-zinc-100 text-zinc-900'
+                : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900'
               }`}
           >
             <Shield size={18} />
@@ -132,9 +204,9 @@ export default function Sidebar({
 
       {/* ── 구분선 ── */}
       <div className="px-4 pt-2 pb-1">
-        <div className="border-t border-zinc-800" />
+        <div className="border-t border-zinc-200" />
         {isOpen && (
-          <p className="text-[11px] text-zinc-600 font-semibold uppercase tracking-wider mt-3 px-1">
+          <p className="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider mt-3 px-1">
             대화 기록
           </p>
         )}
@@ -142,42 +214,52 @@ export default function Sidebar({
 
       {/* ── 세션 히스토리 ── */}
       <div className="flex-1 overflow-y-auto px-3 pb-4 space-y-0.5 scrollbar-thin scrollbar-thumb-zinc-800">
-        {sessions.length === 0 ? (
+        {sessionItems.length === 0 ? (
           <div className="px-3 py-6 text-center">
             {isOpen && (
-              <p className="text-zinc-600 text-xs">아직 대화 기록이 없습니다</p>
+              <p className="text-zinc-400 text-xs">아직 대화 기록이 없습니다</p>
             )}
           </div>
         ) : (
-          sessions.map((session) => {
+          sessionItems.map((session) => {
             const isActive = activeSessionId === session.id;
-            const title = session.first_message
-              ? session.first_message.slice(0, 30) + (session.first_message.length > 30 ? '...' : '')
-              : `세션 ${session.id.slice(0, 8)}`;
-            const date = new Date(session.created_at).toLocaleDateString('ko-KR', {
-              month: 'short',
-              day: 'numeric',
-            });
+            const title = getSessionTitle(session);
+            const date = getSessionDate(session.created_at);
 
             return (
               <Link
                 key={session.id}
                 href={`/chat/${session.id}`}
+                prefetch={false}
                 className={`group flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all text-sm ${isActive
-                    ? 'bg-zinc-800 text-white'
-                    : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200'
+                    ? 'bg-zinc-100 text-zinc-900'
+                    : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900'
                   }`}
               >
                 <MessageSquare size={16} className="shrink-0" />
                 {isOpen && (
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <StatusIcon status={session.session_status} />
-                      <span className="truncate text-xs font-medium">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="truncate text-xs font-medium flex-1 min-w-0">
                         {title}
                       </span>
+                      {/* completed 세션만 리포트 아이콘 표시 */}
+                      {session.session_status === 'completed' && (
+                        <Link
+                          href={`/chat/${session.id}/report`}
+                          prefetch={false}
+                          onClick={(e) => e.stopPropagation()}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 p-1 rounded-lg hover:bg-emerald-50 text-emerald-500 hover:text-emerald-600"
+                          title="세션 리포트 보기"
+                        >
+                          <BarChart2 size={13} />
+                        </Link>
+                      )}
                     </div>
-                    <span className="text-[10px] text-zinc-600">{date}</span>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <StatusBadge status={session.session_status} />
+                      <span className="text-[10px] text-zinc-400">{date}</span>
+                    </div>
                   </div>
                 )}
               </Link>
@@ -193,7 +275,7 @@ export default function Sidebar({
       {/* ── 모바일 햄버거 버튼 ── */}
       <button
         onClick={() => setIsMobileOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-zinc-900 text-white rounded-lg shadow-lg"
+        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white text-zinc-900 border border-zinc-200 rounded-lg shadow-lg"
       >
         <Menu size={20} />
       </button>
@@ -216,7 +298,7 @@ export default function Sidebar({
 
       {/* ── 데스크톱 사이드바 ── */}
       <div
-        className={`hidden md:flex flex-col shrink-0 transition-all duration-300 ease-out border-r border-zinc-800 ${isOpen ? 'w-64' : 'w-16'
+        className={`hidden md:flex flex-col shrink-0 transition-all duration-300 ease-out border-r border-zinc-200 ${isOpen ? 'w-64' : 'w-16'
           }`}
       >
         {sidebarContent}

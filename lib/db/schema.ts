@@ -55,6 +55,7 @@ export type Database = {
           concept_code: string
           node_type: string
           title: string
+          definition: string
           description: string
           keywords: string[]
           prerequisites: string[]
@@ -67,6 +68,7 @@ export type Database = {
           concept_code: string
           node_type?: string
           title?: string
+          definition?: string
           description: string
           keywords?: string[]
           prerequisites?: string[]
@@ -79,6 +81,7 @@ export type Database = {
           concept_code?: string
           node_type?: string
           title?: string
+          definition?: string
           description?: string
           keywords?: string[]
           prerequisites?: string[]

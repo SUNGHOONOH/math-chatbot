@@ -20,6 +20,7 @@
     "katex": "^0.16.44",
     "lucide-react": "^1.7.0",
     "next": "16.2.1",
+    "pdf-parse": "^2.4.5",
     "posthog-js": "^1.364.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -27,11 +28,13 @@
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "tailwind-merge": "^3.5.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",

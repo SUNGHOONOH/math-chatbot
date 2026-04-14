@@ -27,7 +27,7 @@ export async function POST() {
     // 2. embedding이 NULL인 노드 전체 조회
     const { data: nodes, error: fetchError } = await admin
       .from('concept_nodes_reference')
-      .select('id, concept_code, title, description')
+      .select('id, concept_code, node_type, title, definition, description, keywords')
       .is('embedding', null);
 
     if (fetchError) {
@@ -44,8 +44,10 @@ export async function POST() {
 
     for (const node of nodes) {
       try {
-        // title + description을 결합하여 임베딩 생성
-        const textToEmbed = `${node.title}: ${node.description}`;
+        // 3단계 구조화 임베딩 텍스트 생성: RAG 매칭 최적화
+        // 형태: "[노드타입] 개념명 (코드) | 정의: <내용> | 설명: <내용> | 키워드: <키워드배열>"
+        const keywordsStr = Array.isArray(node.keywords) ? node.keywords.join(', ') : '';
+        const textToEmbed = `[${node.node_type}] ${node.title} (${node.concept_code}) | 정의: ${node.definition} | 설명_및_오개념: ${node.description} | 키워드: ${keywordsStr}`.trim();
         const vector = await generateEmbedding(textToEmbed);
 
         const { error: updateError } = await admin

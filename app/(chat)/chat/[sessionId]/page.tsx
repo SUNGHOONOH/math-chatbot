@@ -6,7 +6,11 @@
 // ============================================================
 
 import { createClient } from '@/lib/supabase/server';
+import { getSupabaseAdmin } from '@/lib/supabase/client';
+import { buildLoginPath } from '@/lib/auth';
 import { notFound, redirect } from 'next/navigation';
+import Link from 'next/link';
+import { BarChart2 } from 'lucide-react';
 import ChatInterface from '@/app/(chat)/_components/chat-interface';
 
 export default async function SessionChatPage({
@@ -16,33 +20,56 @@ export default async function SessionChatPage({
 }) {
   const { sessionId } = await params;
   const supabase = await createClient();
+  const supabaseAdmin = getSupabaseAdmin();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login');
+    redirect(buildLoginPath(`/chat/${sessionId}`));
   }
 
   // 1. 세션 존재 여부 및 소유권 확인
-  const { data: session } = await supabase
+  const { data: session, error: sessionError } = await supabaseAdmin
     .from('tutoring_sessions')
     .select('id, student_id, session_status, problem_hash, extracted_text')
     .eq('id', sessionId)
-    .single();
+    .maybeSingle();
 
-  if (!session || session.student_id !== user.id) {
+  if (sessionError) {
+    console.error('[chat/[sessionId]] 세션 조회 실패:', {
+      sessionId,
+      userId: user.id,
+      error: sessionError.message,
+    });
+    redirect('/chat/new');
+  }
+
+  if (!session) {
+    console.warn('[chat/[sessionId]] 세션을 찾을 수 없음, 새 질문으로 이동:', {
+      sessionId,
+      userId: user.id,
+    });
+    redirect('/chat/new');
+  }
+
+  if (session.student_id !== user.id) {
+    console.warn('[chat/[sessionId]] 다른 사용자 세션 접근 차단:', {
+      sessionId,
+      userId: user.id,
+      ownerId: session.student_id,
+    });
     notFound();
   }
 
   // 2. 세션 상태를 in_progress로 복원 (abandoned에서 돌아온 경우)
   if (session.session_status === 'abandoned') {
-    await supabase
+    await supabaseAdmin
       .from('tutoring_sessions')
       .update({ session_status: 'in_progress', updated_at: new Date().toISOString() })
       .eq('id', sessionId);
   }
 
   // 3. dialogue_logs에서 대화 기록 패칭 (시간순)
-  const { data: logs } = await supabase
+  const { data: logs } = await supabaseAdmin
     .from('dialogue_logs')
     .select('id, speaker, message_text, created_at')
     .eq('session_id', sessionId)
@@ -52,14 +79,32 @@ export default async function SessionChatPage({
   const initialMessages = (logs || []).map((log) => ({
     id: log.id,
     role: (log.speaker === 'student' ? 'user' : 'assistant') as 'user' | 'assistant',
-    content: log.message_text,
+    parts: [{ type: 'text' as const, text: log.message_text }],
   }));
 
   return (
-    <ChatInterface
-      sessionId={sessionId}
-      initialMessages={initialMessages}
-      extractedText={session.extracted_text}
-    />
+    <div className="flex flex-col h-full">
+      {/* completed 세션일 때만 리포트 버튼 표시 */}
+      {session.session_status === 'completed' && (
+        <div className="flex items-center justify-end px-4 py-2 border-b border-zinc-100 bg-white shrink-0">
+          <Link
+            href={`/chat/${sessionId}/report`}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-xs font-semibold rounded-lg transition-colors"
+          >
+            <BarChart2 size={13} />
+            세션 리포트 보기
+          </Link>
+        </div>
+      )}
+      <div className="flex-1 min-h-0">
+        <ChatInterface
+          key={sessionId}
+          sessionId={sessionId}
+          initialMessages={initialMessages}
+          extractedText={session.extracted_text}
+          initialSessionStatus={session.session_status}
+        />
+      </div>
+    </div>
   );
 }

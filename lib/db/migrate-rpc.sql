@@ -9,7 +9,7 @@
 
 -- 코사인 유사도로 비교하여 상위 N개 후보를 반환합니다.
 CREATE OR REPLACE FUNCTION public.match_concept_nodes(
-  query_embedding vector(1536),
+  query_embedding vector(1024),
   match_threshold float DEFAULT 0.0,
   match_count int DEFAULT 3
 )
