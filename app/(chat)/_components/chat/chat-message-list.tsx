@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { Bot, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useChatStore } from '@/lib/store/use-chat-store';
 import { ChatMessageItem } from './chat-message-item';
 
@@ -27,14 +28,30 @@ export function ChatMessageList() {
           <p className="text-zinc-500 max-w-sm">수학 문제 사진을 찍어 올리거나, 텍스트로 질문해 주세요.</p>
         </div>
       ) : (
-        messages.map((message) => (
-          <ChatMessageItem key={message.id} message={message} />
-        ))
+        messages.map((message, index) => {
+          const isStreamingMessage =
+            isLoading &&
+            message.role === 'assistant' &&
+            index === messages.length - 1;
+
+          return (
+            <ChatMessageItem
+              key={message.id}
+              message={message}
+              isStreaming={isStreamingMessage}
+            />
+          );
+        })
       )}
 
       {/* 로딩/스트리밍 중 바운싱 닷 표시 */}
       {isLoading && messages[messages.length - 1]?.role === 'user' && (
-        <div className="flex gap-4 justify-start">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex gap-4 justify-start"
+        >
           <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm">
             <Bot size={18} />
           </div>
@@ -43,7 +60,7 @@ export function ChatMessageList() {
             <div className="w-2 h-2 bg-zinc-300 rounded-full animate-bounce [animation-delay:-0.15s]" />
             <div className="w-2 h-2 bg-zinc-300 rounded-full animate-bounce" />
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* 세션 초기화 로딩 */}

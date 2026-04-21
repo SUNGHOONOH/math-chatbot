@@ -16,7 +16,7 @@
 //   새 세션 생성 시 기존 in_progress → abandoned 처리.
 // ============================================================
 
-import { getSupabaseAdmin } from '@/lib/supabase/client';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export type SessionStatus =
   | 'in_progress'
@@ -97,12 +97,10 @@ export async function createSession({
   studentId,
   problemHash,
   extractedText,
-  hasStudentConsent,
 }: {
   studentId: string;
   problemHash: string;
   extractedText: string;
-  hasStudentConsent: boolean;
 }): Promise<string> {
   const supabase = getSupabaseAdmin();
 
@@ -129,7 +127,7 @@ export async function createSession({
       problem_hash: problemHash,
       extracted_text: extractedText,
       session_status: 'in_progress',
-      has_student_consent: hasStudentConsent,
+      has_student_consent: true, // 프로필 온보딩 완료 사용자만 세션 진입 가능
     })
     .select('id')
     .single();
@@ -144,7 +142,7 @@ export async function createSession({
 
 /**
  * 세션을 completed로 전환.
- * AI [PROBLEM_SOLVED] 토큰 감지 또는 수동 완료 버튼에서 호출.
+ * 사용자 확인 UI 또는 수동 완료 액션에서 호출.
  * 보고서 생성은 lazy — 이곳에서 절대 수행하지 않습니다.
  */
 export async function completeSession(

@@ -1,5 +1,6 @@
-import { getSupabaseAdmin } from '@/lib/supabase/client';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import Link from 'next/link';
+import { Database, BookOpen, Loader2 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,38 +56,57 @@ export default async function AdminPage() {
         <div className="bg-white rounded-2xl p-6 border border-zinc-100 shadow-sm">
           <h3 className="text-zinc-500 text-sm font-medium">감지된 병목</h3>
           <p className="text-3xl font-bold text-rose-600 mt-2">{totalBottlenecks || 0}</p>
-          <Link href="/admin/sessions" className="mt-4 inline-flex text-sm font-medium text-blue-600 hover:text-blue-700">
-            대화 품질 보기
+          <Link href="/admin/labeling" className="mt-4 inline-flex text-sm font-medium text-blue-600 hover:text-blue-700">
+            병목 상태 보기 
           </Link>
         </div>
         <div className="bg-white rounded-2xl p-6 border border-zinc-100 shadow-sm">
           <h3 className="text-zinc-500 text-sm font-medium">진단 보고서</h3>
           <p className="text-3xl font-bold text-emerald-600 mt-2">{totalReports || 0}</p>
-          <Link href="/admin/sessions" className="mt-4 inline-flex text-sm font-medium text-blue-600 hover:text-blue-700">
-            리포트 흐름 보기
+          <Link href="/admin/problems" className="mt-4 inline-flex text-sm font-medium text-blue-600 hover:text-blue-700">
+            전략 그래프 보기 
           </Link>
         </div>
         <div className="bg-white rounded-2xl p-6 border border-zinc-100 shadow-sm">
           <h3 className="text-zinc-500 text-sm font-medium">개념 노드 수</h3>
           <p className="text-3xl font-bold text-blue-600 mt-2">{totalConceptNodes || 0}</p>
-          <Link href="/admin/labeling" className="mt-4 inline-flex text-sm font-medium text-blue-600 hover:text-blue-700">
+          <Link href="/admin/knowledge" className="mt-4 inline-flex text-sm font-medium text-blue-600 hover:text-blue-700">
             노드/문제 은행 관리
           </Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Link
           href="/admin/labeling"
           className="block bg-white rounded-2xl border border-zinc-100 shadow-sm p-6 hover:border-blue-200 hover:shadow-md transition-all"
         >
-          <h2 className="text-lg font-bold text-zinc-900">라벨링 · 문제 은행</h2>
-          <p className="text-sm text-zinc-500 mt-2">
-            개념 노드 임포트, 임베딩 생성, 전략 그래프 검수와 문제 은행 관리를 한 곳으로 모았습니다.
+          <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4">
+            <Database size={20} />
+          </div>
+          <h2 className="text-lg font-bold text-zinc-900">AI 진단 라벨링 (교정)</h2>
+          <p className="text-sm text-zinc-500 mt-2 leading-relaxed">
+            AI가 판단한 학생의 병목 지점을 검수하고, 잘못 매핑된 개념 코드를 수동으로 교정합니다.
           </p>
-          <div className="mt-5 flex items-center gap-4 text-sm">
-            <span className="text-zinc-600">개념 노드 {totalConceptNodes || 0}개</span>
-            <span className={`font-medium ${(nullEmbeddingCount || 0) > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+          <div className="mt-5 flex items-center gap-4 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+            <span>최근 병목 {totalBottlenecks || 0}건</span>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/knowledge"
+          className="block bg-white rounded-2xl border border-blue-50 shadow-sm p-6 hover:border-emerald-200 hover:shadow-md transition-all ring-1 ring-emerald-50"
+        >
+          <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-4">
+            <BookOpen size={20} />
+          </div>
+          <h2 className="text-lg font-bold text-zinc-900">지식베이스 · 문제 은행</h2>
+          <p className="text-sm text-zinc-500 mt-2 leading-relaxed">
+            마스터 개념 등록, 학생어 별칭 추가, 그리고 과거 세션의 문제 데이터를 검색하고 관리합니다.
+          </p>
+          <div className="mt-5 flex items-center gap-4 text-[11px] font-bold uppercase tracking-wider">
+            <span className="text-zinc-400">개념 {totalConceptNodes || 0}개</span>
+            <span className={(nullEmbeddingCount || 0) > 0 ? 'text-amber-600' : 'text-emerald-600'}>
               임베딩 대기 {nullEmbeddingCount || 0}개
             </span>
           </div>
@@ -96,14 +116,16 @@ export default async function AdminPage() {
           href="/admin/sessions"
           className="block bg-white rounded-2xl border border-zinc-100 shadow-sm p-6 hover:border-blue-200 hover:shadow-md transition-all"
         >
-          <h2 className="text-lg font-bold text-zinc-900">세션 · 최근 대화 로그</h2>
-          <p className="text-sm text-zinc-500 mt-2">
-            세션 상태, 최근 대화 로그, 병목 기록, 보고서 흐름을 세션 단위로 조회합니다.
+          <div className="w-10 h-10 bg-zinc-50 text-zinc-600 rounded-xl flex items-center justify-center mb-4">
+            <Loader2 size={20} />
+          </div>
+          <h2 className="text-lg font-bold text-zinc-900">세션 · 대화 로그</h2>
+          <p className="text-sm text-zinc-500 mt-2 leading-relaxed">
+            전체 튜터링 세션의 상태와 상세 대화 흐름, 생성된 리포트를 타임라인 순으로 확인합니다.
           </p>
-          <div className="mt-5 flex items-center gap-4 text-sm text-zinc-600">
-            <span>세션 {totalSessions || 0}개</span>
-            <span>병목 {totalBottlenecks || 0}개</span>
-            <span>리포트 {totalReports || 0}개</span>
+          <div className="mt-5 flex items-center gap-4 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+            <span>세션 {totalSessions || 0}건</span>
+            <span>리포트 {totalReports || 0}건</span>
           </div>
         </Link>
       </div>

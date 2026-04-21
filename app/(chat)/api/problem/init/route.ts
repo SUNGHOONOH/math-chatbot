@@ -26,7 +26,6 @@ export async function POST(req: Request) {
     const {
       imageUrls = [],
       textInput = '',
-      hasStudentConsent = false,
       fileType = '',
     } = await req.json();
 
@@ -77,15 +76,15 @@ export async function POST(req: Request) {
 
     // 2. 문제 해시 생성 및 전략 그래프 탐색
     const problemHash = generateProblemHash(extractedText);
-    await ensureStrategyGraphExists(problemHash);
+    await ensureStrategyGraphExists(problemHash, extractedText);
     const strategyGraph = await getStrategyGraph(problemHash);
 
+    // 3. 새 세션 자동 생성 (session-service를 통해 단일 활성 세션 불변식 유지)
     // 3. 새 세션 자동 생성 (session-service를 통해 단일 활성 세션 불변식 유지)
     const sessionId = await createSession({
       studentId: user.id,
       problemHash,
       extractedText,
-      hasStudentConsent: Boolean(hasStudentConsent),
     });
 
     console.log('[problem/init] 세션 생성 완료:', sessionId);

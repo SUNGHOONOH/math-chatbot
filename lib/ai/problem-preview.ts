@@ -3,15 +3,18 @@ function unwrapEscapedLatex(text: string): string {
 }
 
 function normalizeBasePreviewText(problemText: string): string {
-  const firstMeaningfulLine = problemText
+  const flattenedText = problemText
     .split('\n')
     .map((line) => line.trim())
-    .find(Boolean) ?? '';
+    .filter(Boolean)
+    .join(' ');
 
-  return unwrapEscapedLatex(firstMeaningfulLine)
+  return unwrapEscapedLatex(flattenedText)
     .replace(/\${1,2}/g, '')
     .replace(/sqrt\s*\(([^()]+)\)/g, '\\sqrt{$1}')
     .replace(/sqrt\s*\{([^{}]+)\}/g, '\\sqrt{$1}')
+    .replace(/\\overline\s*\{([^{}]+)\}/g, '$1')
+    .replace(/\\,/g, ' ')
     .replace(/\\left|\\right/g, '')
     .replace(/\s+/g, ' ')
     .trim();
@@ -55,10 +58,30 @@ export function formatProblemPreviewForChat(problemText: string): string {
   return normalized.slice(0, 120).trim();
 }
 
+export function formatProblemPreviewForKickoff(problemText: string): string {
+  const normalized = normalizeBasePreviewText(problemText)
+    .replace(/\\frac\s*\{([^{}]+)\}\s*\{([^{}]+)\}/g, '$1/$2')
+    .replace(/\\sqrt\s*\{([^{}]+)\}/g, '√$1')
+    .replace(/\\overline/g, '')
+    .replace(/\\sin/g, 'sin')
+    .replace(/\\cos/g, 'cos')
+    .replace(/\\tan/g, 'tan')
+    .replace(/[\{\}\$]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!normalized) {
+    return '방금 올린 수학 문제';
+  }
+
+  return normalized.slice(0, 120).trim() + (normalized.length > 120 ? '...' : '');
+}
+
 export function formatProblemPreviewForTitle(problemText: string): string {
   const normalized = normalizeBasePreviewText(problemText)
     .replace(/\\frac\s*\{([^{}]+)\}\s*\{([^{}]+)\}/g, '$1/$2')
     .replace(/\\sqrt\s*\{([^{}]+)\}/g, '√$1')
+    .replace(/\\overline/g, '')
     .replace(/\\sin/g, 'sin')
     .replace(/\\cos/g, 'cos')
     .replace(/\\tan/g, 'tan')

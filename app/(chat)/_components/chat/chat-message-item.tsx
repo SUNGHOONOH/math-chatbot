@@ -1,6 +1,7 @@
 'use client';
 
 import { Bot, User } from 'lucide-react';
+import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -8,10 +9,14 @@ import { cn } from '@/lib/utils';
 import { ChatMessage } from '@/types/chat';
 import { MathErrorBoundary } from './math-error-boundary';
 
-const PROBLEM_SOLVED_TOKEN = '[PROBLEM_SOLVED]';
-
 interface ChatMessageItemProps {
   message: ChatMessage;
+  isStreaming?: boolean;
+}
+
+interface MarkdownMessageProps {
+  text: string;
+  className: string;
 }
 
 // Utils (ChatInterface에서 추출)
@@ -42,13 +47,38 @@ function getCleanUserText(message: ChatMessage): string {
     .trim();
 }
 
-export function ChatMessageItem({ message }: ChatMessageItemProps) {
+function sanitizeAssistantText(text: string): string {
+  return text
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
+    .replace(/<\/?think>/gi, '')
+    .replace(/\[PROBLEM_SOLVED\]/g, '')
+    .trim();
+}
+
+function MarkdownMessage({ text, className }: MarkdownMessageProps) {
+  return (
+    <div className={className}>
+      <MathErrorBoundary key={text} rawText={text}>
+        <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+          {text}
+        </ReactMarkdown>
+      </MathErrorBoundary>
+    </div>
+  );
+}
+
+export function ChatMessageItem({ message, isStreaming = false }: ChatMessageItemProps) {
   const images = getMessageImages(message);
   const cleanText = message.role === 'user' ? getCleanUserText(message) : getMessageText(message);
-  const assistantText = cleanText.replace(PROBLEM_SOLVED_TOKEN, '').trim();
+  const assistantText = sanitizeAssistantText(cleanText);
 
   return (
-    <div className={cn('flex gap-4', message.role === 'user' ? 'justify-end' : 'justify-start')}>
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      className={cn('flex gap-4', message.role === 'user' ? 'justify-end' : 'justify-start')}
+    >
       {message.role !== 'user' && (
         <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm">
           <Bot size={18} />
@@ -72,15 +102,21 @@ export function ChatMessageItem({ message }: ChatMessageItemProps) {
           ))}
 
         {message.role === 'user' ? (
-          cleanText && <div className="whitespace-pre-wrap leading-relaxed text-[15px]">{cleanText}</div>
-        ) : (
-          <div className="prose prose-sm prose-zinc max-w-none text-[15px] leading-relaxed">
-            <MathErrorBoundary key={assistantText} rawText={assistantText}>
-              <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-                {assistantText}
-              </ReactMarkdown>
-            </MathErrorBoundary>
+          cleanText && (
+            <MarkdownMessage
+              text={cleanText}
+              className="prose prose-sm prose-invert max-w-none text-[15px] leading-relaxed [&_.katex]:text-white"
+            />
+          )
+        ) : isStreaming ? (
+          <div className="whitespace-pre-wrap leading-relaxed text-[15px] text-zinc-800">
+            {assistantText}
           </div>
+        ) : (
+          <MarkdownMessage
+            text={assistantText}
+            className="prose prose-sm prose-zinc max-w-none text-[15px] leading-relaxed"
+          />
         )}
       </div>
 
@@ -89,6 +125,6 @@ export function ChatMessageItem({ message }: ChatMessageItemProps) {
           <User size={18} />
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

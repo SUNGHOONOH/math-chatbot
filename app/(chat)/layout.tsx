@@ -7,7 +7,9 @@
 import Sidebar from '@/app/(chat)/_components/sidebar/sidebar';
 import { getSidebarSessions } from '@/app/(chat)/_components/sidebar/session-list';
 import { createClient } from '@/lib/supabase/server';
-import { isUserAdmin } from '@/lib/auth';
+import { buildLoginPath, buildOnboardingPath, isUserAdmin } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+import { getUserProfileSetupState } from '@/lib/user-profile';
 
 export default async function ChatLayout({
   children,
@@ -17,6 +19,16 @@ export default async function ChatLayout({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  if (!user) {
+    redirect(buildLoginPath('/chat/new'));
+  }
+
+  const profileState = await getUserProfileSetupState(supabase, user.id);
+
+  if (!profileState.isComplete) {
+    redirect(buildOnboardingPath('/chat/new'));
+  }
+
   // 세션 목록 및 관리자 여부 가져오기
   const sessions = await getSidebarSessions() || [];
   const isAdmin = isUserAdmin(user);
@@ -24,7 +36,7 @@ export default async function ChatLayout({
   return (
     <div className="flex h-screen overflow-hidden bg-zinc-50">
       <Sidebar sessions={sessions} isAdmin={isAdmin} />
-      <main className="flex-1 overflow-hidden">{children}</main>
+      <main className="flex-1 min-h-0 overflow-hidden">{children}</main>
     </div>
   );
 }

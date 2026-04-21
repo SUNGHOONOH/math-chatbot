@@ -39,12 +39,14 @@ serve(async (req: any) => {
       .maybeSingle()
     if (sessionError) throw sessionError
 
-    const { data: logs, error: logsError } = await supabaseClient
+    const { data: logRow, error: logsError } = await supabaseClient
       .from('dialogue_logs')
-      .select('speaker, message_text, created_at')
+      .select('messages, updated_at')
       .eq('session_id', sessionId)
-      .order('created_at', { ascending: true })
+      .maybeSingle()
     if (logsError) throw logsError
+
+    const messagesArray = (logRow?.messages as any[]) || []
 
     const { data: bottlenecks, error: bottlenecksError } = await supabaseClient
       .from('learning_bottlenecks')
@@ -56,7 +58,7 @@ serve(async (req: any) => {
     console.log('[session-end] 리포트 생성을 위한 집계 준비 완료', {
       sessionId,
       sessionStatus: session?.session_status,
-      logCount: logs?.length ?? 0,
+      logCount: messagesArray.length,
       bottleneckCount: bottlenecks?.length ?? 0,
     })
 
@@ -65,7 +67,7 @@ serve(async (req: any) => {
         success: true,
         message: '세션 리포트용 데이터 집계가 완료되었습니다.',
         sessionStatus: session?.session_status ?? null,
-        logCount: logs?.length ?? 0,
+        logCount: messagesArray.length,
         bottleneckCount: bottlenecks?.length ?? 0,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

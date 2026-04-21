@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { LOGIN_PATH, sanitizeRedirectPath } from '@/lib/auth';
+import { DEFAULT_POST_ONBOARDING_PATH, LOGIN_PATH, buildOnboardingPath, sanitizeRedirectPath } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
+import { getUserProfileSetupState } from '@/lib/user-profile';
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -12,6 +13,19 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        const profileState = await getUserProfileSetupState(supabase, user.id);
+
+        if (!profileState.isComplete) {
+          const onboardingPath = buildOnboardingPath(
+            next === '/' ? DEFAULT_POST_ONBOARDING_PATH : next
+          );
+          return NextResponse.redirect(`${origin}${onboardingPath}`);
+        }
+      }
+
       return NextResponse.redirect(`${origin}${next}`);
     }
   }

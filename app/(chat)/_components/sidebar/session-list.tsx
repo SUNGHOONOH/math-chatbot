@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { getSupabaseAdmin } from '@/lib/supabase/client';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import type { SessionItem } from './sidebar';
 
 export default async function SessionList() {
@@ -19,7 +19,12 @@ export default async function SessionList() {
 
   if (!rawSessions || rawSessions.length === 0) return [];
 
-  const sessions: SessionItem[] = rawSessions.map((s) => ({
+  const sessions: SessionItem[] = (rawSessions as Array<{
+    id: string;
+    session_status: string;
+    created_at: string;
+    extracted_text: string;
+  }>).map((s) => ({
     id: s.id,
     session_status: s.session_status,
     created_at: s.created_at,

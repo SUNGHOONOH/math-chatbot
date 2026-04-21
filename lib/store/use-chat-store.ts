@@ -1,22 +1,18 @@
 import { create } from 'zustand';
 import { 
   ChatMessage, 
-  ChatStatus, 
-  PendingSessionAction, 
-  ChatTextPart 
+  ChatStatus 
 } from '@/types/chat';
 import { buildLoginPath } from '@/lib/auth';
 import { supabaseBrowser } from '@/lib/supabase/browser';
-import posthog from 'posthog-js';
+import { RESOLUTION_CHECK_MIN_EXCHANGES } from '@/lib/constants';
 
 // --- Utils (ChatInterface에서 가져옴) ---
 
-const SESSION_ACTION_STORAGE_PREFIX = 'aha:pending-session-action:';
-const PROBLEM_SOLVED_TOKEN = '[PROBLEM_SOLVED]';
-
-function getPendingSessionActionKey(sessionId: string) {
-  return `${SESSION_ACTION_STORAGE_PREFIX}${sessionId}`;
-}
+const inFlightProblemInitRequests = new Set<string>();
+const inFlightKickoffRequests = new Set<string>();
+const inFlightStreamRequests = new Set<string>();
+const inFlightCompletionRequests = new Set<string>();
 
 function getCurrentPathWithSearch() {
   if (typeof window === 'undefined') return '/';
@@ -36,23 +32,18 @@ function makeTextMessage(id: string, role: 'user' | 'assistant', text: string): 
   };
 }
 
-function buildImageMessageText(url: string): string {
-  return `[첨부된 수학 문제 이미지]\n![수학 문제](${url})`;
+function getMessageText(message: ChatMessage): string {
+  return message.parts
+    .filter((part) => part.type === 'text')
+    .map((part) => part.text)
+    .join('')
+    .trim();
 }
 
-function buildUserMessage({ text, imageUrl }: { text?: string; imageUrl?: string }): ChatMessage {
-  const parts: ChatTextPart[] = [];
-  if (imageUrl) {
-    parts.push({ type: 'text', text: `${buildImageMessageText(imageUrl)}\n\n` });
-  }
-  if (text?.trim()) {
-    parts.push({ type: 'text', text: text.trim() });
-  }
-  return {
-    id: `user-${crypto.randomUUID()}`,
-    role: 'user',
-    parts,
-  };
+function countCompletedExchanges(messages: ChatMessage[]): number {
+  const userTurns = messages.filter((message) => message.role === 'user' && getMessageText(message)).length;
+  const assistantTurns = messages.filter((message) => message.role === 'assistant' && getMessageText(message)).length;
+  return Math.min(userTurns, assistantTurns);
 }
 
 async function resizeImage(file: File, maxSize = 1200): Promise<Blob> {
@@ -99,11 +90,12 @@ interface ChatState {
   imageFile: File | null;
   isUploading: boolean;
   isInitializing: boolean;
-  hasStudentConsent: boolean;
-  consentError: string | null;
   pendingNotice: string | null;
   sessionCompleted: boolean;
   currentSessionId: string | undefined;
+  resolutionCheckVisible: boolean;
+  lastResolutionCheckExchangeCount: number;
+  isCompletingSession: boolean;
   
   // Internal refs-like state
   abortController: AbortController | null;
@@ -112,13 +104,13 @@ interface ChatState {
   // Actions
   setInput: (val: string) => void;
   setImage: (file: File | null, preview: string | null) => void;
-  setConsent: (val: boolean) => void;
   resetSession: (sessionId?: string, initialMessages?: ChatMessage[], initialStatus?: string) => void;
   setSessionCompleted: (val: boolean) => void;
+  dismissResolutionCheck: () => void;
   
   // Async Actions
   uploadImage: (file: File) => Promise<{ url: string; path: string }>;
-  initProblemSession: (payload: any) => Promise<{ sessionId: string }>;
+  initProblemSession: (payload: { imageUrls?: string[]; fileType?: string; textInput?: string }) => Promise<{ sessionId: string }>;
   streamResponse: (sessionId: string, requestMessages: ChatMessage[]) => Promise<void>;
   requestKickoff: (sessionId: string, initialUserMessage?: ChatMessage) => Promise<void>;
   stopStreaming: () => void;
@@ -139,19 +131,24 @@ export const useChatStore = create<ChatState>((set, get) => ({
   imageFile: null,
   isUploading: false,
   isInitializing: false,
-  hasStudentConsent: false,
-  consentError: null,
   pendingNotice: null,
   sessionCompleted: false,
   currentSessionId: undefined,
+  resolutionCheckVisible: false,
+  lastResolutionCheckExchangeCount: 0,
+  isCompletingSession: false,
   abortController: null,
   lastSubmittedMessages: null,
 
   // Simple Actions
   setInput: (input) => set({ input }),
   setImage: (imageFile, imagePreview) => set({ imageFile, imagePreview }),
-  setConsent: (hasStudentConsent) => set({ hasStudentConsent }),
   setSessionCompleted: (sessionCompleted) => set({ sessionCompleted }),
+  dismissResolutionCheck: () =>
+    set((state) => ({
+      resolutionCheckVisible: false,
+      lastResolutionCheckExchangeCount: countCompletedExchanges(state.messages),
+    })),
 
   resetSession: (sessionId, initialMessages = [], initialStatus) => set({
     currentSessionId: sessionId,
@@ -165,6 +162,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
     isInitializing: false,
     pendingNotice: null,
     sessionCompleted: initialStatus === 'completed',
+    resolutionCheckVisible: false,
+    lastResolutionCheckExchangeCount: 0,
+    isCompletingSession: false,
   }),
 
   clearImage: () => set({ imageFile: null, imagePreview: null }),
@@ -215,7 +215,17 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
-  initProblemSession: async (payload: any) => {
+  initProblemSession: async (payload) => {
+    const requestKey = JSON.stringify({
+      imageUrls: Array.isArray(payload?.imageUrls) ? payload.imageUrls : [],
+      fileType: payload?.fileType ?? '',
+      textInput: payload?.textInput ?? '',
+    });
+    if (inFlightProblemInitRequests.has(requestKey)) {
+      throw new Error('세션 초기화 요청이 이미 진행 중입니다.');
+    }
+
+    inFlightProblemInitRequests.add(requestKey);
     set({ isInitializing: true });
     try {
       const response = await fetch('/api/problem/init', {
@@ -233,12 +243,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
       }
       return response.json();
     } finally {
+      inFlightProblemInitRequests.delete(requestKey);
       set({ isInitializing: false });
     }
   },
 
   requestKickoff: async (sessionId, initialUserMessage) => {
-    set({ isInitializing: true, error: undefined });
+    if (inFlightKickoffRequests.has(sessionId)) return;
+    inFlightKickoffRequests.add(sessionId);
+    set({ isInitializing: true, error: undefined, resolutionCheckVisible: false });
     if (initialUserMessage) set({ messages: [initialUserMessage] });
 
     try {
@@ -272,15 +285,20 @@ export const useChatStore = create<ChatState>((set, get) => ({
           makeTextMessage(`assistant-kickoff-${sessionId}`, 'assistant', assistantMessage),
         ],
         status: 'ready',
+        resolutionCheckVisible: false,
       }));
-    } catch (err: any) {
+    } catch (err: unknown) {
       set({ status: 'error', error: err instanceof Error ? err : new Error('첫 질문 생성 실패') });
     } finally {
+      inFlightKickoffRequests.delete(sessionId);
       set({ isInitializing: false });
     }
   },
 
   streamResponse: async (sessionId, requestMessages) => {
+    if (inFlightStreamRequests.has(sessionId)) return;
+    inFlightStreamRequests.add(sessionId);
+
     const assistantId = `assistant-${crypto.randomUUID()}`;
     const assistantPlaceholder = makeTextMessage(assistantId, 'assistant', '');
     
@@ -288,7 +306,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
       messages: [...requestMessages, assistantPlaceholder],
       status: 'submitted',
       error: undefined,
-      lastSubmittedMessages: requestMessages
+      lastSubmittedMessages: requestMessages,
+      resolutionCheckVisible: false,
     });
 
     const controller = new AbortController();
@@ -342,31 +361,41 @@ export const useChatStore = create<ChatState>((set, get) => ({
         }
       }
 
-      set({ status: 'ready', abortController: null });
+      set((state) => {
+        const exchangeCount = countCompletedExchanges(state.messages);
+        const shouldShowResolutionCheck =
+          !state.sessionCompleted &&
+          exchangeCount >= RESOLUTION_CHECK_MIN_EXCHANGES &&
+          exchangeCount > state.lastResolutionCheckExchangeCount;
 
-      // [PROBLEM_SOLVED] 토큰 감지 → API 호출 후 DB 확인 시에만 sessionCompleted 설정
-      if (assistantText.includes(PROBLEM_SOLVED_TOKEN) && !get().sessionCompleted) {
-        try {
-          const res = await fetch(`/api/sessions/${sessionId}/complete`, { method: 'POST' });
-          if (res.ok) {
-            set({ sessionCompleted: true });
-          }
-        } catch (err) {
-          console.error('[store] 세션 완료 호출 실패:', err);
-        }
-      }
-    } catch (err: any) {
-      if (err?.name === 'AbortError') return;
+        return {
+          status: 'ready',
+          abortController: null,
+          resolutionCheckVisible: shouldShowResolutionCheck,
+          lastResolutionCheckExchangeCount: shouldShowResolutionCheck
+            ? exchangeCount
+            : state.lastResolutionCheckExchangeCount,
+        };
+      });
+
+      // AI가 스스로 세션을 완료시키던 로직 제거 (사용자 직접 판단 및 수동 완료로 변경)
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') return;
       set({ 
         messages: requestMessages, 
         status: 'error', 
         error: err instanceof Error ? err : new Error('대화 생성 중 오류 발생'),
         abortController: null
       });
+    } finally {
+      inFlightStreamRequests.delete(sessionId);
     }
   },
 
   completeManualSession: async (sessionId: string) => {
+    if (inFlightCompletionRequests.has(sessionId)) return;
+    inFlightCompletionRequests.add(sessionId);
+    set({ isCompletingSession: true });
     try {
       const res = await fetch(`/api/sessions/${sessionId}/complete`, {
         method: 'POST',
@@ -374,7 +403,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         body: JSON.stringify({ status: 'completed' }),
       });
       if (res.ok) {
-        set({ sessionCompleted: true });
+        set({ sessionCompleted: true, resolutionCheckVisible: false });
       } else {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || '세션 완료 처리 실패');
@@ -382,6 +411,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
     } catch (err) {
       console.error('[store] 수동 세션 완료 실패:', err);
       throw err;
+    } finally {
+      inFlightCompletionRequests.delete(sessionId);
+      set({ isCompletingSession: false });
     }
   },
 }));

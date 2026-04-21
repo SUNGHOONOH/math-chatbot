@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
+import ProblemBankPanel from './_components/problem-bank-panel';
 
 export default function ProblemsPage() {
-  redirect('/admin/labeling');
+  return <ProblemBankPanel />;
 }

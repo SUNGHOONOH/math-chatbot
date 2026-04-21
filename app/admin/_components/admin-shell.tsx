@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   GraduationCap,
   Tags,
+  BookOpen,
   MessageSquare,
   Cpu,
   PieChart,
@@ -30,17 +31,18 @@ const MENU_GROUPS = [
   {
     title: '사용자',
     items: [
-      { name: '계정 관리', href: '/admin/users', icon: Users, badge: '' },
-      { name: '동의 현황', href: '/admin/consent', icon: ShieldCheck, badge: '중요' },
-      { name: '튜터 관리', href: '/admin/tutors', icon: GraduationCap, badge: 'NEW' },
+      { name: '계정 관리', href: '/admin/users', icon: Users, badge: 'Profile' },
+      { name: '튜터 관리', href: '/admin/tutors', icon: GraduationCap, badge: 'Tutor' },
     ],
   },
   {
-    title: '데이터 · AI',
+    title: '데이터 관리',
     items: [
-      { name: '라벨링 · 문제 은행', href: '/admin/labeling', icon: Tags, badge: '핵심' },
-      { name: '대화 세션 조회', href: '/admin/sessions', icon: MessageSquare, badge: '' },
-      { name: '모델 버전 관리', href: '/admin/models', icon: Cpu, badge: '핵심' },
+      { name: 'AI 병목진단 라벨링', href: '/admin/labeling', icon: Tags, badge: '' },
+      { name: '개념 노드 · Alias', href: '/admin/knowledge', icon: BookOpen, badge: 'Concepts' },
+      { name: '문제 은행', href: '/admin/problems', icon: Database, badge: 'Strategy' },
+      { name: '세션 통계 및 분석', href: '/admin/analytics', icon: MessageSquare, badge: 'Insights' },
+      { name: '모델 버전 관리', href: '/admin/models', icon: Cpu, badge: 'Model' },
     ],
   },
   {

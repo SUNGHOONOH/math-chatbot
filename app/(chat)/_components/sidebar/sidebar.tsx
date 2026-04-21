@@ -225,44 +225,45 @@ export default function Sidebar({
             const isActive = activeSessionId === session.id;
             const title = getSessionTitle(session);
             const date = getSessionDate(session.created_at);
+            const itemClassName = `group flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all text-sm ${isActive
+              ? 'bg-zinc-100 text-zinc-900'
+              : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900'
+              }`;
 
             return (
-              <Link
-                key={session.id}
-                href={`/chat/${session.id}`}
-                prefetch={false}
-                className={`group flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all text-sm ${isActive
-                    ? 'bg-zinc-100 text-zinc-900'
-                    : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900'
-                  }`}
-              >
-                <MessageSquare size={16} className="shrink-0" />
-                {isOpen && (
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-1">
-                      <span className="truncate text-xs font-medium flex-1 min-w-0">
-                        {title}
-                      </span>
-                      {/* completed 세션만 리포트 아이콘 표시 */}
-                      {session.session_status === 'completed' && (
-                        <Link
-                          href={`/chat/${session.id}/report`}
-                          prefetch={false}
-                          onClick={(e) => e.stopPropagation()}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 p-1 rounded-lg hover:bg-emerald-50 text-emerald-500 hover:text-emerald-600"
-                          title="세션 리포트 보기"
-                        >
-                          <BarChart2 size={13} />
-                        </Link>
-                      )}
+              <div key={session.id} className={itemClassName}>
+                <Link
+                  href={`/chat/${session.id}`}
+                  prefetch={false}
+                  className="flex items-center gap-2.5 min-w-0 flex-1"
+                >
+                  <MessageSquare size={16} className="shrink-0" />
+                  {isOpen && (
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="truncate text-xs font-medium flex-1 min-w-0">
+                          {title}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <StatusBadge status={session.session_status} />
+                        <span className="text-[10px] text-zinc-400">{date}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <StatusBadge status={session.session_status} />
-                      <span className="text-[10px] text-zinc-400">{date}</span>
-                    </div>
-                  </div>
+                  )}
+                </Link>
+                {isOpen && session.session_status === 'completed' && (
+                  <Link
+                    href={`/chat/${session.id}/report`}
+                    prefetch={false}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 p-1 rounded-lg hover:bg-emerald-50 text-emerald-500 hover:text-emerald-600"
+                    title="세션 리포트 보기"
+                    aria-label="세션 리포트 보기"
+                  >
+                    <BarChart2 size={13} />
+                  </Link>
                 )}
-              </Link>
+              </div>
             );
           })
         )}

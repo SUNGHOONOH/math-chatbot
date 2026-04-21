@@ -1,28 +1,36 @@
 // ============================================================
-// AHA v5 — Route 2: 실시간 소크라틱 대화 + 백그라운드 병목 감지
+// AHA v5 — Route 2: 실시간 소크라틱 대화
 // ============================================================
 // AGENTS.md §2, §3-1, §10 준수:
 // - Dialog LLM은 오직 소크라틱 텍스트만 스트리밍 (JSON 금지)
-// - after()를 사용하여 대화 로그 저장 + 병목 감지를 비동기로 처리
+// - after()를 사용하여 대화 로그 저장과 턴별 병목 감지를 비동기로 처리
 // - 스트리밍 도중 DB 저장을 섞어 지연을 발생시키지 않음
 // ============================================================
 
 import type { UIMessage } from 'ai';
 import { TEXT_MODEL } from '@/lib/ai/models';
-import { completedSessionSolutionPrompt, socraticTutorPrompt } from '@/lib/ai/prompts';
+import {
+  buildKickoffMessage,
+  buildLanguagePolicyPrompt,
+  buildTutorSystemPrompt,
+} from '@/lib/ai/prompts';
 import {
   hfStreamText,
   getSlidingWindowMessages,
   getTutoringSession,
   runBottleneckDetection,
-  saveDialogueLog,
+  updateDialogueLogs,
 } from '@/lib/ai/ai-service';
 import { resumeSession } from '@/lib/services/session-service';
-import { formatProblemPreviewForChat } from '@/lib/ai/problem-preview';
+import { formatProblemPreviewForKickoff } from '@/lib/ai/problem-preview';
 import { createClient } from '@/lib/supabase/server';
 import { after } from 'next/server';
 
 export const maxDuration = 60;
+
+function formatDurationMs(startTime: number): string {
+  return `${Date.now() - startTime}ms`;
+}
 
 function extractPlainText(message: UIMessage): string {
   const content = (message as any).content;
@@ -47,39 +55,27 @@ function extractPlainText(message: UIMessage): string {
     .trim();
 }
 
-function buildKickoffMessage(problemText: string): string {
-  const problemSummary = formatProblemPreviewForChat(problemText);
-
-  return `지금 올린 문제는 ${problemSummary}를 다루는 문제예요. 어디서부터 막혔는지, 또는 어떤 방식으로 시작해 보려 했는지 먼저 말해줄래요?`;
-}
-
-function buildLanguagePolicy(latestUserMessage: string): string {
-  const trimmed = latestUserMessage.trim();
-
-  if (!trimmed) {
-    return '응답 언어는 한국어를 기본값으로 유지하세요.';
-  }
-
-  const hasHangul = /[가-힣]/.test(trimmed);
-  const hasCjk = /[\u4E00-\u9FFF]/.test(trimmed);
-
-  if (hasHangul) {
-    return '마지막 사용자 메시지는 한국어입니다. 반드시 한국어로만 답하고, 중국어는 절대 사용하지 마세요.';
-  }
-
-  if (hasCjk) {
-    return '마지막 사용자 메시지의 언어를 따라 답하되, 사용자가 한국어로 말하지 않은 경우에만 한국어 이외 언어를 사용하세요.';
-  }
-
-  return '마지막 사용자 메시지의 언어를 최대한 따라 답하세요. 다만 사용자가 중국어로 말하지 않았다면 중국어로 답하지 마세요.';
+function sanitizeAssistantOutput(text: string): string {
+  return text
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
+    .replace(/<\/?think>/gi, '')
+    .replace(/\[PROBLEM_SOLVED\]/g, '')
+    .trim();
 }
 
 export async function POST(req: Request) {
+  const requestStartedAt = Date.now();
   try {
     const { messages, sessionId, kickoff = false } = await req.json();
     if (!sessionId) {
       return new Response('sessionId is required', { status: 400 });
     }
+
+    console.log('[chat/route] 요청 시작:', {
+      sessionId,
+      kickoff,
+      startedAt: new Date(requestStartedAt).toISOString(),
+    });
 
     // 1. 인증된 사용자 확인
     const supabase = await createClient();
@@ -112,36 +108,32 @@ export async function POST(req: Request) {
     const contextMessages = getSlidingWindowMessages(normalizedMessages);
     const allowFullSolution = session.session_status === 'completed';
     const latestUserMessage = [...normalizedMessages].reverse().find((message) => message.role === 'user')?.content ?? '';
-    const languagePolicy = buildLanguagePolicy(latestUserMessage);
+    const languagePolicy = buildLanguagePolicyPrompt(latestUserMessage);
 
     // 2. Dialog LLM (Streaming) - 소크라틱 텍스트만 출력
-    const systemPrompt = `
-${allowFullSolution ? completedSessionSolutionPrompt : socraticTutorPrompt}
-
-[CONTEXT: 학습자가 풀고 있는 문제의 원본 텍스트 및 LaTeX 데이터입니다]
-${session.extracted_text}
-
-${languagePolicy}
-
-절대로 JSON 형식을 출력하지 마세요. 오직 학생과 대화하는 자연어 텍스트만 출력하세요.
-    `.trim();
+    const systemPrompt = buildTutorSystemPrompt({
+      allowFullSolution,
+      problemText: session.extracted_text,
+      languagePolicy,
+    });
 
     if (kickoff) {
-      const lastUserMessage = normalizedMessages[normalizedMessages.length - 1];
-      if (lastUserMessage?.role === 'user') {
-        await saveDialogueLog({
-          sessionId,
-          speaker: 'student',
-          messageText: lastUserMessage.content,
-        });
-      }
+      const assistantMessage = buildKickoffMessage(
+        formatProblemPreviewForKickoff(session.extracted_text)
+      );
+      const fullMessages = [
+        ...normalizedMessages,
+        { role: 'assistant', content: assistantMessage },
+      ];
 
-      const assistantMessage = buildKickoffMessage(session.extracted_text);
-
-      await saveDialogueLog({
+      await updateDialogueLogs({
         sessionId,
-        speaker: 'ai_tutor',
-        messageText: assistantMessage,
+        messages: fullMessages,
+      });
+
+      console.log('[chat/route] kickoff 완료:', {
+        sessionId,
+        duration: formatDurationMs(requestStartedAt),
       });
 
       return Response.json({ message: assistantMessage });
@@ -153,49 +145,65 @@ ${languagePolicy}
       resolveAssistantMessage = resolve;
     });
 
+    const generationStartedAt = Date.now();
+
     const stream = await hfStreamText({
       model: TEXT_MODEL,
       system: systemPrompt,
       messages: contextMessages,
+      debugTag: `session:${sessionId}`,
       onFinish: (text: string) => {
-        resolveAssistantMessage(text);
+        const sanitizedText = sanitizeAssistantOutput(text);
+        console.log('[chat/route] 모델 응답 완료:', {
+          sessionId,
+          model: TEXT_MODEL,
+          generationDuration: formatDurationMs(generationStartedAt),
+          totalDuration: formatDurationMs(requestStartedAt),
+          responseChars: sanitizedText.length,
+        });
+        resolveAssistantMessage(sanitizedText);
       }
     });
 
-    console.log('[chat/route] 스트리밍 시작:', sessionId);
+    console.log('[chat/route] 스트리밍 시작:', {
+      sessionId,
+      model: TEXT_MODEL,
+      streamReadyDuration: formatDurationMs(requestStartedAt),
+    });
 
-    // 4. after()를 사용하여 스트리밍 완료 후 백그라운드 처리 (최상단 호출로 안정성 확보)
+    // 4. after()를 사용하여 스트리밍 완료 후 백그라운드 저장/감지 처리
     after(async () => {
       try {
         const assistantMessage = await assistantMessagePromise;
-        console.log('[chat/route] 스트리밍 완료, 백그라운드 분석 중:', sessionId);
-
-        // 4-1. 대화 로그 저장 (dialogue_logs)
-        const lastUserMessage = messages[messages.length - 1];
-        if (lastUserMessage?.role === 'user') {
-          await saveDialogueLog({
-            sessionId,
-            speaker: 'student',
-            messageText: extractPlainText(lastUserMessage as UIMessage),
-          });
-        }
-
-        await saveDialogueLog({
+        const backgroundStartedAt = Date.now();
+        console.log('[chat/route] 백그라운드 저장/감지 시작:', {
           sessionId,
-          speaker: 'ai_tutor',
-          messageText: assistantMessage,
+          elapsedBeforeBackground: formatDurationMs(requestStartedAt),
         });
 
-        // 4-2. 병목 감지 (정규화된 메시지 사용)
+        // 4-1. 대화 로그 저장
         const fullMessages = [
           ...normalizedMessages,
           { role: 'assistant', content: assistantMessage },
         ];
 
-        await runBottleneckDetection({
+        await updateDialogueLogs({
           sessionId,
-          problemText: session.extracted_text,
           messages: fullMessages,
+        });
+
+        if (session.session_status === 'in_progress') {
+          await runBottleneckDetection({
+            sessionId,
+            problemText: session.extracted_text,
+            messages: fullMessages,
+          });
+        }
+
+        console.log('[chat/route] 백그라운드 저장/감지 완료:', {
+          sessionId,
+          backgroundDuration: formatDurationMs(backgroundStartedAt),
+          totalDuration: formatDurationMs(requestStartedAt),
         });
       } catch (bgErr) {
         console.error('[chat/route] 백그라운드 작업 에러:', bgErr);
@@ -205,10 +213,14 @@ ${languagePolicy}
     return new Response(stream, {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
+        'X-Content-Type-Options': 'nosniff',
+        'Cache-Control': 'no-cache, no-transform',
+        'Connection': 'keep-alive',
       },
     });
   } catch (err: any) {
     console.error('[chat/route] 치명적 에러:', err);
+    console.error('[chat/route] 실패까지 걸린 시간:', formatDurationMs(requestStartedAt));
     return new Response(JSON.stringify({
       error: '대화 생성 중 오류가 발생했습니다.',
       details: err?.message || '알 수 없는 서버 에러'

@@ -16,6 +16,16 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Debugging
+
+Enable Hugging Face stream debug logs with:
+
+```bash
+HF_STREAM_DEBUG=1 pnpm dev
+```
+
+This prints per-stream summaries for `delta.content`, `delta.reasoning`, `finish_reason`, and the final accumulated assistant text on the server.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

@@ -1,11 +1,16 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Send, ImagePlus, X, Loader2, FileText, Square } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useChatStore } from '@/lib/store/use-chat-store';
 import { PendingSessionAction } from '@/types/chat';
+import { MathInputPanel } from './math-input-panel';
+import { SimpleCalculator } from './simple-calculator';
+
+// 어떤 패널이 열려있는지 (null = 닫힘)
+type PanelMode = 'math' | 'calc' | null;
 
 export function ChatInputArea() {
   const router = useRouter();
@@ -20,24 +25,38 @@ export function ChatInputArea() {
     isInitializing,
     status,
     currentSessionId,
-    sessionCompleted,
     messages,
-    hasStudentConsent,
     uploadImage,
     initProblemSession,
     streamResponse,
     stopStreaming,
-    completeManualSession,
   } = useChatStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const composerFormRef = useRef<HTMLFormElement>(null);
+  const submitLockRef = useRef(false);
   const isLoading = status === 'streaming' || status === 'submitted';
+
+  // 패널 상태
+  const [panel, setPanel] = useState<PanelMode>(null);
+  // 수식 패널 내 LaTeX 상태 (패널 닫아도 유지)
+  const [mathLatex, setMathLatex] = useState('');
+
+  const togglePanel = (mode: PanelMode) => {
+    setPanel((cur) => (cur === mode ? null : mode));
+  };
+
+  // 수식 패널 → 채팅 삽입
+  const handleMathInsert = () => {
+    if (!mathLatex.trim()) return;
+    const separator = input.trim() ? ' ' : '';
+    setInput(input + separator + `$${mathLatex}$`);
+    setPanel(null);
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (file.type === 'application/pdf') {
       setImage(file, 'pdf-placeholder');
     } else {
@@ -54,11 +73,15 @@ export function ChatInputArea() {
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() && !imageFile) return;
-    if (isLoading || isUploading || isInitializing) return;
+    if (submitLockRef.current || isLoading || isUploading || isInitializing) return;
 
-    // 1. 세션 없는 경우 초기화
-    if (!currentSessionId) {
-      try {
+    submitLockRef.current = true;
+
+    setPanel(null);
+
+    try {
+      // 1. 세션 없는 경우 초기화
+      if (!currentSessionId) {
         let imageUrl: string | undefined;
         if (imageFile) {
           const { url } = await uploadImage(imageFile);
@@ -83,44 +106,45 @@ export function ChatInputArea() {
           imageUrls: imageUrl ? [imageUrl] : [],
           fileType: imageFile?.type,
           textInput: input.trim(),
-          hasStudentConsent,
         });
 
         persistPendingAction(sessionId, pendingAction);
         setInput('');
         clearImage();
         router.replace(`/chat/${sessionId}`);
-      } catch (err) {
-        console.error('세션 시작 실패:', err);
+        return;
       }
-      return;
+
+      // 2. 기존 세션에 메시지 전송
+      let imageUrl: string | undefined;
+      if (imageFile) {
+        const { url } = await uploadImage(imageFile);
+        imageUrl = url;
+      }
+
+      const userMessage = {
+        id: `user-${crypto.randomUUID()}`,
+        role: 'user' as const,
+        parts: [
+          ...(imageUrl ? [{ type: 'text' as const, text: `[첨부된 수학 문제 이미지]\n![수학 문제](${imageUrl})\n\n` }] : []),
+          ...(input.trim() ? [{ type: 'text' as const, text: input.trim() }] : []),
+        ],
+      };
+
+      const nextMessages = [...messages, userMessage];
+      setInput('');
+      clearImage();
+      void streamResponse(currentSessionId, nextMessages);
+    } catch (err) {
+      console.error('세션 시작 실패:', err);
+    } finally {
+      submitLockRef.current = false;
     }
-
-    // 2. 기존 세션에 메시지 전원
-    let imageUrl: string | undefined;
-    if (imageFile) {
-      const { url } = await uploadImage(imageFile);
-      imageUrl = url;
-    }
-
-    const userMessage = {
-      id: `user-${crypto.randomUUID()}`,
-      role: 'user' as const,
-      parts: [
-        ...(imageUrl ? [{ type: 'text' as const, text: `[첨부된 수학 문제 이미지]\n![수학 문제](${imageUrl})\n\n` }] : []),
-        ...(input.trim() ? [{ type: 'text' as const, text: input.trim() }] : []),
-      ],
-    };
-
-    const nextMessages = [...messages, userMessage];
-    setInput('');
-    clearImage();
-
-    void streamResponse(currentSessionId, nextMessages);
   };
 
   return (
     <div className="bg-white">
+      {/* 이미지 미리보기 */}
       {imagePreview && (
         <div className="px-4 pt-3 border-t border-zinc-100">
           <div className="relative inline-block">
@@ -130,7 +154,6 @@ export function ChatInputArea() {
                 <span className="text-[10px] text-zinc-500 font-medium max-w-[100px] truncate">{imageFile?.name}</span>
               </div>
             ) : (
-              // 업로드 직후의 임시 미리보기 데이터 URL은 next/image 최적화 대상이 아니므로 일반 img를 사용합니다.
               // eslint-disable-next-line @next/next/no-img-element
               <img src={imagePreview} alt="미리보기" className="h-24 rounded-lg object-cover border border-zinc-200" />
             )}
@@ -144,8 +167,24 @@ export function ChatInputArea() {
         </div>
       )}
 
-      <div className={cn('p-4', !imagePreview && 'border-t border-zinc-100')}>
-        <form ref={composerFormRef} onSubmit={handleFormSubmit} className="relative max-w-3xl mx-auto flex items-center gap-2">
+      {/* 수식 입력 패널 */}
+      {panel === 'math' && (
+        <MathInputPanel
+          latex={mathLatex}
+          onChange={setMathLatex}
+          onInsert={handleMathInsert}
+          onClose={() => setPanel(null)}
+        />
+      )}
+
+      {/* 계산기 패널 */}
+      {panel === 'calc' && (
+        <SimpleCalculator onClose={() => setPanel(null)} />
+      )}
+
+      {/* 입력 폼 */}
+      <div className={cn('p-4', !imagePreview && panel === null && 'border-t border-zinc-100')}>
+        <form ref={composerFormRef} onSubmit={handleFormSubmit} className="relative max-w-3xl mx-auto flex items-center gap-1.5">
           <input
             ref={fileInputRef}
             type="file"
@@ -153,6 +192,8 @@ export function ChatInputArea() {
             onChange={handleFileSelect}
             className="hidden"
           />
+
+          {/* 이미지 업로드 */}
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -165,8 +206,40 @@ export function ChatInputArea() {
             <ImagePlus size={20} />
           </button>
 
+          {/* 수식 입력 버튼 (ƒ) */}
+          <button
+            type="button"
+            onClick={() => togglePanel('math')}
+            disabled={isLoading || isInitializing}
+            title="수식 입력"
+            className={cn(
+              'p-2.5 rounded-full transition-colors shrink-0 text-[15px] font-bold leading-none',
+              panel === 'math'
+                ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                : 'bg-zinc-100 text-zinc-500'
+            )}
+          >
+            ƒ
+          </button>
+
+          {/* 계산기 버튼 (🟰) */}
+          <button
+            type="button"
+            onClick={() => togglePanel('calc')}
+            disabled={isLoading || isInitializing}
+            title="계산기"
+            className={cn(
+              'p-2.5 rounded-full transition-colors shrink-0 text-[15px] leading-none',
+              panel === 'calc'
+                ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                : 'bg-zinc-100 text-zinc-500'
+            )}
+          >
+            🟰
+          </button>
+
           <input
-            className="w-full bg-zinc-100/80 text-zinc-900 rounded-full pl-6 pr-14 py-4 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white border border-transparent transition-all placeholder:text-zinc-400"
+            className="w-full bg-zinc-100/80 text-zinc-900 rounded-full pl-5 pr-14 py-4 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white border border-transparent transition-all placeholder:text-zinc-400"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="수학 문제를 입력하거나 사진을 올려주세요..."
@@ -197,22 +270,6 @@ export function ChatInputArea() {
           <span className="text-[11px] text-zinc-400 font-medium">
             📸 사진이나 📄 PDF를 올리면 AI와 공부를 시작할 수 있습니다
           </span>
-          {currentSessionId && !sessionCompleted && (
-            <button
-              type="button"
-              onClick={async () => {
-                if (!currentSessionId) return;
-                try {
-                  await completeManualSession(currentSessionId);
-                } catch (err) {
-                  console.error('수동 완료 처리 에러:', err);
-                }
-              }}
-              className="text-[11px] text-zinc-300 hover:text-zinc-500 underline underline-offset-2"
-            >
-              학습 완료로 표시
-            </button>
-          )}
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '@/lib/supabase/client';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,9 +15,9 @@ export default async function SessionsPage() {
 
   const { data: recentLogs } = await supabase
     .from('dialogue_logs')
-    .select('id, speaker, message_text, created_at, session_id')
-    .order('created_at', { ascending: false })
-    .limit(30);
+    .select('session_id, messages, updated_at')
+    .order('updated_at', { ascending: false })
+    .limit(10);
 
   return (
     <div className="p-8 lg:p-12 max-w-7xl mx-auto space-y-8">
@@ -57,22 +57,27 @@ export default async function SessionsPage() {
               최근 대화 로그가 아직 없습니다.
             </div>
           ) : (
-            recentLogs.map((log) => (
-              <div key={log.id} className="p-4 flex items-start gap-4 hover:bg-zinc-50 transition-colors">
-                <span className={`text-xs font-mono px-2 py-1 rounded shrink-0 ${log.speaker === 'student'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-emerald-100 text-emerald-700'
-                  }`}>
-                  {log.speaker === 'student' ? '학생' : 'AI'}
-                </span>
-                <div className="min-w-0 space-y-1">
-                  <p className="text-sm text-zinc-700 line-clamp-2">{log.message_text}</p>
-                  <p className="text-[11px] text-zinc-400 font-mono">
-                    session: {log.session_id} · {new Date(log.created_at).toLocaleString('ko-KR')}
-                  </p>
+            recentLogs.map((log) => {
+              const msgs = (log.messages as any[]) || [];
+              const lastMsg = msgs[msgs.length - 1];
+              if (!lastMsg) return null;
+              const isStudent = lastMsg.role === 'student' || lastMsg.role === 'user';
+
+              return (
+                <div key={log.session_id} className="p-4 flex items-start gap-4 hover:bg-zinc-50 transition-colors">
+                  <span className={`text-xs font-mono px-2 py-1 rounded shrink-0 ${isStudent ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
+                    }`}>
+                    {isStudent ? '학생' : 'AI'}
+                  </span>
+                  <div className="min-w-0 space-y-1">
+                    <p className="text-sm text-zinc-700 line-clamp-2">{lastMsg.content}</p>
+                    <p className="text-[11px] text-zinc-400 font-mono">
+                      session: {log.session_id} · {new Date(log.updated_at).toLocaleString('ko-KR')}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

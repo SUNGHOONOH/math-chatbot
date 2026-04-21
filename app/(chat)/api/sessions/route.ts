@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getSupabaseAdmin } from '@/lib/supabase/client';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export async function GET() {
   try {
@@ -27,7 +27,12 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      sessions: (data || []).map((session) => ({
+      sessions: (data as Array<{
+        id: string;
+        session_status: string;
+        created_at: string;
+        extracted_text: string;
+      }> || []).map((session) => ({
         id: session.id,
         session_status: session.session_status,
         created_at: session.created_at,

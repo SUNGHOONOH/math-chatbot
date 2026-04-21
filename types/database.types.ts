@@ -14,6 +14,7 @@ export type TutoringSession = Database['public']['Tables']['tutoring_sessions'][
 export type DialogueLog = Database['public']['Tables']['dialogue_logs']['Row']
 export type LearningBottleneck = Database['public']['Tables']['learning_bottlenecks']['Row']
 export type SessionReport = Database['public']['Tables']['session_reports']['Row']
+export type UserProfile = Database['public']['Tables']['user_profiles']['Row']
 
 // ── Insert 타입 (DB에 새로 삽입할 데이터) ──
 export type StrategyGraphInsert = Database['public']['Tables']['strategy_graphs']['Insert']
@@ -22,9 +23,11 @@ export type TutoringSessionInsert = Database['public']['Tables']['tutoring_sessi
 export type DialogueLogInsert = Database['public']['Tables']['dialogue_logs']['Insert']
 export type LearningBottleneckInsert = Database['public']['Tables']['learning_bottlenecks']['Insert']
 export type SessionReportInsert = Database['public']['Tables']['session_reports']['Insert']
+export type UserProfileInsert = Database['public']['Tables']['user_profiles']['Insert']
 
 // ── Update 타입 (DB 레코드 부분 수정) ──
 export type TutoringSessionUpdate = Database['public']['Tables']['tutoring_sessions']['Update']
+export type UserProfileUpdate = Database['public']['Tables']['user_profiles']['Update']
 
 // ── RPC 반환 타입 ──
 export type ConceptMatch = Database['public']['Functions']['match_concept_nodes']['Returns'][number]
@@ -33,4 +36,4 @@ export type ConceptMatch = Database['public']['Functions']['match_concept_nodes'
 export type SessionStatus = TutoringSession['session_status']
 
 // ── 발화자/발화유형 Enum ──
-export type Speaker = DialogueLog['speaker']
+export type Speaker = 'student' | 'ai_tutor'

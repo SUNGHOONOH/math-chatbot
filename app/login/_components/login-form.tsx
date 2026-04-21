@@ -18,6 +18,7 @@ export default function LoginForm({ nextPath = '/' }: LoginFormProps) {
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setLoading(true);
     setError(null);
 
@@ -48,7 +49,9 @@ export default function LoginForm({ nextPath = '/' }: LoginFormProps) {
   };
 
   const handleOAuthLogin = async (provider: 'google' | 'kakao') => {
+
     setLoading(true);
+    setError(null);
     const callbackUrl = new URL('/auth/callback', window.location.origin);
     if (safeNextPath !== '/') {
       callbackUrl.searchParams.set('next', safeNextPath);
@@ -77,7 +80,7 @@ export default function LoginForm({ nextPath = '/' }: LoginFormProps) {
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center">
+        <div className="mb-4 p-3 bg-red-50 border border-red-100 text-red-600 rounded-lg text-[13px] text-center font-medium">
           {error}
         </div>
       )}

@@ -10,6 +10,19 @@ import { getOrBuildSessionReport } from '@/lib/services/report-service';
 
 export const maxDuration = 60;
 
+function getErrorResponse(error: unknown) {
+  const status =
+    typeof error === 'object' && error !== null && 'status' in error && typeof error.status === 'number'
+      ? error.status
+      : 500;
+  const message =
+    typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string'
+      ? error.message
+      : '리포트 생성 중 오류가 발생했습니다.';
+
+  return NextResponse.json({ error: message }, { status });
+}
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ sessionId: string }> }
@@ -25,8 +38,27 @@ export async function GET(
   try {
     const report = await getOrBuildSessionReport(sessionId, user.id);
     return NextResponse.json(report);
-  } catch (err: any) {
-    const status = err?.status ?? 500;
-    return NextResponse.json({ error: err.message }, { status });
+  } catch (err: unknown) {
+    return getErrorResponse(err);
+  }
+}
+
+export async function POST(
+  _req: Request,
+  { params }: { params: Promise<{ sessionId: string }> }
+) {
+  const { sessionId } = await params;
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
+  }
+
+  try {
+    const report = await getOrBuildSessionReport(sessionId, user.id, { forceRegenerate: true });
+    return NextResponse.json(report);
+  } catch (err: unknown) {
+    return getErrorResponse(err);
   }
 }
