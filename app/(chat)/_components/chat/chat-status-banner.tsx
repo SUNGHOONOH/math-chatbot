@@ -89,7 +89,7 @@ export function ChatStatusBanner() {
 
       {/* 4. 학습 완료 배너 (트로피) */}
       {sessionCompleted && currentSessionId && (
-        <div className="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-4 animate-in slide-in-from-bottom-2 duration-300">
+        <div className="p-4 bg-linear-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-4 animate-in slide-in-from-bottom-2 duration-300">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0">
               <Trophy size={20} className="text-emerald-600" />

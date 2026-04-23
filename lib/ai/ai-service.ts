@@ -1,10 +1,9 @@
-import { VISION_MODEL, TAGGING_MODEL, EMBEDDING_MODEL } from './models';
+import { VISION_MODEL, TAGGING_MODEL, EMBEDDING_MODEL, TEXT_MODEL } from './models';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
-import { CHAT_CONTEXT_WINDOW_SIZE, RAG_SIMILARITY_THRESHOLD } from '@/lib/constants';
+import { CHAT_CONTEXT_WINDOW_SIZE } from '@/lib/constants';
 import crypto from 'crypto';
 import type { Json } from '@/lib/db/schema';
 
-const RAG_MATCH_COUNT = 3;
 const DEFAULT_CHAT_MAX_TOKENS = 2048;
 const HF_STREAM_DEBUG = process.env.HF_STREAM_DEBUG === '1';
 const VALID_FAILURE_TYPES = new Set([
@@ -28,115 +27,214 @@ type StructuredResponseFormat =
     };
   };
 
-const gateResponseFormat: StructuredResponseFormat = {
-  type: 'json_schema',
-  json_schema: {
-    name: 'bottleneck_gate',
-    description: 'Determine whether the latest student turn should be sent to bottleneck tagging.',
-    strict: true,
-    schema: {
-      type: 'object',
-      additionalProperties: false,
-      required: ['should_tag', 'focus_text', 'reason'],
-      properties: {
-        should_tag: { type: 'boolean' },
-        focus_text: { type: 'string' },
-        reason: { type: 'string' },
+export interface StrategyGraphWay {
+  way_id: 'A' | 'B' | 'C';
+  is_primary: boolean;
+  summary: string;
+  concepts: string[];
+}
+
+export interface StrategyGraphPhase {
+  phase: number;
+  goal_code: string;
+  goal_type: 'MG' | 'G';
+  goal: string;
+  summary: string;
+  requires: string[];
+  ways: StrategyGraphWay[];
+}
+
+export interface StrategyGraphData {
+  version: 1;
+  phases: StrategyGraphPhase[];
+}
+
+export interface StrategyRouteStep {
+  phase: number;
+  goal_code: string;
+  goal_type: 'MG' | 'G';
+  way_id: 'A' | 'B' | 'C';
+  summary: string;
+  concepts: string[];
+}
+
+interface RawDialogueMessage {
+  role?: string;
+  content?: string;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function normalizeStrategyGraphWay(
+  value: unknown,
+  allowedConcepts?: Set<string>
+): StrategyGraphWay | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const wayId = value.way_id;
+  if (wayId !== 'A' && wayId !== 'B' && wayId !== 'C') {
+    return null;
+  }
+
+  const summary = typeof value.summary === 'string' ? value.summary.trim() : '';
+  if (!summary) {
+    return null;
+  }
+
+  const concepts = Array.isArray(value.concepts)
+    ? value.concepts
+      .filter((item): item is string => typeof item === 'string')
+      .map((item) => item.trim())
+      .filter((item) => (allowedConcepts ? allowedConcepts.has(item) : Boolean(item)))
+    : [];
+
+  return {
+    way_id: wayId,
+    is_primary: value.is_primary === true,
+    summary,
+    concepts: Array.from(new Set(concepts)),
+  };
+}
+
+function normalizeStrategyGraphPhase(
+  value: unknown,
+  allowedConcepts?: Set<string>
+): StrategyGraphPhase | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const phase = typeof value.phase === 'number' && Number.isInteger(value.phase) && value.phase > 0
+    ? value.phase
+    : null;
+  const goalCode = typeof value.goal_code === 'string' ? value.goal_code.trim() : '';
+  const goalType = value.goal_type === 'G' ? 'G' : value.goal_type === 'MG' ? 'MG' : null;
+  const goal = typeof value.goal === 'string' ? value.goal.trim() : '';
+  const summary = typeof value.summary === 'string' ? value.summary.trim() : '';
+  const requires = Array.isArray(value.requires)
+    ? value.requires.filter((item): item is string => typeof item === 'string').map((item) => item.trim()).filter(Boolean)
+    : [];
+
+  const normalizedWays = Array.isArray(value.ways)
+    ? value.ways
+      .map((way) => normalizeStrategyGraphWay(way, allowedConcepts))
+      .filter((way): way is StrategyGraphWay => Boolean(way))
+    : [];
+
+  if (!phase || !goalCode || !goalType || !goal || !summary || normalizedWays.length === 0) {
+    return null;
+  }
+
+  return {
+    phase,
+    goal_code: goalCode,
+    goal_type: goalType,
+    goal,
+    summary,
+    requires: Array.from(new Set(requires)),
+    ways: normalizedWays.slice(0, 3),
+  };
+}
+
+export function normalizeStrategyGraphData(
+  value: unknown,
+  allowedConcepts?: string[]
+): StrategyGraphData {
+  if (!isRecord(value)) {
+    return { version: 1, phases: [] };
+  }
+
+  const allowedSet = Array.isArray(allowedConcepts) ? new Set(allowedConcepts) : undefined;
+  const phases = Array.isArray(value.phases)
+    ? value.phases
+      .map((phase) => normalizeStrategyGraphPhase(phase, allowedSet))
+      .filter((phase): phase is StrategyGraphPhase => Boolean(phase))
+    : [];
+
+  phases.sort((a, b) => a.phase - b.phase);
+
+  const seenGoalCodes = new Set<string>();
+  const normalizedPhases = phases.filter((phase) => {
+    if (seenGoalCodes.has(phase.goal_code)) {
+      return false;
+    }
+    seenGoalCodes.add(phase.goal_code);
+    return true;
+  });
+
+  return {
+    version: 1,
+    phases: normalizedPhases.slice(0, 5),
+  };
+}
+
+export function hasUsableStrategyGraphData(value: unknown): boolean {
+  return normalizeStrategyGraphData(value).phases.length > 0;
+}
+
+export function deriveRecommendedRouteFromGraphData(graphData: StrategyGraphData): StrategyRouteStep[] {
+  return graphData.phases.flatMap((phase) => {
+    const primaryWay = phase.ways.find((way) => way.is_primary);
+    if (!primaryWay) {
+      return [];
+    }
+
+    return [{
+      phase: phase.phase,
+      goal_code: phase.goal_code,
+      goal_type: phase.goal_type,
+      way_id: primaryWay.way_id,
+      summary: primaryWay.summary,
+      concepts: primaryWay.concepts,
+    }];
+  });
+}
+
+function buildFallbackStrategyGraphData(requiredConcepts: string[]): StrategyGraphData {
+  const concepts = Array.from(new Set(requiredConcepts.map((concept) => concept.trim()).filter(Boolean))).slice(0, 8);
+
+  if (concepts.length === 0) {
+    return { version: 1, phases: [] };
+  }
+
+  return {
+    version: 1,
+    phases: [
+      {
+        phase: 1,
+        goal_code: 'G',
+        goal_type: 'G',
+        goal: '문제 해결에 필요한 핵심 개념 적용',
+        summary: 'RAG로 검색된 핵심 개념을 바탕으로 문제 해결 경로를 구성합니다.',
+        requires: [],
+        ways: [
+          {
+            way_id: 'A',
+            is_primary: true,
+            summary: '가장 관련도가 높은 후보 개념들을 순서대로 적용합니다.',
+            concepts,
+          },
+        ],
       },
-    },
-  },
-};
+    ],
+  };
+}
+
 
 const diagnosisResponseFormat: StructuredResponseFormat = {
-  type: 'json_schema',
-  json_schema: {
-    name: 'bottleneck_diagnosis',
-    description: 'Return a validated bottleneck diagnosis JSON object.',
-    strict: true,
-    schema: {
-      type: 'object',
-      additionalProperties: false,
-      required: ['selected_concept_code', 'failure_type', 'student_friendly_description', 'reason'],
-      properties: {
-        selected_concept_code: { type: 'string' },
-        failure_type: {
-          type: 'string',
-          enum: Array.from(VALID_FAILURE_TYPES),
-        },
-        student_friendly_description: { type: 'string' },
-        reason: { type: 'string' },
-      },
-    },
-  },
+  type: 'json_object',
 };
 
 const requiredConceptsResponseFormat: StructuredResponseFormat = {
-  type: 'json_schema',
-  json_schema: {
-    name: 'required_concepts',
-    description: 'Return the required concept codes needed to solve the problem as JSON.',
-    strict: true,
-    schema: {
-      type: 'object',
-      additionalProperties: false,
-      required: ['required_concepts', 'base_difficulty'],
-      properties: {
-        required_concepts: {
-          type: 'array',
-          items: { type: 'string' },
-        },
-        base_difficulty: {
-          type: 'integer',
-          minimum: 1,
-          maximum: 5,
-        },
-      },
-    },
-  },
+  type: 'json_object',
 };
 
 export const sessionInsightResponseFormat: StructuredResponseFormat = {
-  type: 'json_schema',
-  json_schema: {
-    name: 'session_insight_report',
-    description: 'Return a structured tutoring session report as JSON.',
-    strict: true,
-    schema: {
-      type: 'object',
-      additionalProperties: false,
-      required: ['mastered_concepts', 'aha_moments', 'ai_tutor_summary', 'performance_metrics'],
-      properties: {
-        mastered_concepts: {
-          type: 'array',
-          items: { type: 'string' },
-        },
-        aha_moments: {
-          type: 'array',
-          items: {
-            type: 'object',
-            additionalProperties: false,
-            required: ['turn', 'node_id', 'utterance'],
-            properties: {
-              turn: { type: 'integer' },
-              node_id: { type: 'string' },
-              utterance: { type: 'string' },
-            },
-          },
-        },
-        ai_tutor_summary: { type: 'string' },
-        performance_metrics: {
-          type: 'object',
-          additionalProperties: false,
-          required: ['total_turns', 'ai_interventions', 'resolved_bottlenecks'],
-          properties: {
-            total_turns: { type: 'integer' },
-            ai_interventions: { type: 'integer' },
-            resolved_bottlenecks: { type: 'integer' },
-          },
-        },
-      },
-    },
-  },
+  type: 'json_object',
 };
 
 function getChatCompletionExtraBody(model: string): Record<string, unknown> | undefined {
@@ -370,21 +468,29 @@ function extractConceptCodeCandidates(text: string): string[] {
 function parseRequiredConceptAnalysisFromText(text: string): {
   requiredConcepts: string[];
   baseDifficulty: number | null;
+  graphData: StrategyGraphData;
 } {
-  const parsedObject = parseJsonObjectFromText<{ required_concepts?: string[]; base_difficulty?: number }>(text);
+  const parsedObject = parseJsonObjectFromText<{
+    required_concepts?: string[];
+    base_difficulty?: number;
+    graph_data?: unknown;
+  }>(text);
   if (parsedObject && Array.isArray(parsedObject.required_concepts)) {
-    return {
-      requiredConcepts: parsedObject.required_concepts
+    const requiredConcepts = parsedObject.required_concepts
       .filter((item): item is string => typeof item === 'string')
       .map((item) => item.trim())
-      .filter(Boolean),
+      .filter(Boolean);
+
+    return {
+      requiredConcepts,
       baseDifficulty:
         typeof parsedObject.base_difficulty === 'number' &&
-        Number.isInteger(parsedObject.base_difficulty) &&
-        parsedObject.base_difficulty >= 1 &&
-        parsedObject.base_difficulty <= 5
+          Number.isInteger(parsedObject.base_difficulty) &&
+          parsedObject.base_difficulty >= 1 &&
+          parsedObject.base_difficulty <= 5
           ? parsedObject.base_difficulty
           : null,
+      graphData: normalizeStrategyGraphData(parsedObject.graph_data, requiredConcepts),
     };
   }
 
@@ -408,14 +514,122 @@ function parseRequiredConceptAnalysisFromText(text: string): {
       return {
         requiredConcepts,
         baseDifficulty: null,
+        graphData: { version: 1, phases: [] },
       };
     }
   }
 
+  const fallbackRequiredConcepts = extractConceptCodeCandidates(text);
   return {
-    requiredConcepts: extractConceptCodeCandidates(text),
+    requiredConcepts: fallbackRequiredConcepts,
     baseDifficulty: null,
+    graphData: { version: 1, phases: [] },
   };
+}
+
+async function retrieveStrategyGraphConceptPool(
+  problemText: string,
+  dialogueTranscript: string
+): Promise<Array<{ concept_code: string; matched_text: string; similarity: number }>> {
+  const supabase = getSupabaseAdmin();
+  const retrievalTexts = [
+    dialogueTranscript.trim()
+      ? `[Problem Text]\n${problemText}\n\n[Full Conversation Transcript]\n${dialogueTranscript}`.trim()
+      : problemText.trim(),
+    problemText.trim(),
+  ].filter((text, index, texts) => text && texts.indexOf(text) === index);
+
+  if (retrievalTexts.length === 0) {
+    return [];
+  }
+
+  const deduped = new Map<string, { concept_code: string; matched_text: string; similarity: number; source_table: string }>();
+
+  for (const retrievalText of retrievalTexts) {
+    const embedding = await generateEmbedding(retrievalText, 'query');
+    const { data: candidates, error } = await supabase.rpc('match_concept_nodes', {
+      query_embedding: JSON.stringify(embedding),
+      match_count: 30,
+    });
+
+    if (error) {
+      console.error('[ai-service] strategy graph concept pool retrieval 에러:', error);
+      continue;
+    }
+
+    const normalized = (candidates ?? [])
+      .filter((candidate) => typeof candidate.concept_code === 'string' && candidate.concept_code.trim())
+      .filter((candidate) => typeof candidate.similarity === 'number')
+      .map((candidate) => ({
+        concept_code: candidate.concept_code.trim(),
+        matched_text: typeof candidate.matched_text === 'string' ? candidate.matched_text.trim() : '',
+        similarity: candidate.similarity,
+        source_table: typeof candidate.source_table === 'string' ? candidate.source_table : '',
+      }));
+
+    console.log('[ai-service] strategy graph RAG 후보 조회:', {
+      rawCount: candidates?.length ?? 0,
+      normalizedCount: normalized.length,
+      referenceCount: normalized.filter((candidate) => candidate.source_table === 'concept_nodes_reference').length,
+      aliasCount: normalized.filter((candidate) => candidate.source_table === 'concept_aliases').length,
+    });
+
+    const conceptCodes = [...new Set(normalized.map((candidate) => candidate.concept_code))];
+    if (conceptCodes.length === 0) {
+      continue;
+    }
+
+    const { data: referenceRows, error: referenceError } = await supabase
+      .from('concept_nodes_reference')
+      .select('concept_code, title, description')
+      .in('concept_code', conceptCodes);
+
+    if (referenceError) {
+      console.error('[ai-service] strategy graph 후보 reference 검증 에러:', referenceError);
+      continue;
+    }
+
+    const referenceMap = new Map(
+      (referenceRows ?? []).map((row) => [
+        row.concept_code,
+        {
+          title: row.title,
+          description: row.description,
+        },
+      ])
+    );
+
+    for (const candidate of normalized) {
+      const reference = referenceMap.get(candidate.concept_code);
+      if (!reference) {
+        continue;
+      }
+
+      const existing = deduped.get(candidate.concept_code);
+      if (!existing || existing.similarity < candidate.similarity) {
+        deduped.set(candidate.concept_code, {
+          ...candidate,
+          matched_text: [
+            candidate.matched_text,
+            reference.title ? `title=${reference.title}` : '',
+            reference.description ? `description=${reference.description}` : '',
+          ].filter(Boolean).join(' | '),
+        });
+      }
+    }
+
+    if (deduped.size > 0) {
+      break;
+    }
+  }
+
+  if (deduped.size === 0) {
+    console.warn('[ai-service] strategy graph RAG 후보가 reference 검증 후 비어 있음');
+  }
+
+  return Array.from(deduped.values())
+    .sort((a, b) => b.similarity - a.similarity)
+    .slice(0, 15);
 }
 
 function parseBracketKeyValueText(text: string): Record<string, string> | null {
@@ -473,57 +687,6 @@ function normalizeConceptCode(value: unknown, candidateConceptCodes: string[]): 
   return candidateConceptCodes.includes(normalized)
     ? normalized
     : 'unmapped_bottleneck';
-}
-
-async function getBottleneckGateResult({
-  problemText,
-  recentContext,
-  latestStudentMessage,
-}: {
-  problemText: string;
-  recentContext: string;
-  latestStudentMessage: string;
-}): Promise<{
-  should_tag: boolean;
-  focus_text: string;
-  reason: string;
-} | null> {
-  const { buildBottleneckGateInput } = await import('./prompts');
-
-  const gateText = await hfGenerateText({
-    model: TAGGING_MODEL,
-    inputs: buildBottleneckGateInput({
-      problemText,
-      recentContext,
-      latestStudentMessage,
-    }),
-    parameters: { max_new_tokens: 1024, temperature: 0.1 },
-    responseFormat: gateResponseFormat,
-  });
-
-  try {
-    const parsed = parseJsonObjectFromText<{
-      should_tag?: boolean;
-      focus_text?: string;
-      reason?: string;
-    }>(gateText);
-
-    if (!parsed || typeof parsed.should_tag !== 'boolean') {
-      console.error('[ai-service] Gate JSON 파싱 실패: should_tag 누락');
-      console.error('[ai-service] Gate 원문 미리보기:', previewForLog(gateText, 300));
-      return null;
-    }
-
-    return {
-      should_tag: parsed.should_tag,
-      focus_text: typeof parsed.focus_text === 'string' ? parsed.focus_text.trim() : '',
-      reason: typeof parsed.reason === 'string' ? parsed.reason.trim() : '',
-    };
-  } catch (e) {
-    console.error('[ai-service] Gate JSON 파싱 실패:', e);
-    console.error('[ai-service] Gate 원문 미리보기:', previewForLog(gateText, 300));
-    return null;
-  }
 }
 
 function parseDiagnosisResultFromText(
@@ -681,7 +844,7 @@ export function generateProblemHash(text: string): string {
 /**
  * [Core] HuggingFace 통합 API 호출 엔진
  */
-async function hfFetch(url: string, body: any, options?: { timeoutMs?: number }) {
+async function hfFetch(url: string, body: unknown, options?: { timeoutMs?: number }) {
   const controller = new AbortController();
   const timeoutMs = options?.timeoutMs;
   const timeoutId = timeoutMs
@@ -700,8 +863,8 @@ async function hfFetch(url: string, body: any, options?: { timeoutMs?: number })
       body: JSON.stringify(body),
       signal: controller.signal,
     });
-  } catch (error) {
-    if ((error as any)?.name === 'AbortError') {
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === 'AbortError') {
       throw new Error(`요청 시간 초과 (${timeoutMs}ms)`);
     }
 
@@ -767,12 +930,11 @@ export async function hfGenerateText({
       model,
       messages,
       temperature: parameters.temperature ?? 0.3,
+      max_tokens: parameters.max_new_tokens || DEFAULT_CHAT_MAX_TOKENS,
       ...(extraBody ?? {}),
     };
 
-    if (!responseFormat || responseFormat.type === 'text') {
-      requestBody.max_tokens = parameters.max_new_tokens || DEFAULT_CHAT_MAX_TOKENS;
-    } else {
+    if (responseFormat && responseFormat.type !== 'text') {
       requestBody.response_format = responseFormat;
     }
 
@@ -818,7 +980,7 @@ export async function hfStreamText({
   debugTag,
 }: {
   model: string;
-  messages: any[];
+  messages: Array<{ role: string; content: string }>;
   system?: string;
   onFinish?: (text: string) => void;
   maxTokens?: number;
@@ -1033,7 +1195,7 @@ export async function getStrategyGraph(problemHash: string): Promise<{
   required_concepts: string[];
   base_difficulty: number;
   intended_path: string[];
-  graph_data: any;
+  graph_data: Json;
   is_human_verified: boolean;
   is_deleted: boolean;
   deleted_at: string | null;
@@ -1053,7 +1215,19 @@ export async function getStrategyGraph(problemHash: string): Promise<{
     return null;
   }
 
-  return data as any;
+  return data as {
+    problem_hash: string;
+    problem_text: string | null;
+    required_concepts: string[];
+    base_difficulty: number;
+    intended_path: string[];
+    graph_data: Json;
+    is_human_verified: boolean;
+    is_deleted: boolean;
+    deleted_at: string | null;
+    deleted_by: string | null;
+    created_at: string;
+  } | null;
 }
 
 export async function ensureStrategyGraphExists(problemHash: string, problemText: string) {
@@ -1315,17 +1489,20 @@ export async function generateEmbedding(text: string, type: 'query' | 'passage' 
 }
 
 /**
- * [Route 2] 백그라운드 병목 감지 및 RAG 매칭 (Two-Step RAG)
- * next/after() 내에서 실행
+ * [Route 2-A] TEXT_MODEL 신호 기반 병목 진단 (Gate LLM 없음 — 비용 최적화)
+ * TEXT_MODEL이 [BOTTLENECK: ...] 태그를 발신할 때만 호출됨.
+ * Gate 호출을 생략하고 바로 RAG → Diagnosis → DB 저장으로 이동.
  */
-export async function runBottleneckDetection({
+export async function runBottleneckDetectionFromSignal({
   sessionId,
   problemText,
-  messages,
+  bottleneckSummary,
+  recentContext,
 }: {
   sessionId: string;
   problemText: string;
-  messages: Array<{ role: string; content: string }>;
+  bottleneckSummary: string; // TEXT_MODEL이 준 요약문
+  recentContext: string;     // 최근 2~3턴 (Diagnosis에서 활용)
 }) {
   try {
     const supabase = getSupabaseAdmin();
@@ -1335,33 +1512,12 @@ export async function runBottleneckDetection({
       .eq('id', sessionId)
       .maybeSingle();
 
-    if (!session || session.session_status !== 'in_progress') {
-      return;
-    }
+    if (!session || session.session_status !== 'in_progress') return;
 
-    const recentContext = messages.slice(-3).map(m => `${m.role === 'assistant' ? 'AI' : '학생'}: ${m.content}`).join('\n');
-    const latestStudentMessage = messages.filter(m => m.role === 'user').pop()?.content || '';
+    const retrievalText = bottleneckSummary.trim();
+    if (!retrievalText) return;
 
-    if (!latestStudentMessage || latestStudentMessage.trim() === '') return;
-
-    // Step 1: Gate LLM이 이 턴을 병목 진단 대상으로 보낼지 결정
-    const gateResult = await getBottleneckGateResult({
-      problemText,
-      recentContext,
-      latestStudentMessage,
-    });
-
-    if (!gateResult || !gateResult.should_tag) {
-      return;
-    }
-
-    const retrievalText = gateResult.focus_text.trim();
-    if (!retrievalText) {
-      console.error('[ai-service] Gate 결과는 should_tag=true지만 focus_text가 비어 있음');
-      return;
-    }
-
-    // Step 2: 임베딩 및 혼합 RAG 검색 (Union Search) - 검색용 'query' 프리픽스 사용
+    // Step 1: RAG 검색 (Gate 없이 바로 임베딩)
     const embedding = await generateEmbedding(retrievalText, 'query');
     const { data: candidates, error: rpcError } = await supabase.rpc(
       'match_concept_nodes',
@@ -1369,17 +1525,16 @@ export async function runBottleneckDetection({
     );
 
     if (rpcError || !candidates || candidates.length === 0) {
-      console.error('[ai-service] RAG 매칭 실패:', rpcError);
+      console.error('[ai-service] [signal] RAG 매칭 실패:', rpcError);
       return;
     }
 
-    const candidatesText = candidates.map((c: any) => `[${c.concept_code}] ${c.matched_text}`).join('\n');
-
+    const candidatesText = candidates.map((c) => `[${c.concept_code}] ${c.matched_text}`).join('\n');
     const candidateConceptCodes = candidates
-      .map((c: any) => (typeof c.concept_code === 'string' ? c.concept_code.trim() : ''))
+      .map((c) => (typeof c.concept_code === 'string' ? c.concept_code.trim() : ''))
       .filter(Boolean);
 
-    // Step 3: LLM 최종 진단 (Concept & Failure Type Selection)
+    // Step 2: TAGGING_MODEL 최종 진단
     const diagnosisResult = await getStrictDiagnosisResult({
       problemText,
       recentContext,
@@ -1388,11 +1543,9 @@ export async function runBottleneckDetection({
       fallbackDescription: retrievalText,
     });
 
-    if (!diagnosisResult) {
-      return;
-    }
+    if (!diagnosisResult) return;
 
-    // Step 4: DB 저장
+    // Step 3: DB 저장
     const { error: insertError } = await supabase
       .from('learning_bottlenecks')
       .insert({
@@ -1406,22 +1559,25 @@ export async function runBottleneckDetection({
       });
 
     if (insertError) {
-      console.error('[ai-service] 병목 저장 에러:', insertError);
+      console.error('[ai-service] [signal] 병목 저장 에러:', insertError);
     } else {
-      console.log(`[ai-service] 병목 진단 저장 완료: ${diagnosisResult.selected_concept_code}`);
+      console.log(`[ai-service] [signal] 병목 진단 저장 완료: ${diagnosisResult.selected_concept_code}`);
     }
   } catch (err) {
-    console.error('[ai-service] runBottleneckDetection 에러:', err);
+    console.error('[ai-service] [signal] runBottleneckDetectionFromSignal 에러:', err);
   }
 }
 
+
 /**
- * [세션 종료] required_concepts 지연 수집 (Lazy Loading - Phase 2)
+ * [세션 리포트] strategy_graphs 지연 분석 (Lazy Loading)
  * 
- * 세션이 종료(completed/abandoned)될 때 호출하여
- * strategy_graphs의 required_concepts만 분석하여 보관합니다.
- * 
- * ⚠️ intended_path, graph_data는 추후 확장을 위해 예약되어 있으며 현재는 사용하지 않습니다.
+ * 리포트 조회 시점에 strategy_graphs의 핵심 분석 데이터를 채웁니다.
+ * - required_concepts
+ * - base_difficulty
+ * - graph_data
+ *
+ * intended_path는 사용하지 않습니다.
  */
 export async function extractAndUpdateRequiredConcepts({
   sessionId,
@@ -1429,7 +1585,11 @@ export async function extractAndUpdateRequiredConcepts({
 }: {
   sessionId: string;
   problemHash: string;
-}): Promise<{ requiredConcepts: string[]; baseDifficulty: number | null } | null> {
+}): Promise<{
+  requiredConcepts: string[];
+  baseDifficulty: number | null;
+  graphData: StrategyGraphData;
+} | null> {
   try {
     const supabase = getSupabaseAdmin();
 
@@ -1452,33 +1612,60 @@ export async function extractAndUpdateRequiredConcepts({
       .eq('session_id', sessionId)
       .maybeSingle();
 
-    const messagesArray = logRow?.messages as any[] || [];
+    const messagesArray = Array.isArray(logRow?.messages)
+      ? (logRow.messages as RawDialogueMessage[])
+      : [];
 
     // 3. 프롬프트 컨텍스트 조립
     const dialogueTranscript = messagesArray
       .map((l) => {
         const speaker = l.role === 'student' || l.role === 'user' ? '학생' : 'AI';
-        const content = sanitizeDialogueMessageText(l.content, l.role);
+        const content = sanitizeDialogueMessageText(l.content ?? '', l.role ?? 'assistant');
         return `${speaker}: ${content}`;
       })
       .join('\n');
 
-    const contextForLLM = dialogueTranscript.trim()
-      ? `[문제 원문]\n${session.extracted_text}\n\n[전체 대화 기록]\n${dialogueTranscript}`
-      : `[문제 원문]\n${session.extracted_text}\n\n[전체 대화 기록]\n(대화 기록 없음)`;
+    const candidatePool = await retrieveStrategyGraphConceptPool(session.extracted_text, dialogueTranscript);
+    if (candidatePool.length === 0) {
+      console.warn('[ai-service] strategy graph concept pool이 비어 있어 extractor를 스킵:', sessionId);
+      return null;
+    }
 
-    // 4. Tagging LLM 호출: required_concepts만 추출
+    const candidatePoolText = candidatePool
+      .map(
+        (candidate, index) =>
+          `${index + 1}. ${candidate.concept_code} | similarity=${candidate.similarity.toFixed(3)} | matched_text=${candidate.matched_text || '(없음)'}`
+      )
+      .join('\n');
+
+    const contextForLLM = dialogueTranscript.trim()
+      ? `[Problem Text]\n${session.extracted_text}\n\n[Full Conversation Transcript]\n${dialogueTranscript}\n\n[Candidate Concept Pool]\n${candidatePoolText}`
+      : `[Problem Text]\n${session.extracted_text}\n\n[Full Conversation Transcript]\n(대화 기록 없음)\n\n[Candidate Concept Pool]\n${candidatePoolText}`;
+
+    // 4. TEXT_MODEL 호출: required_concepts, base_difficulty, graph_data 추출
     const { buildConceptExtractionInput } = await import('./prompts');
     const text = await hfGenerateText({
-      model: TAGGING_MODEL,
+      model: TEXT_MODEL,
       inputs: buildConceptExtractionInput(contextForLLM),
       parameters: { max_new_tokens: 2048, temperature: 0.1 },
       responseFormat: requiredConceptsResponseFormat,
     });
 
-    // 5. JSON 파싱 (마크다운 코드블록 및 앞뒤 텍스트에 강인하게 처리)
+    // 5. JSON 파싱 및 정규화
     const analysisResult = parseRequiredConceptAnalysisFromText(text);
-    const requiredConcepts = analysisResult.requiredConcepts;
+    const allowedConcepts = new Set(candidatePool.map((candidate) => candidate.concept_code));
+    const extractedRequiredConcepts = analysisResult.requiredConcepts.filter((concept) => allowedConcepts.has(concept));
+    const fallbackRequiredConcepts = candidatePool
+      .map((candidate) => candidate.concept_code)
+      .filter((concept, index, concepts) => concepts.indexOf(concept) === index)
+      .slice(0, 8);
+    const requiredConcepts = extractedRequiredConcepts.length > 0
+      ? extractedRequiredConcepts
+      : fallbackRequiredConcepts;
+    const extractedGraphData = normalizeStrategyGraphData(analysisResult.graphData, requiredConcepts);
+    const graphData = extractedGraphData.phases.length > 0
+      ? extractedGraphData
+      : buildFallbackStrategyGraphData(requiredConcepts);
 
     if (requiredConcepts.length === 0) {
       console.error('[ai-service] 개념 추출 JSON 파싱 에러: 유효한 required_concepts를 찾지 못함');
@@ -1487,12 +1674,13 @@ export async function extractAndUpdateRequiredConcepts({
       return null;
     }
 
-    // 6. strategy_graphs UPDATE (required_concepts만, intended_path/graph_data는 건드리지 않음)
+    // 6. strategy_graphs UPDATE
     const { error: updateError } = await supabase
       .from('strategy_graphs')
       .update({
         required_concepts: requiredConcepts,
         ...(analysisResult.baseDifficulty ? { base_difficulty: analysisResult.baseDifficulty } : {}),
+        graph_data: graphData as unknown as Json,
       })
       .eq('problem_hash', problemHash);
 
@@ -1507,6 +1695,7 @@ export async function extractAndUpdateRequiredConcepts({
     return {
       requiredConcepts,
       baseDifficulty: analysisResult.baseDifficulty,
+      graphData,
     };
   } catch (err) {
     console.error('[ai-service] extractAndUpdateRequiredConcepts 실패:', err);

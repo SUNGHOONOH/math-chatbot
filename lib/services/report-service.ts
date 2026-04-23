@@ -7,11 +7,16 @@
 
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import {
+  deriveRecommendedRouteFromGraphData,
   extractAndUpdateRequiredConcepts,
+  hasUsableStrategyGraphData,
   hfGenerateText,
+  normalizeStrategyGraphData,
   parseJsonObjectFromText,
   sanitizeDialogueMessageText,
   sessionInsightResponseFormat,
+  type StrategyGraphData,
+  type StrategyRouteStep,
 } from '@/lib/ai/ai-service';
 import { TAGGING_MODEL } from '@/lib/ai/models';
 import { insightAgentPrompt } from '@/lib/ai/prompts';
@@ -50,6 +55,8 @@ export interface SessionReport {
     baseDifficulty: number | null;
     isHumanVerified: boolean;
     wasAnalyzedOnDemand: boolean;
+    graphData: StrategyGraphData;
+    recommendedPath: StrategyRouteStep[];
   };
   dialogueLogs: Array<{
     id: string;
@@ -71,6 +78,14 @@ export interface SessionReport {
     ahaMoments: Json;
     aiTutorSummary: string;
     performanceMetrics: Json;
+    pathComparison: {
+      studentEstimatedPath: Array<{
+        phase: number;
+        goalCode: string;
+        wayId: 'A' | 'B' | 'C';
+      }>;
+      pathFeedback: string;
+    } | null;
     summaryStatus: 'ready' | 'fallback';
     createdAt: string;
     updatedAt: string;
@@ -89,6 +104,14 @@ type PersistedSummaryPayload = {
   aha_moments: Json;
   ai_tutor_summary: string;
   performance_metrics: Json;
+  path_comparison: {
+    student_estimated_path: Array<{
+      phase: number;
+      goal_code: string;
+      way_id: 'A' | 'B' | 'C';
+    }>;
+    path_feedback_ko: string;
+  } | null;
   summary_status: 'ready' | 'fallback';
 };
 
@@ -125,11 +148,10 @@ const reportBuildLocks = new Map<string, Promise<SessionReport>>();
 function fallbackConceptDisplayName(code: string): string {
   if (!code) return '';
   if (code === 'unmapped_bottleneck') return '아직 매핑되지 않은 병목';
-  if (code.startsWith('IR-')) return `조건 해석: ${code.slice(3)}`;
-  if (code.startsWith('SM-')) return `전략: ${code.slice(3)}`;
-  if (code.startsWith('PC-')) return `계산 처리: ${code.slice(3)}`;
-  if (code.endsWith('_PC')) return `${code.replace(/_PC$/, '')} 계산`;
-  return code;
+  if (code.includes('_PD_')) return '핵심 개념';
+  if (code.includes('_PP_')) return '파생 성질';
+  if (code.includes('_PC_')) return '계산 처리';
+  return '개념 정보 확인 중';
 }
 
 function collectConceptCodes(report: SessionReport): string[] {
@@ -168,6 +190,7 @@ async function attachConceptDisplayMap(
     .in('concept_code', conceptCodes);
 
   const conceptDisplayMap: Record<string, string> = {};
+  const knownConceptCodes = new Set<string>();
 
   for (const code of conceptCodes) {
     conceptDisplayMap[code] = fallbackConceptDisplayName(code);
@@ -175,6 +198,7 @@ async function attachConceptDisplayMap(
 
   for (const row of conceptRows ?? []) {
     if (row.concept_code && row.title) {
+      knownConceptCodes.add(row.concept_code);
       conceptDisplayMap[row.concept_code] = row.title;
     }
   }
@@ -182,6 +206,12 @@ async function attachConceptDisplayMap(
   return {
     ...report,
     conceptDisplayMap,
+    persistedReport: report.persistedReport
+      ? {
+        ...report.persistedReport,
+        masteredConcepts: report.persistedReport.masteredConcepts.filter((concept) => knownConceptCodes.has(concept)),
+      }
+      : null,
   };
 }
 
@@ -209,7 +239,7 @@ async function attachReportFreshness(
 
   const hasNewDialogueSinceReport = Boolean(
     dialogueRow?.updated_at &&
-      new Date(dialogueRow.updated_at).getTime() > new Date(reportUpdatedAt).getTime()
+    new Date(dialogueRow.updated_at).getTime() > new Date(reportUpdatedAt).getTime()
   );
 
   return {
@@ -221,12 +251,61 @@ async function attachReportFreshness(
   };
 }
 
+async function attachStrategyGraphContext(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  report: SessionReport
+): Promise<SessionReport> {
+  const { data: graph } = await supabase
+    .from('strategy_graphs')
+    .select('graph_data')
+    .eq('problem_hash', report.session.problemHash)
+    .maybeSingle();
+
+  const graphData = normalizeStrategyGraphData(graph?.graph_data);
+  const recommendedPath = deriveRecommendedRouteFromGraphData(graphData);
+  const normalizedPathComparison = report.persistedReport?.pathComparison
+    ? normalizeStoredPathComparison({
+      student_estimated_path: report.persistedReport.pathComparison.studentEstimatedPath.map((step) => ({
+        phase: step.phase,
+        goal_code: step.goalCode,
+        way_id: step.wayId,
+      })),
+      path_feedback_ko: report.persistedReport.pathComparison.pathFeedback,
+    }, graphData)
+    : null;
+
+  return {
+    ...report,
+    analysis: {
+      ...report.analysis,
+      graphData,
+      recommendedPath,
+    },
+    persistedReport: report.persistedReport
+      ? {
+        ...report.persistedReport,
+        pathComparison: normalizedPathComparison
+          ? {
+            studentEstimatedPath: normalizedPathComparison.student_estimated_path.map((step) => ({
+              phase: step.phase,
+              goalCode: step.goal_code,
+              wayId: step.way_id,
+            })),
+            pathFeedback: normalizedPathComparison.path_feedback_ko,
+          }
+          : null,
+      }
+      : null,
+  };
+}
+
 async function hydrateReport(
   supabase: ReturnType<typeof getSupabaseAdmin>,
   report: SessionReport
 ): Promise<SessionReport> {
   const withConceptDisplayMap = await attachConceptDisplayMap(supabase, report);
-  return attachReportFreshness(supabase, withConceptDisplayMap);
+  const withGraphContext = await attachStrategyGraphContext(supabase, withConceptDisplayMap);
+  return attachReportFreshness(supabase, withGraphContext);
 }
 
 function buildDialogueTranscript(messages: RawDialogueMessage[]): string {
@@ -255,6 +334,194 @@ function buildBottlenecksTranscript(bottlenecks: RawBottleneckRow[]): string {
     .join('\n');
 }
 
+function buildInsightGraphContext(graphData: StrategyGraphData, recommendedPath: StrategyRouteStep[]): string {
+  const hasGraphData = graphData.phases.length > 0;
+  const hasRecommendedPath = recommendedPath.length > 0;
+  const phasesText = graphData.phases.length > 0
+    ? graphData.phases
+      .map((phase) => {
+        const waysText = phase.ways
+          .map(
+            (way) =>
+              `- ${phase.goal_code}/${way.way_id}${way.is_primary ? ' [PRIMARY]' : ''}: ${way.summary} | concepts=${way.concepts.join(', ') || '(없음)'}`
+          )
+          .join('\n');
+
+        return [
+          `[Phase ${phase.phase}] ${phase.goal_code} (${phase.goal_type})`,
+          `goal=${phase.goal}`,
+          `summary=${phase.summary}`,
+          `requires=${phase.requires.join(', ') || '(없음)'}`,
+          waysText,
+        ].join('\n');
+      })
+      .join('\n\n')
+    : '(graph_data 없음)';
+
+  const recommendedPathText = recommendedPath.length > 0
+    ? recommendedPath
+      .map(
+        (step) =>
+          `- phase=${step.phase}, goal_code=${step.goal_code}, way_id=${step.way_id}, summary=${step.summary}, concepts=${step.concepts.join(', ') || '(없음)'}`
+      )
+      .join('\n')
+    : '(추천 경로 없음)';
+
+  return [
+    `[Graph Availability]`,
+    hasGraphData && hasRecommendedPath ? 'available' : 'unavailable',
+    ``,
+    `[Graph Data]`,
+    phasesText,
+    ``,
+    `[Recommended Path Derived From is_primary]`,
+    recommendedPathText,
+  ].join('\n');
+}
+
+function buildStrategyRouteKey(phase: number, goalCode: string, wayId: string): string {
+  return `${phase}::${goalCode}::${wayId}`;
+}
+
+function getValidStrategyRouteKeys(graphData: StrategyGraphData): Set<string> {
+  return new Set(
+    graphData.phases.flatMap((phase) =>
+      phase.ways.map((way) => buildStrategyRouteKey(phase.phase, phase.goal_code, way.way_id))
+    )
+  );
+}
+
+function getGraphConceptCodes(graphData: StrategyGraphData): Set<string> {
+  return new Set(
+    graphData.phases.flatMap((phase) => phase.ways.flatMap((way) => way.concepts))
+  );
+}
+
+function getAllowedReportConceptCodes(graphData: StrategyGraphData, bottlenecks: RawBottleneckRow[]): Set<string> {
+  const allowedConceptCodes = getGraphConceptCodes(graphData);
+
+  for (const bottleneck of bottlenecks) {
+    if (bottleneck.mapped_concept_id) {
+      allowedConceptCodes.add(bottleneck.mapped_concept_id);
+    }
+  }
+
+  return allowedConceptCodes;
+}
+
+function normalizeAhaMoments(value: unknown, allowedConceptCodes: Set<string>): Json {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((item) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      return [];
+    }
+
+    const record = item as Record<string, unknown>;
+    const turn = typeof record.turn === 'number' && Number.isInteger(record.turn) && record.turn > 0
+      ? record.turn
+      : null;
+    const nodeId = typeof record.node_id === 'string' ? record.node_id.trim() : '';
+    const utterance = typeof record.utterance === 'string' ? record.utterance.trim() : '';
+
+    if (!turn || !utterance) {
+      return [];
+    }
+
+    return [{
+      turn,
+      node_id: allowedConceptCodes.has(nodeId) ? nodeId : '',
+      utterance,
+    }];
+  }) as Json;
+}
+
+function normalizeStoredPathComparison(
+  value: unknown,
+  graphData?: StrategyGraphData
+): PersistedSummaryPayload['path_comparison'] {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+
+  const validRouteKeys = graphData ? getValidStrategyRouteKeys(graphData) : null;
+  if (validRouteKeys && validRouteKeys.size === 0) {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  const studentEstimatedPath: NonNullable<PersistedSummaryPayload['path_comparison']>['student_estimated_path'] = Array.isArray(record.student_estimated_path)
+    ? record.student_estimated_path.flatMap((item) => {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) {
+        return [];
+      }
+
+      const step = item as Record<string, unknown>;
+      const phase = typeof step.phase === 'number' && Number.isInteger(step.phase) && step.phase > 0
+        ? step.phase
+        : null;
+      const goalCode = typeof step.goal_code === 'string' ? step.goal_code.trim() : '';
+      const wayId = step.way_id === 'A' || step.way_id === 'B' || step.way_id === 'C' ? step.way_id : null;
+
+      if (!phase || !goalCode || !wayId) {
+        return [];
+      }
+
+      if (validRouteKeys && !validRouteKeys.has(buildStrategyRouteKey(phase, goalCode, wayId))) {
+        return [];
+      }
+
+      return [{
+        phase,
+        goal_code: goalCode,
+        way_id: wayId,
+      }];
+    })
+    : [];
+
+  const pathFeedback = typeof record.path_feedback_ko === 'string' ? record.path_feedback_ko.trim() : '';
+
+  if (studentEstimatedPath.length === 0 && !pathFeedback) {
+    return null;
+  }
+
+  return {
+    student_estimated_path: studentEstimatedPath,
+    path_feedback_ko: pathFeedback,
+  };
+}
+
+function mergePerformanceMetricsWithPathComparison(
+  performanceMetrics: Json,
+  pathComparison: PersistedSummaryPayload['path_comparison']
+): Json {
+  const baseMetrics =
+    performanceMetrics && typeof performanceMetrics === 'object' && !Array.isArray(performanceMetrics)
+      ? { ...(performanceMetrics as Record<string, Json>) }
+      : {};
+  delete baseMetrics.path_comparison;
+
+  if (!pathComparison) {
+    return baseMetrics as Json;
+  }
+
+  return {
+    ...baseMetrics,
+    path_comparison: pathComparison as unknown as Json,
+  } satisfies Json;
+}
+
+function readPathComparisonFromPerformanceMetrics(value: unknown): PersistedSummaryPayload['path_comparison'] {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  return normalizeStoredPathComparison(record.path_comparison);
+}
+
 function buildFallbackPersistedReport(
   messages: RawDialogueMessage[],
   bottlenecks: RawBottleneckRow[]
@@ -275,23 +542,27 @@ function buildFallbackPersistedReport(
       ai_interventions: aiInterventions,
       resolved_bottlenecks: resolvedBottlenecks,
     } satisfies Json,
+    path_comparison: null,
     summary_status: 'fallback',
   };
 }
 
 async function buildPersistedSessionReport(
   messages: RawDialogueMessage[],
-  bottlenecks: RawBottleneckRow[]
+  bottlenecks: RawBottleneckRow[],
+  graphData: StrategyGraphData,
+  recommendedPath: StrategyRouteStep[]
 ): Promise<PersistedSummaryPayload> {
   const startedAt = Date.now();
   const fallback = buildFallbackPersistedReport(messages, bottlenecks);
   const dialogueTranscript = buildDialogueTranscript(messages);
   const bottlenecksTranscript = buildBottlenecksTranscript(bottlenecks);
+  const graphContext = buildInsightGraphContext(graphData, recommendedPath);
 
   try {
     const text = await hfGenerateText({
       model: TAGGING_MODEL,
-      inputs: insightAgentPrompt(dialogueTranscript, bottlenecksTranscript),
+      inputs: insightAgentPrompt(dialogueTranscript, bottlenecksTranscript, graphContext),
       parameters: { max_new_tokens: 2048, temperature: 0.1 },
       responseFormat: sessionInsightResponseFormat,
     });
@@ -306,22 +577,31 @@ async function buildPersistedSessionReport(
       aha_moments?: Json;
       ai_tutor_summary?: string;
       performance_metrics?: Json;
+      path_comparison?: unknown;
     }>(text);
 
     if (!parsed || typeof parsed.ai_tutor_summary !== 'string') {
       return fallback;
     }
 
+    const pathComparison = normalizeStoredPathComparison(parsed.path_comparison, graphData);
+    const allowedConceptCodes = getAllowedReportConceptCodes(graphData, bottlenecks);
+    const performanceMetrics =
+      parsed.performance_metrics && typeof parsed.performance_metrics === 'object'
+        ? mergePerformanceMetricsWithPathComparison(parsed.performance_metrics, pathComparison)
+        : mergePerformanceMetricsWithPathComparison(fallback.performance_metrics, pathComparison);
+
     return {
       mastered_concepts: Array.isArray(parsed.mastered_concepts)
-        ? parsed.mastered_concepts.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+        ? parsed.mastered_concepts
+          .filter((item): item is string => typeof item === 'string')
+          .map((item) => item.trim())
+          .filter((item) => allowedConceptCodes.has(item))
         : [],
-      aha_moments: Array.isArray(parsed.aha_moments) ? parsed.aha_moments : [],
+      aha_moments: normalizeAhaMoments(parsed.aha_moments, allowedConceptCodes),
       ai_tutor_summary: parsed.ai_tutor_summary.trim() || fallback.ai_tutor_summary,
-      performance_metrics:
-        parsed.performance_metrics && typeof parsed.performance_metrics === 'object'
-          ? parsed.performance_metrics
-          : fallback.performance_metrics,
+      performance_metrics: performanceMetrics,
+      path_comparison: pathComparison,
       summary_status: 'ready',
     };
   } catch (err) {
@@ -412,6 +692,7 @@ function normalizeBottleneckSnapshots(value: unknown): SnapshotBottleneck[] {
 
 function buildSessionReportFromPersistedRow(row: PersistedReportRow): SessionReport {
   const summaryStatus = row.ai_tutor_summary.startsWith(FALLBACK_SUMMARY_PREFIX) ? 'fallback' : 'ready';
+  const pathComparison = readPathComparisonFromPerformanceMetrics(row.performance_metrics);
 
   return {
     conceptDisplayMap: {},
@@ -427,6 +708,8 @@ function buildSessionReportFromPersistedRow(row: PersistedReportRow): SessionRep
       baseDifficulty: row.base_difficulty_snapshot ?? null,
       isHumanVerified: row.is_human_verified_snapshot ?? false,
       wasAnalyzedOnDemand: row.was_analyzed_on_demand ?? false,
+      graphData: { version: 1, phases: [] },
+      recommendedPath: [],
     },
     dialogueLogs: normalizeDialogueLogSnapshots(row.dialogue_logs_snapshot),
     bottlenecks: normalizeBottleneckSnapshots(row.bottlenecks_snapshot),
@@ -436,6 +719,16 @@ function buildSessionReportFromPersistedRow(row: PersistedReportRow): SessionRep
       ahaMoments: row.aha_moments ?? [],
       aiTutorSummary: row.ai_tutor_summary,
       performanceMetrics: row.performance_metrics ?? {},
+      pathComparison: pathComparison
+        ? {
+          studentEstimatedPath: pathComparison.student_estimated_path.map((step) => ({
+            phase: step.phase,
+            goalCode: step.goal_code,
+            wayId: step.way_id,
+          })),
+          pathFeedback: pathComparison.path_feedback_ko,
+        }
+        : null,
       summaryStatus,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
@@ -469,17 +762,22 @@ async function buildAndPersistSessionReport(
     problem_hash: string;
     extracted_text: string;
     created_at: string;
+  },
+  options?: {
+    forceReanalyzeStrategyGraph?: boolean;
   }
 ): Promise<SessionReport> {
   const buildStartedAt = Date.now();
+  const forceReanalyzeStrategyGraph = options?.forceReanalyzeStrategyGraph ?? false;
   console.log('[report-service] 리포트 빌드 시작:', {
     sessionId: session.id,
+    forceReanalyzeStrategyGraph,
     startedAt: new Date(buildStartedAt).toISOString(),
   });
 
   const { data: graph } = await supabase
     .from('strategy_graphs')
-    .select('required_concepts, base_difficulty, is_human_verified')
+    .select('required_concepts, base_difficulty, graph_data, is_human_verified')
     .eq('problem_hash', session.problem_hash)
     .maybeSingle();
 
@@ -503,15 +801,17 @@ async function buildAndPersistSessionReport(
   const fallbackSummary = buildFallbackPersistedReport(messagesArray, bottleneckRows);
   const now = new Date().toISOString();
 
+  const trustedGraph = forceReanalyzeStrategyGraph ? null : graph;
+
   const baselinePayload: Database['public']['Tables']['session_reports']['Insert'] = {
     session_id: session.id,
     problem_hash: session.problem_hash,
     session_status_snapshot: session.session_status,
     extracted_text_snapshot: session.extracted_text,
     session_created_at_snapshot: session.created_at,
-    required_concepts_snapshot: graph?.required_concepts ?? [],
-    base_difficulty_snapshot: graph?.base_difficulty ?? null,
-    is_human_verified_snapshot: graph?.is_human_verified ?? false,
+    required_concepts_snapshot: trustedGraph?.required_concepts ?? [],
+    base_difficulty_snapshot: trustedGraph?.base_difficulty ?? null,
+    is_human_verified_snapshot: trustedGraph?.is_human_verified ?? false,
     was_analyzed_on_demand: false,
     dialogue_logs_snapshot: dialogueLogSnapshots,
     bottlenecks_snapshot: bottleneckSnapshots,
@@ -539,10 +839,12 @@ async function buildAndPersistSessionReport(
         problemHash: session.problem_hash,
       },
       analysis: {
-        requiredConcepts: graph?.required_concepts ?? [],
-        baseDifficulty: graph?.base_difficulty ?? null,
-        isHumanVerified: graph?.is_human_verified ?? false,
+        requiredConcepts: trustedGraph?.required_concepts ?? [],
+        baseDifficulty: trustedGraph?.base_difficulty ?? null,
+        isHumanVerified: trustedGraph?.is_human_verified ?? false,
         wasAnalyzedOnDemand: false,
+        graphData: normalizeStrategyGraphData(trustedGraph?.graph_data),
+        recommendedPath: deriveRecommendedRouteFromGraphData(normalizeStrategyGraphData(trustedGraph?.graph_data)),
       },
       dialogueLogs: dialogueLogSnapshots,
       bottlenecks: bottleneckSnapshots,
@@ -556,16 +858,21 @@ async function buildAndPersistSessionReport(
   }
 
   let analyzedGraph = {
-    required_concepts: graph?.required_concepts ?? [],
-    base_difficulty: graph?.base_difficulty ?? null,
-    is_human_verified: graph?.is_human_verified ?? false,
+    required_concepts: trustedGraph?.required_concepts ?? [],
+    base_difficulty: trustedGraph?.base_difficulty ?? null,
+    graph_data: normalizeStrategyGraphData(trustedGraph?.graph_data, trustedGraph?.required_concepts ?? []),
+    is_human_verified: trustedGraph?.is_human_verified ?? false,
   };
 
-  const needsAnalysis = !graph?.required_concepts?.length;
+  const needsAnalysis =
+    forceReanalyzeStrategyGraph ||
+    !trustedGraph?.required_concepts?.length ||
+    !hasUsableStrategyGraphData(trustedGraph?.graph_data);
   if (needsAnalysis) {
     const analysisStartedAt = Date.now();
     console.log('[report-service] required_concepts 동기 분석 시작:', {
       sessionId: session.id,
+      forceReanalyzeStrategyGraph,
     });
     try {
       const extracted = await extractAndUpdateRequiredConcepts({
@@ -577,6 +884,7 @@ async function buildAndPersistSessionReport(
           ...analyzedGraph,
           required_concepts: extracted.requiredConcepts,
           base_difficulty: extracted.baseDifficulty ?? analyzedGraph.base_difficulty,
+          graph_data: extracted.graphData,
         };
       }
       console.log('[report-service] required_concepts 동기 분석 완료:', {
@@ -590,7 +898,13 @@ async function buildAndPersistSessionReport(
     }
   }
 
-  const persistedSummary = await buildPersistedSessionReport(messagesArray, bottleneckRows);
+  const recommendedPath = deriveRecommendedRouteFromGraphData(analyzedGraph.graph_data);
+  const persistedSummary = await buildPersistedSessionReport(
+    messagesArray,
+    bottleneckRows,
+    analyzedGraph.graph_data,
+    recommendedPath
+  );
   const reportPayload: Database['public']['Tables']['session_reports']['Insert'] = {
     ...baselinePayload,
     required_concepts_snapshot: analyzedGraph.required_concepts,
@@ -600,7 +914,10 @@ async function buildAndPersistSessionReport(
     mastered_concepts: persistedSummary.mastered_concepts,
     aha_moments: persistedSummary.aha_moments,
     ai_tutor_summary: persistedSummary.ai_tutor_summary,
-    performance_metrics: persistedSummary.performance_metrics,
+    performance_metrics: mergePerformanceMetricsWithPathComparison(
+      persistedSummary.performance_metrics,
+      persistedSummary.path_comparison
+    ),
     updated_at: new Date().toISOString(),
   };
 
@@ -691,7 +1008,9 @@ export async function getOrBuildSessionReport(
     return existingLock.then((report) => hydrateReport(supabase, report));
   }
 
-  const buildPromise = buildAndPersistSessionReport(supabase, session);
+  const buildPromise = buildAndPersistSessionReport(supabase, session, {
+    forceReanalyzeStrategyGraph: forceRegenerate,
+  });
   reportBuildLocks.set(sessionId, buildPromise);
 
   try {

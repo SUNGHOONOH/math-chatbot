@@ -30,13 +30,16 @@ function topN(map: Map<string, number>, n: number): Array<{ concept: string; cou
     .map(([concept, count]) => ({ concept, count }));
 }
 
+function isKnownConceptCodeShape(code: string): boolean {
+  return code.includes('_PD_') || code.includes('_PP_') || code.includes('_PC_');
+}
+
 function fallbackConceptLabel(code: string): string {
   if (code === 'unmapped_bottleneck') return '아직 매핑되지 않은 병목';
-  if (code.startsWith('IR-')) return `조건 해석: ${code.slice(3)}`;
-  if (code.startsWith('SM-')) return `전략: ${code.slice(3)}`;
-  if (code.startsWith('PC-')) return `계산 처리: ${code.slice(3)}`;
-  if (code.endsWith('_PC')) return `${code.replace(/_PC$/, '')} 계산`;
-  return code;
+  if (code.includes('_PD_')) return '핵심 개념';
+  if (code.includes('_PP_')) return '파생 성질';
+  if (code.includes('_PC_')) return '계산 처리';
+  return '개념 정보 확인 중';
 }
 
 export default async function DashboardPage() {
@@ -59,7 +62,11 @@ export default async function DashboardPage() {
   if (reports) {
     for (const report of reports) {
       if (Array.isArray(report.mastered_concepts)) {
-        allMastered.push(...report.mastered_concepts);
+        allMastered.push(
+          ...report.mastered_concepts.filter((concept): concept is string =>
+            typeof concept === 'string' && isKnownConceptCodeShape(concept)
+          )
+        );
       }
     }
   }
@@ -75,7 +82,7 @@ export default async function DashboardPage() {
   const weakConcepts: string[] = [];
   if (bottlenecks) {
     for (const b of bottlenecks) {
-      if (b.mapped_concept_id && b.mapped_concept_id !== 'NEW_NODE') {
+      if (b.mapped_concept_id && isKnownConceptCodeShape(b.mapped_concept_id)) {
         weakConcepts.push(b.mapped_concept_id);
       }
     }
@@ -139,7 +146,7 @@ export default async function DashboardPage() {
       </header>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {/* 마스터 개념 순위 */}
+        {/* 마스터 개념 순위 */}
         <section className="space-y-4 rounded-[28px] border border-zinc-200 bg-white p-6 shadow-sm">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-emerald-700">
             <CircleCheckBig size={18} />
@@ -150,14 +157,13 @@ export default async function DashboardPage() {
           ) : (
             <ul className="space-y-3">
               {masteredRanking.map((item, i) => (
-                <li key={item.concept} className="flex items-center justify-between rounded-2xl border border-zinc-100 bg-zinc-50 px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg font-bold text-emerald-600">{i + 1}</span>
-                    <div className="flex flex-col">
-                      <span className="text-sm text-zinc-800">{getConceptLabel(item.concept)}</span>
-                      <span className="font-mono text-[11px] text-zinc-400">{item.concept}</span>
-                    </div>
-                  </div>
+	                <li key={item.concept} className="flex items-center justify-between rounded-2xl border border-zinc-100 bg-zinc-50 px-4 py-3">
+	                  <div className="flex items-center gap-3">
+	                    <span className="text-lg font-bold text-emerald-600">{i + 1}</span>
+	                    <div className="flex flex-col">
+	                      <span className="text-sm text-zinc-800">{getConceptLabel(item.concept)}</span>
+	                    </div>
+	                  </div>
                   <span className="text-xs text-zinc-500">{item.count}회 마스터</span>
                 </li>
               ))}
@@ -175,18 +181,17 @@ export default async function DashboardPage() {
             <p className="text-sm text-zinc-400">취약 개념이 없습니다. 훌륭합니다.</p>
           ) : (
             <ul className="space-y-3">
-              {weakRanking.map((item, i) => (
-                <li key={item.concept} className="space-y-2 rounded-2xl border border-zinc-100 bg-zinc-50 px-4 py-3">
-                  <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg font-bold text-rose-600">{i + 1}</span>
-                    <div className="flex flex-col">
-                      <span className="text-sm text-zinc-800">{getConceptLabel(item.concept)}</span>
-                      <span className="font-mono text-[11px] text-zinc-400">{item.concept}</span>
-                    </div>
-                  </div>
-                  <span className="text-xs text-zinc-500">{item.count}회 미해결</span>
-                </div>
+	              {weakRanking.map((item, i) => (
+	                <li key={item.concept} className="space-y-2 rounded-2xl border border-zinc-100 bg-zinc-50 px-4 py-3">
+	                  <div className="flex items-center justify-between">
+	                    <div className="flex items-center gap-3">
+	                      <span className="text-lg font-bold text-rose-600">{i + 1}</span>
+	                      <div className="flex flex-col">
+	                        <span className="text-sm text-zinc-800">{getConceptLabel(item.concept)}</span>
+	                      </div>
+	                    </div>
+	                    <span className="text-xs text-zinc-500">{item.count}회 미해결</span>
+	                  </div>
                   <Link
                     href={`/practice?concept=${encodeURIComponent(item.concept)}`}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-zinc-800"

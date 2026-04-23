@@ -18,7 +18,7 @@ import {
   hfStreamText,
   getSlidingWindowMessages,
   getTutoringSession,
-  runBottleneckDetection,
+  runBottleneckDetectionFromSignal,
   updateDialogueLogs,
 } from '@/lib/ai/ai-service';
 import { resumeSession } from '@/lib/services/session-service';
@@ -60,7 +60,14 @@ function sanitizeAssistantOutput(text: string): string {
     .replace(/<think>[\s\S]*?<\/think>/gi, '')
     .replace(/<\/?think>/gi, '')
     .replace(/\[PROBLEM_SOLVED\]/g, '')
+    .replace(/\[BOTTLENECK:[^\]]*\]/g, '') // 사용자에게 숨김
     .trim();
+}
+
+// TEXT_MODEL이 발신한 [BOTTLENECK: ...] 태그를 파싱
+function extractBottleneckSignal(text: string): string | null {
+  const match = text.match(/\[BOTTLENECK:\s*([^\]]+)\]/);
+  return match ? match[1].trim() : null;
 }
 
 export async function POST(req: Request) {
@@ -193,11 +200,23 @@ export async function POST(req: Request) {
         });
 
         if (session.session_status === 'in_progress') {
-          await runBottleneckDetection({
-            sessionId,
-            problemText: session.extracted_text,
-            messages: fullMessages,
-          });
+          // TEXT_MODEL 신호 기반 병목 감지: Gate LLM 호출 없이 신호가 있을 때만 진단
+          const rawAssistantText = await assistantMessagePromise; // sanitize 전 원본에서 추출
+          const bottleneckSummary = extractBottleneckSignal(rawAssistantText);
+
+          if (bottleneckSummary) {
+            const recentContext = fullMessages
+              .slice(-4)
+              .map(m => `${m.role === 'assistant' ? 'AI' : '학생'}: ${m.content}`)
+              .join('\n');
+            console.log('[chat/route] [signal] 병목 신호 감지:', { sessionId, bottleneckSummary });
+            await runBottleneckDetectionFromSignal({
+              sessionId,
+              problemText: session.extracted_text,
+              bottleneckSummary,
+              recentContext,
+            });
+          }
         }
 
         console.log('[chat/route] 백그라운드 저장/감지 완료:', {

@@ -67,7 +67,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform" />
             튜터 홈으로
           </Link>
-          <h2 className="text-xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-600 bg-clip-text text-transparent">
+          <h2 className="text-xl font-bold bg-linear-to-r from-zinc-900 to-zinc-600 bg-clip-text text-transparent">
             AHA Admin
           </h2>
           <p className="text-xs text-zinc-500 mt-1 font-medium tracking-wide">BACKOFFICE PORTAL v5</p>

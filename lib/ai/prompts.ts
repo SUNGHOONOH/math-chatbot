@@ -95,8 +95,15 @@ export const socraticTutorPrompt = `You are a Socratic math tutor helping Korean
 
 [Session Termination]
 1. Never decide on your own that the session is complete.
-2. Do not output [PROBLEM_SOLVED], <think>, JSON, or any hidden signals.
-3. Session completion is handled by the system UI.`;
+2. Do not output [PROBLEM_SOLVED], <think>, or JSON.
+3. Session completion is handled by the system UI.
+
+[Bottleneck Signal — CRITICAL]
+If the student explicitly says they don\'t know how to proceed, makes a logical error, or asks a question revealing a misconception, you MUST append exactly ONE tag at the very end of your response, on its own line:
+  [BOTTLENECK: <one short Korean sentence describing exactly where the student is stuck>]
+- Example: [BOTTLENECK: 로그의 덧셈 성질을 진수의 곱셈과 혼동하여 질문함]
+- Mandatory Trigger: Any time the student is stuck, unsure, or asks how to calculate something they should know based on the current context.
+- The tag will be hidden from the student automatically by the system.`;
 
 // ── Completed session solution prompt ──
 export const completedSessionSolutionPrompt = `You are a math tutor. This session has already been marked as complete.
@@ -158,65 +165,23 @@ ${problemText}
 
 ${languagePolicy}
 
-Never output JSON. Output only natural language dialogue directed at the student.
+Output only natural language dialogue directed at the student. Do not output JSON except for the [BOTTLENECK: ...] signal described above.
   `.trim();
 }
 
-// ------------------------------------------------------------
-// Section 4. Bottleneck Gate Prompts
-// ------------------------------------------------------------
-
-export const bottleneckGatePrompt = `You are a routing classifier for a math tutoring system.
-Your only job: decide whether the current student utterance should be sent to bottleneck diagnosis.
-
-[Input Variables]
-- Problem text
-- Recent conversation context (last 2–3 turns)
-- Current student utterance
-
-[Rules]
-1. should_tag:
-   - Set true if the student shows signs of being stuck, confused, holding a misconception, failing at strategy, misinterpreting a condition, or making a calculation error.
-   - Set false for simple responses, plain calculation results, or meaningless filler (e.g., "ok", "ㅇㅇ").
-   - Even a short formula or symbol can be true if context shows it points to where the student is stuck.
-2. focus_text:
-   - Fill only when should_tag is true.
-   - Write a short, specific Korean sentence summarizing exactly where the student is stuck. This will be used directly for embedding search.
-   - Leave as empty string when should_tag is false.
-3. reason:
-   - One-line explanation of your decision.
-
-Output valid JSON only. No markdown, no preamble:
-{
-  "should_tag": true | false,
-  "focus_text": "string",
-  "reason": "string"
-}`;
-
-export function buildBottleneckGateInput({
-  problemText,
-  recentContext,
-  latestStudentMessage,
-}: {
-  problemText: string;
-  recentContext: string;
-  latestStudentMessage: string;
-}): string {
-  return (
-    `${bottleneckGatePrompt}\n\n` +
-    `[Problem Text]\n${problemText}\n\n` +
-    `[Recent Context]\n${recentContext}\n\n` +
-    `[Current Student Utterance]\n${latestStudentMessage}\n\n` +
-    `Result (JSON):`
-  );
-}
 
 // ------------------------------------------------------------
 // Section 5. Bottleneck Diagnosis Prompts
 // ------------------------------------------------------------
 
-export const diagnosisSelectionPrompt = `You are a math education diagnosis specialist.
+export const diagnosisSelectionPrompt = `You are a math education diagnosis specialist for korean students.
 Analyze where the student is stuck and select the most accurate diagnosis from the provided [Top-K Candidate Concepts].
+
+[JSON Output]
+- Output exactly one JSON object.
+- The output must be valid JSON.
+- Do not output markdown, code fences, bullets, or explanatory text outside the JSON object.
+- selected_concept_code must be exactly one concept code that appears in [Top-K Candidate Concepts].
 
 [Diagnosis Rules]
 1. selected_concept_code:
@@ -231,7 +196,7 @@ Analyze where the student is stuck and select the most accurate diagnosis from t
 3. student_friendly_description: One sentence in Korean, written so a student or parent can easily understand the bottleneck. (e.g., "로그의 밑변환 공식을 적용하는 방향을 헷갈려하고 있어요.")
 4. reason: One paragraph explaining why you chose this concept and failure type, based on evidence from the dialogue.
  
-Output valid JSON only. No markdown, no preamble:
+Example JSON output:
 {
   "selected_concept_code": "string",
   "failure_type": "concept_gap | misconception | strategy_failure | calculation_error | condition_interpretation_failure",
@@ -288,37 +253,120 @@ export function buildDiagnosisRepairInput({
 // Section 6. Required Concept Extraction Prompts
 // ------------------------------------------------------------
 
-export const conceptExtractionPrompt = `You are a math curriculum analysis specialist.
-Analyze the [Problem Text] and [Full Conversation Transcript] below.
-Extract all concept nodes required to solve this problem, and assess the problem's base difficulty.
+export const conceptExtractionPrompt = `You are a math curriculum and strategy-graph analysis specialist.
 
-[Node ID System]
-- PD: Core textbook concept
-  - Example: "M1_EXPLOG_PD_001"
-- PP: Derived property
-  - Example: "M1_EXPLOG_PP_001"
-- PC: Procedural calculation
-  - Example: "M1_EXPLOG_PC_001"
+Analyze the [Problem Text], [Full Conversation Transcript], and [Candidate Concept Pool].
+Return one JSON object for the strategy_graphs table with:
+- required_concepts
+- base_difficulty
+- graph_data
 
-[Extraction Rules]
-1. Include every concept node essential to solving this problem.
-2. Always include concepts that were mentioned or caused a bottleneck in the conversation.
-3. Exclude overly broad concepts (e.g., "mathematics").
-4. Extract between 5 and 15 nodes.
-5. Use only the three allowed prefixes: PD, PP, PC.
-6. Prefer concrete and instructionally useful nodes over vague abstractions.
-7. base_difficulty: integer from 1 to 5. Evaluate strictly based on the KICE (Korea Institute for Curriculum and Evaluation) standards for the CSAT (수능) and typical Korean high school math curricula.
-   - 1 (Basic/Calculation): Equivalent to CSAT 2-point questions. Requires only direct definition recall, single-step formula application, or basic arithmetic operations. No problem-solving strategy needed.
-   - 2 (Comprehension): Equivalent to easy CSAT 3-point questions or Step-A in Korean math workbooks. Requires understanding 1-2 basic concepts and applying them directly. The intended path is immediately obvious from the problem statement.
-   - 3 (Standard Application): Equivalent to hard CSAT 3-point to easy 4-point questions (Standard school exam level / 'Type B' in workbooks). Requires combining 2 related concepts. The problem follows a well-known, standardized pattern/type, but requires multi-step algebraic manipulation.
-   - 4 (Advanced Reasoning): Equivalent to standard CSAT 4-point questions. Requires complex problem-solving skills, such as connecting 3+ cross-unit concepts, uncovering hidden conditions, defining a new function from given rules, or performing systematic case classifications.
-   - 5 (Heuristic / Killer): Equivalent to CSAT 4-point 'Killer' or 'Semi-killer' questions (typically #15, #22, #30). Requires substantial heuristic reasoning, multi-layered strategic planning, graphical deep insights, or extreme case analyses where the standard path is intentionally obscured.
+[JSON Output]
+- Output exactly one JSON object.
+- The output must be valid JSON.
+- Do not output markdown, code fences, commentary, or any text outside the JSON object.
+- Use the exact top-level keys: required_concepts, base_difficulty, graph_data.
 
-Output valid JSON only. No other text:
+[Core Rules]
+- Use only concept codes from the [Candidate Concept Pool].
+- Do not invent, guess, or modify concept codes.
+- Treat the [Candidate Concept Pool] as the only allowed concept universe.
+- Copy the full concept_code exactly as shown in the candidate pool, such as "M1_TRIGLAW_PD_001".
+- Do not output Korean concept names, short labels, or partial tags such as "PD", "PP", "PC", "log_sum", or "log_property".
+- required_concepts must contain all essential concepts needed to solve the problem.
+- Always include concepts that were explicitly mentioned in the conversation or clearly related to a bottleneck.
+- Use only PD, PP, and PC concept codes.
+- Extract 5 to 15 required_concepts.
+- Reuse the same concept codes consistently across required_concepts and graph_data.
+- Every graph_data.ways.concepts item must be chosen from required_concepts.
+- Do not place a concept in graph_data.ways.concepts unless it already appears in required_concepts.
+
+[Difficulty]
+base_difficulty must be an integer from 1 to 5 based on Korean high school math / CSAT standards.
+- 1: direct definition recall, single-step formula use, or basic calculation
+- 2: direct application of 1-2 basic concepts, obvious path
+- 3: standard multi-step application with 2 related concepts
+- 4: advanced reasoning with 3+ concepts, hidden conditions, auxiliary setup, or case analysis
+- 5: heuristic or killer-level reasoning, heavily obscured path, deep insight required
+
+[Graph Purpose]
+graph_data is a compact comparison graph for:
+- representing the standard solution flow
+- comparing the student's estimated path with the standard path
+- generating simple post-session path feedback
+
+Do not generate a fine-grained proof graph.
+
+[Graph Rules]
+- Divide the solution into 1 to 5 meaningful phases.
+- Each phase must represent either:
+  - MG: an intermediate goal
+  - G: the final goal
+- Use goal_code values MG1, MG2, MG3, ... and G for the final phase.
+- goal_code values must be unique.
+- The final phase must have goal_type "G" and usually goal_code "G".
+- requires lists prerequisite goal_code values and must be interpreted as AND.
+- ways lists alternative valid approaches inside a phase and must be interpreted as OR.
+- requires may reference only earlier goal_code values.
+
+[Way Rules]
+- Each phase must have at least 1 way and at most 3 ways.
+- Prefer 1 or 2 ways unless a third way is clearly educationally distinct.
+- Merge near-duplicate routes into one way.
+- Do not split ways for minor algebra order changes or cosmetic reformulations.
+- Separate ways only when strategy, concept usage, or instructional meaning clearly differs.
+- way_id must be "A", "B", or "C".
+- Each way must contain:
+  - way_id
+  - is_primary
+  - summary
+  - concepts
+
+[Primary Way Rules]
+- Usually exactly one way per phase should have is_primary = true.
+- Mark as primary the most standard, most teachable, and most curriculum-aligned route.
+- Prefer the way that best matches typical Korean school / CSAT explanation style.
+- Do not choose a way as primary merely because it is shorter or trickier.
+- The AI-recommended route will later be derived from ways where is_primary = true, so assign this field carefully.
+
+[Summary Rules]
+- Each phase summary should explain what that phase accomplishes.
+- Each way summary should explain that route in one concise sentence.
+- Avoid vague summaries like "solve the problem" or "do the calculation".
+
+[Output Rules]
+- Output exactly one valid JSON object.
+- No markdown, no code fences, no commentary.
+- Do not output null unless strictly necessary.
+- Do not leave placeholders such as "...", "TBD", or "example".
+
+Output this exact top-level shape:
 {
-  "required_concepts": ["M1_EXPLOG_PD_001", "M1_EXPLOG_PP_001", "M1_EXPLOG_PC_001", ......],
-  "base_difficulty": 3
+  "required_concepts": ["string"],
+  "base_difficulty": 3,
+  "graph_data": {
+    "version": 1,
+    "phases": [
+      {
+        "phase": 1,
+        "goal_code": "MG1",
+        "goal_type": "MG",
+        "goal": "string",
+        "summary": "string",
+        "requires": [],
+        "ways": [
+          {
+            "way_id": "A",
+            "is_primary": true,
+            "summary": "string",
+            "concepts": ["string", "string"]
+          }
+        ]
+      }
+    ]
+  }
 }`.trim();
+
 
 export function buildConceptExtractionInput(contextForLLM: string): string {
   return `${conceptExtractionPrompt}\n\nContext:\n${contextForLLM}\n\nResult (JSON):`;
@@ -328,9 +376,13 @@ export function buildConceptExtractionInput(contextForLLM: string): string {
 // Section 7. Session Report Insight Prompts
 // ------------------------------------------------------------
 
-export const insightAgentPrompt = (dialogueTranscript: string, bottlenecks: string) => `
+export const insightAgentPrompt = (
+  dialogueTranscript: string,
+  bottlenecks: string,
+  graphContext: string
+) => `
 You are a math learning diagnosis specialist.
-Analyze the conversation transcript and detected bottleneck data below, then produce a comprehensive session diagnostic report.
+Analyze the conversation transcript, detected bottleneck data, and compact strategy graph context below, then produce a comprehensive session diagnostic report.
 
 [Conversation Transcript]
 ${dialogueTranscript}
@@ -338,12 +390,33 @@ ${dialogueTranscript}
 [Detected Bottlenecks]
 ${bottlenecks}
 
+[Strategy Graph Context]
+${graphContext}
+
 [mastered_concepts Selection Rules]
 - Include only concepts the student correctly applied on their own, or clearly explained in their own words or calculations.
+- Use exact concept codes from the strategy graph concepts or detected bottleneck concept IDs when available.
+- Do not invent concept IDs or node labels.
 - Do not include concepts where the AI explained and it is unclear whether the student actually understood.
 - Do not include concepts that remain as unresolved bottlenecks.
 - Do not copy the full required_concepts list.
 - be strict.
+
+[aha_moments Rules]
+- node_id must be an exact existing concept code from the strategy graph concepts or detected bottleneck concept IDs.
+- Do not invent node_id values such as "log_sum", "log_property", or "step_1".
+- If no exact existing concept code is supported by the transcript, use an empty string for node_id.
+- CRITICAL: When extracting the student's utterance, you MUST wrap any mathematical formulas or variables in inline markdown format ($...$). For example, output '$ \\log_2 a + \\log_2 b = \\log_2(ab) $' instead of '\\log_2 a + \\log_2 b = \\log_2(ab)'.
+
+[path_comparison Rules]
+- student_estimated_path must be inferred only from supported evidence in the transcript.
+- Do not fabricate unsupported later phases or way choices.
+- Every student_estimated_path item must match an existing graph phase goal_code and one of that phase's way_id values.
+- If the student stopped mid-way, return only the supported partial path.
+- recommended_path is already determined from is_primary in graph_data; do not reinterpret it.
+- path_feedback_ko must be short Korean feedback comparing the student's inferred route with the recommended route.
+- If Strategy Graph Context says graph_data is unavailable or recommended path is unavailable, return "student_estimated_path": [] and explain that path comparison is unavailable because the strategy graph was not generated.
+- If the evidence for student_estimated_path is weak, return an empty array and explain uncertainty briefly in Korean.
 
 [ai_tutor_summary]
 - Write in Korean.
@@ -355,6 +428,10 @@ Output valid JSON only. No other text:
   "mastered_concepts": ["string"],
   "aha_moments": [{"turn": number, "node_id": "string", "utterance": "string (학생의 깨달음 발화)"}],
   "ai_tutor_summary": "string",
-  "performance_metrics": {"total_turns": number, "ai_interventions": number, "resolved_bottlenecks": number}
+  "performance_metrics": {"total_turns": number, "ai_interventions": number, "resolved_bottlenecks": number},
+  "path_comparison": {
+    "student_estimated_path": [{"phase": number, "goal_code": "string", "way_id": "A"}],
+    "path_feedback_ko": "string"
+  }
 }
 `.trim();

@@ -79,9 +79,18 @@ export default function LabelingPage() {
     }
   }
 
-  const filteredBottlenecks = bottlenecks.filter(b => 
-    filter === 'all' || b.mapped_concept_id === 'unmapped_bottleneck'
-  );
+  // 최고 유사도가 낮을수록 앞으로 (검토 우선순위 높음)
+  const filteredBottlenecks = bottlenecks
+    .filter(b => filter === 'all' || b.mapped_concept_id === 'unmapped_bottleneck')
+    .sort((a, b) => {
+      const maxSimA = Array.isArray(a.candidate_matches) && a.candidate_matches.length > 0
+        ? Math.max(...a.candidate_matches.map(c => c.similarity))
+        : 0;
+      const maxSimB = Array.isArray(b.candidate_matches) && b.candidate_matches.length > 0
+        ? Math.max(...b.candidate_matches.map(c => c.similarity))
+        : 0;
+      return maxSimA - maxSimB; // 낮은 유사도가 먼저
+    });
 
   const selectedItem = bottlenecks.find(b => b.id === selectedId);
 
@@ -179,9 +188,21 @@ export default function LabelingPage() {
                     </span>
                   </div>
                   <p className="text-sm text-zinc-800 font-medium line-clamp-2 leading-relaxed">{b.struggle_description}</p>
-                  <p className="text-[10px] text-zinc-400 mt-2 font-mono">
-                    {new Date(b.created_at).toLocaleString()}
-                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <p className="text-[10px] text-zinc-400 font-mono">
+                      {new Date(b.created_at).toLocaleString()}
+                    </p>
+                    {Array.isArray(b.candidate_matches) && b.candidate_matches.length > 0 && (() => {
+                      const maxSim = Math.max(...b.candidate_matches.map(c => c.similarity));
+                      const pct = Math.round(maxSim * 100);
+                      const color = pct < 60 ? 'bg-rose-100 text-rose-700' : pct < 80 ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700';
+                      return (
+                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded font-mono ${color}`}>
+                          top {pct}%
+                        </span>
+                      );
+                    })()}
+                  </div>
                 </div>
                 <ChevronRight size={16} className={selectedId === b.id ? 'text-blue-400' : 'text-zinc-300'} />
               </button>
@@ -209,7 +230,7 @@ export default function LabelingPage() {
                   <label className="text-[11px] text-zinc-400 block mb-1.5 font-bold">문제 원문</label>
                   <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-100 text-sm text-zinc-700">
                     {selectedItem.tutoring_sessions?.extracted_text ? (
-                      <div className="prose prose-sm prose-zinc max-w-none leading-relaxed [&_*]:my-0">
+                      <div className="prose prose-sm prose-zinc max-w-none leading-relaxed **:my-0">
                         <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
                           {selectedItem.tutoring_sessions.extracted_text}
                         </ReactMarkdown>
