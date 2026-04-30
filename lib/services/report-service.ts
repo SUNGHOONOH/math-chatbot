@@ -584,7 +584,7 @@ async function buildPersistedSessionReport(
       return fallback;
     }
 
-    const pathComparison = normalizeStoredPathComparison(parsed.path_comparison, graphData);
+    const pathComparison = null;
     const allowedConceptCodes = getAllowedReportConceptCodes(graphData, bottlenecks);
     const performanceMetrics =
       parsed.performance_metrics && typeof parsed.performance_metrics === 'object'
@@ -801,7 +801,8 @@ async function buildAndPersistSessionReport(
   const fallbackSummary = buildFallbackPersistedReport(messagesArray, bottleneckRows);
   const now = new Date().toISOString();
 
-  const trustedGraph = forceReanalyzeStrategyGraph ? null : graph;
+  const isHumanVerifiedGraph = graph?.is_human_verified === true;
+  const trustedGraph = forceReanalyzeStrategyGraph && !isHumanVerifiedGraph ? null : graph;
 
   const baselinePayload: Database['public']['Tables']['session_reports']['Insert'] = {
     session_id: session.id,
@@ -865,9 +866,11 @@ async function buildAndPersistSessionReport(
   };
 
   const needsAnalysis =
-    forceReanalyzeStrategyGraph ||
-    !trustedGraph?.required_concepts?.length ||
-    !hasUsableStrategyGraphData(trustedGraph?.graph_data);
+    !isHumanVerifiedGraph && (
+      forceReanalyzeStrategyGraph ||
+      !trustedGraph?.required_concepts?.length ||
+      !hasUsableStrategyGraphData(trustedGraph?.graph_data)
+    );
   if (needsAnalysis) {
     const analysisStartedAt = Date.now();
     console.log('[report-service] required_concepts 동기 분석 시작:', {

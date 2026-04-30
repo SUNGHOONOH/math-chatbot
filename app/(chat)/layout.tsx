@@ -34,9 +34,9 @@ export default async function ChatLayout({
   const isAdmin = isUserAdmin(user);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-zinc-50">
+    <div className="flex h-[100dvh] w-full max-w-[100vw] overflow-hidden overscroll-x-none bg-zinc-50">
       <Sidebar sessions={sessions} isAdmin={isAdmin} />
-      <main className="flex-1 min-h-0 overflow-hidden">{children}</main>
+      <main className="min-h-0 min-w-0 flex-1 overflow-hidden overscroll-x-none">{children}</main>
     </div>
   );
 }

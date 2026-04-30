@@ -6,6 +6,7 @@ import {
 import { buildLoginPath } from '@/lib/auth';
 import { supabaseBrowser } from '@/lib/supabase/browser';
 import { RESOLUTION_CHECK_MIN_EXCHANGES } from '@/lib/constants';
+import { createClientId } from '@/lib/client-id';
 
 // --- Utils (ChatInterface에서 가져옴) ---
 
@@ -37,6 +38,15 @@ function getMessageText(message: ChatMessage): string {
     .filter((part) => part.type === 'text')
     .map((part) => part.text)
     .join('')
+    .trim();
+}
+
+function sanitizeAssistantText(text: string): string {
+  return text
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
+    .replace(/<\/?think>/gi, '')
+    .replace(/\[PROBLEM_SOLVED\]/g, '')
+    .replace(/\[BOTTLENECK:[^\]]*\]/g, '')
     .trim();
 }
 
@@ -299,7 +309,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     if (inFlightStreamRequests.has(sessionId)) return;
     inFlightStreamRequests.add(sessionId);
 
-    const assistantId = `assistant-${crypto.randomUUID()}`;
+    const assistantId = createClientId('assistant');
     const assistantPlaceholder = makeTextMessage(assistantId, 'assistant', '');
     
     set({ 
@@ -352,9 +362,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
           if (!trimmed.startsWith('0:')) continue;
           try {
             assistantText += JSON.parse(trimmed.slice(2));
+            const visibleAssistantText = sanitizeAssistantText(assistantText);
             set((state) => ({
               messages: state.messages.map((m) =>
-                m.id === assistantId ? makeTextMessage(assistantId, 'assistant', assistantText) : m
+                m.id === assistantId ? makeTextMessage(assistantId, 'assistant', visibleAssistantText) : m
               ),
             }));
           } catch {}

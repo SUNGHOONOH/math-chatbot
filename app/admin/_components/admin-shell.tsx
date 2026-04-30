@@ -63,9 +63,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen bg-zinc-50/50 flex flex-col md:flex-row">
       <aside className="w-full md:w-64 bg-white border-r border-zinc-200 shrink-0 md:h-screen md:sticky md:top-0 overflow-y-auto">
         <div className="p-6">
-          <Link href="/" className="inline-flex items-center text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors mb-6 group">
+          <Link href="/chat/new" className="inline-flex items-center text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors mb-6 group">
             <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform" />
-            튜터 홈으로
+            채팅창으로
           </Link>
           <h2 className="text-xl font-bold bg-linear-to-r from-zinc-900 to-zinc-600 bg-clip-text text-transparent">
             AHA Admin

@@ -35,9 +35,13 @@ export default async function proxy(request: NextRequest) {
   const isLoginRoute = request.nextUrl.pathname.startsWith('/login');
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
   const isAuthCallback = request.nextUrl.pathname.startsWith('/auth/callback');
+  const isPublicMarketingRoute =
+    request.nextUrl.pathname === '/' ||
+    request.nextUrl.pathname === '/app' ||
+    request.nextUrl.pathname.startsWith('/teachers');
 
   // 로그인이 안 되어 있으면 로그인 후 원래 경로로 복귀할 수 있게 next 파라미터를 유지한다.
-  if (!user && !isLoginRoute && !isAuthCallback) {
+  if (!user && !isLoginRoute && !isAuthCallback && !isPublicMarketingRoute) {
     const nextPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
     return NextResponse.redirect(new URL(buildLoginPath(nextPath), request.url));
   }

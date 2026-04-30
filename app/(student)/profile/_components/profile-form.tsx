@@ -69,7 +69,7 @@ export function ProfileForm({
       try {
         setNicknameStatus('checking');
         const response = await fetch(
-          `/api/user/profile/check-nickname?nickname=${encodeURIComponent(trimmedNickname)}`,
+          `/api/user/profile?nickname=${encodeURIComponent(trimmedNickname)}`,
           {
             method: 'GET',
             signal: controller.signal,

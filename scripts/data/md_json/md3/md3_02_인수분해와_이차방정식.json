@@ -1,0 +1,325 @@
+[
+  {
+    "concept_code": "MD3_QUAD_PD_001",
+    "node_type": "PD",
+    "title": "다항식의 인수분해",
+    "definition": "다항식을 두 개 이상의 다항식의 곱으로 나타내는 것을 인수분해라고 한다.",
+    "description": "전개와 인수분해를 별개로만 보거나, 공통인수와 공식 형태를 찾지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "인수분해",
+      "다항식",
+      "곱"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "x^2-5x+6을 인수분해하는 상황",
+      "인수분해 뜻을 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PD_002",
+    "node_type": "PD",
+    "title": "인수분해 공식",
+    "definition": "완전제곱식, 합차공식 등을 거꾸로 이용해 다항식을 빠르게 인수분해할 수 있다.",
+    "description": "전개 공식은 알아도 인수분해 공식으로 역이용하지 못하거나, 부호를 잘못 대응할 때 검색되어야 한다.",
+    "keywords": [
+      "인수분해 공식",
+      "완전제곱식",
+      "합차공식"
+    ],
+    "prerequisites": [
+      "MD3_QUAD_PD_001"
+    ],
+    "examples_of_use": [
+      "x^2+6x+9를 인수분해하는 상황",
+      "x^2-16을 인수분해하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PD_003",
+    "node_type": "PD",
+    "title": "이차방정식",
+    "definition": "미지수에 대한 식을 정리했을 때 ax^2+bx+c=0(a≠0) 꼴이 되는 방정식을 이차방정식이라고 한다.",
+    "description": "이차항이 보이기만 하면 모두 이차방정식이라고 생각하거나, 정리 후 꼴을 확인하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "이차방정식",
+      "ax^2+bx+c=0"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "x^2-5x+6=0을 이차방정식으로 보는 상황",
+      "형태 판정 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PD_004",
+    "node_type": "PD",
+    "title": "이차방정식의 해",
+    "definition": "이차방정식을 참이 되게 하는 값을 이차방정식의 해 또는 근이라고 한다.",
+    "description": "해를 단순 계산 결과로만 보고, 방정식을 만족하는 값이라는 의미를 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "이차방정식의 해",
+      "근",
+      "방정식 만족"
+    ],
+    "prerequisites": [
+      "MD3_QUAD_PD_003"
+    ],
+    "examples_of_use": [
+      "해를 검산하는 상황",
+      "근의 뜻을 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PD_005",
+    "node_type": "PD",
+    "title": "인수분해를 이용한 이차방정식 풀이",
+    "definition": "이차방정식을 인수분해한 뒤 각 인수가 0이 되는 경우를 이용해 해를 구할 수 있다.",
+    "description": "곱이 0이면 각 인수 중 하나가 0이라는 원리를 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "인수분해 풀이",
+      "곱이 0",
+      "이차방정식"
+    ],
+    "prerequisites": [
+      "MD3_QUAD_PD_001",
+      "MD3_QUAD_PD_003"
+    ],
+    "examples_of_use": [
+      "(x-2)(x-3)=0을 푸는 상황",
+      "인수분해로 해를 구하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PD_006",
+    "node_type": "PD",
+    "title": "완전제곱식을 이용한 이차방정식 풀이",
+    "definition": "이차방정식을 완전제곱식 꼴로 바꾸어 제곱근을 이용해 해를 구할 수 있다.",
+    "description": "완전제곱식으로 정리하지 못하거나, 제곱근을 구할 때 ±를 빠뜨릴 때 검색되어야 한다.",
+    "keywords": [
+      "완전제곱식",
+      "제곱근",
+      "이차방정식 풀이"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_001",
+      "MD3_QUAD_PD_003"
+    ],
+    "examples_of_use": [
+      "(x-2)^2=9를 푸는 상황",
+      "완전제곱식 풀이 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PD_007",
+    "node_type": "PD",
+    "title": "이차방정식의 근의 공식",
+    "definition": "이차방정식 ax^2+bx+c=0(a≠0)의 해는 x={-b±√(b^2-4ac)}/2a 이다.",
+    "description": "근의 공식을 형태로만 외우고 각 부분의 위치와 부호를 자주 틀릴 때 검색되어야 한다.",
+    "keywords": [
+      "근의 공식",
+      "b^2-4ac",
+      "±"
+    ],
+    "prerequisites": [
+      "MD3_QUAD_PD_003",
+      "MD3_REAL_PD_001"
+    ],
+    "examples_of_use": [
+      "근의 공식으로 해를 구하는 상황",
+      "일반형 이차방정식 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PD_008",
+    "node_type": "PD",
+    "title": "이차방정식의 활용",
+    "definition": "실제 상황의 조건을 문자와 식으로 나타내어 이차방정식을 세우고 해를 구할 수 있다.",
+    "description": "문장제를 이차방정식으로 세우지 못하거나, 구한 해를 상황에 맞게 해석하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "이차방정식 활용",
+      "문장제",
+      "식 세우기"
+    ],
+    "prerequisites": [
+      "MD3_QUAD_PD_003"
+    ],
+    "examples_of_use": [
+      "넓이 문제를 이차방정식으로 푸는 상황",
+      "활용 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PP_001",
+    "node_type": "PP",
+    "title": "곱이 0일 조건",
+    "definition": "ab=0이면 a=0 또는 b=0 이다.",
+    "description": "인수분해는 했지만 각 인수를 0으로 두는 연결을 못 할 때 검색되어야 한다.",
+    "keywords": [
+      "곱이 0",
+      "인수 중 하나가 0"
+    ],
+    "prerequisites": [
+      "MD3_QUAD_PD_005"
+    ],
+    "examples_of_use": [
+      "(x+1)(x-4)=0을 해석하는 상황",
+      "근을 찾는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PP_002",
+    "node_type": "PP",
+    "title": "이차방정식 풀이 전략 선택",
+    "definition": "이차방정식은 인수분해, 완전제곱식, 근의 공식 중 식의 형태에 맞는 방법을 선택하여 푸는 것이 효율적이다.",
+    "description": "항상 한 방법만 고집하거나, 식의 형태를 보고 적절한 전략을 고르지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "풀이 전략",
+      "인수분해",
+      "완전제곱식",
+      "근의 공식"
+    ],
+    "prerequisites": [
+      "MD3_QUAD_PD_005",
+      "MD3_QUAD_PD_006",
+      "MD3_QUAD_PD_007"
+    ],
+    "examples_of_use": [
+      "쉬운 인수분해형을 근의 공식으로 푸는 상황",
+      "전략 선택 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PP_003",
+    "node_type": "PP",
+    "title": "근의 공식의 판별 부분",
+    "definition": "근의 공식의 √(b^2-4ac) 부분은 해의 형태를 결정하는 핵심 부분이다.",
+    "description": "판별 부분을 단순 계산식으로만 보고, 제곱근 안 값의 부호에 따라 해의 형태가 달라질 수 있다는 점을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "b^2-4ac",
+      "근의 공식",
+      "해의 형태"
+    ],
+    "prerequisites": [
+      "MD3_QUAD_PD_007"
+    ],
+    "examples_of_use": [
+      "근의 공식에서 판별 부분을 해석하는 상황",
+      "해의 개형을 보는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PC_001",
+    "node_type": "PC",
+    "title": "공통인수와 공식 인수분해 계산",
+    "definition": "공통인수를 먼저 묶거나 인수분해 공식을 이용해 다항식을 인수분해하는 계산 단위이다.",
+    "description": "공통인수를 놓치거나 공식 형태를 인식하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "인수분해 계산",
+      "공통인수",
+      "공식"
+    ],
+    "prerequisites": [
+      "MD3_QUAD_PD_002"
+    ],
+    "examples_of_use": [
+      "2x^2-8x를 인수분해하는 상황",
+      "공식 인수분해 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PC_002",
+    "node_type": "PC",
+    "title": "인수분해를 이용한 이차방정식 풀이 계산",
+    "definition": "이차방정식을 인수분해하고 각 인수를 0으로 두어 해를 구하는 계산 단위이다.",
+    "description": "인수분해는 했지만 해를 끝까지 구하지 못하거나, 한쪽 인수만 0으로 둘 때 검색되어야 한다.",
+    "keywords": [
+      "인수분해 풀이 계산",
+      "이차방정식",
+      "해 구하기"
+    ],
+    "prerequisites": [
+      "MD3_QUAD_PP_001"
+    ],
+    "examples_of_use": [
+      "x^2-5x+6=0을 푸는 상황",
+      "인수분해형 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PC_003",
+    "node_type": "PC",
+    "title": "완전제곱식으로 바꾸기 계산",
+    "definition": "이차방정식의 좌변을 완전제곱식 꼴로 변형하는 계산 단위이다.",
+    "description": "상수항 보정을 잘못하거나, 식의 양변에 같은 수를 더하는 과정을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "완전제곱식 만들기",
+      "변형",
+      "보정"
+    ],
+    "prerequisites": [
+      "MD3_QUAD_PD_006"
+    ],
+    "examples_of_use": [
+      "x^2+4x-5=0을 완전제곱식으로 바꾸는 상황",
+      "변형 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PC_004",
+    "node_type": "PC",
+    "title": "완전제곱식을 이용한 이차방정식 풀이 계산",
+    "definition": "완전제곱식 꼴로 만든 뒤 제곱근을 이용해 이차방정식의 해를 구하는 계산 단위이다.",
+    "description": "제곱근 단계에서 ±를 빠뜨리거나, 완전제곱식을 만든 뒤 정리를 마치지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "완전제곱식 풀이",
+      "제곱근",
+      "±"
+    ],
+    "prerequisites": [
+      "MD3_QUAD_PC_003"
+    ],
+    "examples_of_use": [
+      "(x-3)^2=4를 푸는 상황",
+      "완전제곱식 풀이 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PC_005",
+    "node_type": "PC",
+    "title": "근의 공식 적용 계산",
+    "definition": "a, b, c 값을 정확히 읽어 근의 공식에 대입해 해를 구하는 계산 단위이다.",
+    "description": "-b, 2a, √(b^2-4ac) 위치를 틀리거나, 대입 후 계산을 실수할 때 검색되어야 한다.",
+    "keywords": [
+      "근의 공식 계산",
+      "대입",
+      "a b c"
+    ],
+    "prerequisites": [
+      "MD3_QUAD_PD_007"
+    ],
+    "examples_of_use": [
+      "근의 공식으로 해를 구하는 상황",
+      "일반형 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QUAD_PC_006",
+    "node_type": "PC",
+    "title": "활용 문제를 이차방정식으로 세우기 계산",
+    "definition": "상황의 길이, 넓이, 수 관계를 문자로 두고 이차방정식을 세워 푸는 계산 단위이다.",
+    "description": "미지수를 잘못 두거나, 해는 구했지만 문제 상황에 맞는 값만 선택해야 한다는 점을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "활용 문제",
+      "식 세우기",
+      "상황 해석"
+    ],
+    "prerequisites": [
+      "MD3_QUAD_PD_008"
+    ],
+    "examples_of_use": [
+      "직사각형 넓이 문제를 푸는 상황",
+      "문장제 문제"
+    ]
+  }
+]

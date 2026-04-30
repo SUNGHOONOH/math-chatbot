@@ -1,0 +1,288 @@
+[
+  {
+    "concept_code": "MD3_QFUNC_PD_001",
+    "node_type": "PD",
+    "title": "이차함수",
+    "definition": "y=ax^2+bx+c(a≠0) 꼴로 나타나는 함수를 이차함수라고 한다.",
+    "description": "이차식과 이차함수를 구분하지 못하거나, 함수 전체의 대응 관계를 식과 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "이차함수",
+      "ax^2+bx+c"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "식이 이차함수인지 보는 상황",
+      "형태 판정 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QFUNC_PD_002",
+    "node_type": "PD",
+    "title": "이차함수의 그래프",
+    "definition": "이차함수의 그래프는 포물선이다.",
+    "description": "그래프 개형은 알지만 식의 각 요소가 포물선의 모양과 어떻게 연결되는지 모를 때 검색되어야 한다.",
+    "keywords": [
+      "포물선",
+      "이차함수 그래프"
+    ],
+    "prerequisites": [
+      "MD3_QFUNC_PD_001"
+    ],
+    "examples_of_use": [
+      "포물선을 해석하는 상황",
+      "그래프 개형 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QFUNC_PD_003",
+    "node_type": "PD",
+    "title": "꼭짓점",
+    "definition": "이차함수 그래프에서 가장 높거나 낮은 점을 꼭짓점이라고 한다.",
+    "description": "꼭짓점을 단순 좌표 암기로만 보고, 최대·최소와 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "꼭짓점",
+      "최대",
+      "최소"
+    ],
+    "prerequisites": [
+      "MD3_QFUNC_PD_002"
+    ],
+    "examples_of_use": [
+      "꼭짓점을 구하는 상황",
+      "그래프 해석 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QFUNC_PD_004",
+    "node_type": "PD",
+    "title": "축",
+    "definition": "포물선을 좌우 대칭으로 나누는 직선을 축이라고 한다.",
+    "description": "축이 꼭짓점의 x좌표와 연결된다는 점을 놓치거나, y축과 혼동할 때 검색되어야 한다.",
+    "keywords": [
+      "축",
+      "대칭축",
+      "포물선"
+    ],
+    "prerequisites": [
+      "MD3_QFUNC_PD_003"
+    ],
+    "examples_of_use": [
+      "축의 식을 구하는 상황",
+      "대칭축 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QFUNC_PD_005",
+    "node_type": "PD",
+    "title": "이차함수의 최대값과 최소값",
+    "definition": "포물선의 꼭짓점에서 이차함수의 최대값 또는 최소값이 결정된다.",
+    "description": "위로 열린 경우와 아래로 열린 경우를 구분하지 못하거나, 꼭짓점의 y좌표가 극값이라는 점을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "최대값",
+      "최소값",
+      "꼭짓점"
+    ],
+    "prerequisites": [
+      "MD3_QFUNC_PD_003"
+    ],
+    "examples_of_use": [
+      "이차함수의 최솟값을 구하는 상황",
+      "극값 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QFUNC_PD_006",
+    "node_type": "PD",
+    "title": "이차함수와 x축의 관계",
+    "definition": "이차함수 y=f(x)의 그래프와 x축의 교점은 방정식 f(x)=0의 해와 대응한다.",
+    "description": "x축 교점과 방정식의 해를 연결하지 못하거나, 교점 개수를 해의 개수와 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "x축 교점",
+      "이차방정식의 해",
+      "그래프와 방정식"
+    ],
+    "prerequisites": [
+      "MD3_QFUNC_PD_002"
+    ],
+    "examples_of_use": [
+      "교점과 해를 연결하는 상황",
+      "그래프-방정식 관계 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QFUNC_PP_001",
+    "node_type": "PP",
+    "title": "a의 부호와 포물선의 방향",
+    "definition": "이차함수 y=ax^2+bx+c에서 a>0이면 포물선은 아래로 볼록, a<0이면 위로 볼록이다.",
+    "description": "열림 방향을 a의 부호와 연결하지 못하거나, 최대·최소와 함께 해석하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "a의 부호",
+      "포물선 방향",
+      "볼록"
+    ],
+    "prerequisites": [
+      "MD3_QFUNC_PD_002"
+    ],
+    "examples_of_use": [
+      "포물선 방향을 판단하는 상황",
+      "a의 부호 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QFUNC_PP_002",
+    "node_type": "PP",
+    "title": "축과 꼭짓점의 관계",
+    "definition": "이차함수의 축은 꼭짓점을 지나며, 축의 방정식은 x=-b/2a 이다.",
+    "description": "축 공식은 외웠지만 꼭짓점과 연결하지 못하거나, 부호를 자주 틀릴 때 검색되어야 한다.",
+    "keywords": [
+      "축 공식",
+      "꼭짓점",
+      "-b/2a"
+    ],
+    "prerequisites": [
+      "MD3_QFUNC_PD_003",
+      "MD3_QFUNC_PD_004"
+    ],
+    "examples_of_use": [
+      "축과 꼭짓점을 함께 구하는 상황",
+      "축 공식 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QFUNC_PP_003",
+    "node_type": "PP",
+    "title": "그래프와 해의 개수 관계",
+    "definition": "포물선이 x축과 두 점에서 만나면 서로 다른 두 실근, 한 점에서 만나면 중근, 만나지 않으면 실근이 없다.",
+    "description": "그래프 위치와 해의 개수를 연결하지 못하거나, 접하는 경우를 한 점 만남으로만 보고 중근과 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "해의 개수",
+      "교점",
+      "중근"
+    ],
+    "prerequisites": [
+      "MD3_QFUNC_PD_006"
+    ],
+    "examples_of_use": [
+      "그래프를 보고 해의 개수를 판단하는 상황",
+      "교점 개수 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QFUNC_PC_001",
+    "node_type": "PC",
+    "title": "이차함수 값 계산",
+    "definition": "주어진 x값을 이차함수식에 대입해 함수값을 계산하는 단위이다.",
+    "description": "제곱 계산을 틀리거나, 음수 대입 시 괄호 처리를 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "이차함수 값",
+      "대입",
+      "제곱"
+    ],
+    "prerequisites": [
+      "MD3_QFUNC_PD_001"
+    ],
+    "examples_of_use": [
+      "x=2일 때 함수값을 구하는 상황",
+      "대입 계산 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QFUNC_PC_002",
+    "node_type": "PC",
+    "title": "축과 꼭짓점 구하기 계산",
+    "definition": "x=-b/2a 를 이용해 축을 구하고, 그 x값을 대입하여 꼭짓점 좌표를 구하는 계산 단위이다.",
+    "description": "축은 구했지만 y좌표를 계산하지 않거나, 분수 계산을 틀릴 때 검색되어야 한다.",
+    "keywords": [
+      "축 계산",
+      "꼭짓점 계산",
+      "좌표"
+    ],
+    "prerequisites": [
+      "MD3_QFUNC_PP_002"
+    ],
+    "examples_of_use": [
+      "꼭짓점을 구하는 상황",
+      "축과 꼭짓점 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QFUNC_PC_003",
+    "node_type": "PC",
+    "title": "이차함수 그래프 그리기 계산",
+    "definition": "축, 꼭짓점, y절편, 대칭성을 이용해 이차함수의 그래프를 그리는 계산 단위이다.",
+    "description": "대표점이 부족하거나 대칭점을 잘못 잡아 포물선 개형을 틀릴 때 검색되어야 한다.",
+    "keywords": [
+      "포물선 그리기",
+      "대칭성",
+      "대표점"
+    ],
+    "prerequisites": [
+      "MD3_QFUNC_PD_002",
+      "MD3_QFUNC_PP_001",
+      "MD3_QFUNC_PP_002"
+    ],
+    "examples_of_use": [
+      "이차함수 그래프를 그리는 상황",
+      "그래프 스케치 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QFUNC_PC_004",
+    "node_type": "PC",
+    "title": "최대값·최소값 계산",
+    "definition": "꼭짓점의 y좌표와 포물선의 방향을 이용해 최대값 또는 최소값을 구하는 계산 단위이다.",
+    "description": "꼭짓점 y좌표를 구하지 못하거나, 방향에 따른 최대·최소 해석을 틀릴 때 검색되어야 한다.",
+    "keywords": [
+      "최대값 계산",
+      "최소값 계산",
+      "꼭짓점 y좌표"
+    ],
+    "prerequisites": [
+      "MD3_QFUNC_PD_005",
+      "MD3_QFUNC_PP_001"
+    ],
+    "examples_of_use": [
+      "최솟값을 구하는 상황",
+      "극값 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QFUNC_PC_005",
+    "node_type": "PC",
+    "title": "그래프와 x축 교점 해석 계산",
+    "definition": "그래프와 x축의 교점 위치를 보고 해의 개수나 해의 값을 해석하는 계산 단위이다.",
+    "description": "교점의 x좌표를 해로 읽지 못하거나, 만남 여부와 해 존재를 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "x축 교점",
+      "해석",
+      "해의 개수"
+    ],
+    "prerequisites": [
+      "MD3_QFUNC_PP_003"
+    ],
+    "examples_of_use": [
+      "교점으로 해를 읽는 상황",
+      "그래프 해석 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_QFUNC_PC_006",
+    "node_type": "PC",
+    "title": "조건으로 이차함수 식 구하기 계산",
+    "definition": "꼭짓점, 한 점, 축 등의 조건을 이용해 이차함수의 식을 구하는 계산 단위이다.",
+    "description": "표준형을 적절히 쓰지 못하거나, 조건을 대입해 계수를 결정하는 과정을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "이차함수 식 구하기",
+      "조건식",
+      "계수 결정"
+    ],
+    "prerequisites": [
+      "MD3_QFUNC_PD_001",
+      "MD3_QFUNC_PD_003"
+    ],
+    "examples_of_use": [
+      "꼭짓점과 한 점으로 식을 구하는 상황",
+      "조건 활용 문제"
+    ]
+  }
+]

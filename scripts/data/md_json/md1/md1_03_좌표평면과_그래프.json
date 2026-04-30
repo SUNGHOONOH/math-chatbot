@@ -1,0 +1,318 @@
+[
+  {
+    "concept_code": "MD1_GRAPH_PD_001",
+    "node_type": "PD",
+    "title": "순서쌍",
+    "definition": "두 수를 순서를 정하여 (a, b)와 같이 나타낸 것을 순서쌍이라고 한다.",
+    "description": "순서를 바꾸어도 같은 것으로 보거나, 좌표를 단순한 두 수의 모임으로 볼 때 검색되어야 한다.",
+    "keywords": [
+      "순서쌍",
+      "(a,b)",
+      "순서"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "(2,3)과 (3,2)를 구분하는 상황",
+      "순서쌍을 읽는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PD_002",
+    "node_type": "PD",
+    "title": "좌표평면과 좌표",
+    "definition": "서로 수직인 두 수직선을 원점에서 만나게 한 평면을 좌표평면이라 하고, 점의 위치를 순서쌍으로 나타낸 것을 좌표라고 한다.",
+    "description": "x좌표와 y좌표의 역할을 뒤바꾸거나, 점의 위치를 사분면과 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "좌표평면",
+      "좌표",
+      "원점",
+      "x축",
+      "y축"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_001"
+    ],
+    "examples_of_use": [
+      "점 (2,-1)을 좌표평면에 찍는 상황",
+      "점의 좌표를 읽는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PD_003",
+    "node_type": "PD",
+    "title": "사분면",
+    "definition": "좌표축이 좌표평면을 네 부분으로 나눌 때 각 부분을 제1사분면부터 제4사분면까지라고 한다.",
+    "description": "사분면 번호와 부호 조합을 연결하지 못하거나, 축 위의 점을 사분면에 넣을 때 검색되어야 한다.",
+    "keywords": [
+      "사분면",
+      "제1사분면",
+      "부호"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_002"
+    ],
+    "examples_of_use": [
+      "점이 어느 사분면에 있는지 판단하는 상황",
+      "사분면을 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PD_004",
+    "node_type": "PD",
+    "title": "그래프",
+    "definition": "좌표평면 위에 조건을 만족하는 점들을 찍어 나타낸 것을 그래프라고 한다.",
+    "description": "그래프를 그림으로만 보고, 점들이 어떤 수량 관계를 나타낸다는 점을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "그래프",
+      "점",
+      "수량 관계",
+      "좌표평면"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_002"
+    ],
+    "examples_of_use": [
+      "표를 보고 그래프를 그리는 상황",
+      "그래프를 해석하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PD_005",
+    "node_type": "PD",
+    "title": "정비례",
+    "definition": "두 양 x, y가 y=ax (a≠0)의 관계를 가질 때 y는 x에 정비례한다고 한다.",
+    "description": "비례상수 a의 의미를 놓치거나, 원점을 지나는 직선과 정비례를 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "정비례",
+      "y=ax",
+      "비례상수",
+      "원점을 지나는 직선"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_004"
+    ],
+    "examples_of_use": [
+      "거리와 시간의 정비례 관계를 보는 상황",
+      "정비례식을 구하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PD_006",
+    "node_type": "PD",
+    "title": "반비례",
+    "definition": "두 양 x, y가 y=a/x (a≠0)의 관계를 가질 때 y는 x에 반비례한다고 한다.",
+    "description": "곱이 일정하다는 뜻을 이해하지 못하거나, 그래프 모양과 식을 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "반비례",
+      "y=a/x",
+      "곱이 일정"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_004"
+    ],
+    "examples_of_use": [
+      "넓이와 한 변의 길이 관계를 보는 상황",
+      "반비례식을 구하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PP_001",
+    "node_type": "PP",
+    "title": "사분면과 부호의 관계",
+    "definition": "제1사분면은 (+,+), 제2사분면은 (-,+), 제3사분면은 (-,-), 제4사분면은 (+,-)의 좌표를 가진다.",
+    "description": "좌표의 부호를 보고 사분면을 빠르게 판정하지 못하거나, x좌표와 y좌표 순서를 바꿀 때 검색되어야 한다.",
+    "keywords": [
+      "사분면 부호",
+      "x좌표",
+      "y좌표"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_003"
+    ],
+    "examples_of_use": [
+      "좌표 부호만 보고 사분면을 판정하는 상황",
+      "사분면을 빠르게 찾는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PP_002",
+    "node_type": "PP",
+    "title": "정비례 그래프의 성질",
+    "definition": "정비례 y=ax의 그래프는 원점을 지나는 직선이며, a가 양수이면 오른쪽 위로, 음수이면 오른쪽 아래로 향한다.",
+    "description": "정비례 그래프가 반드시 원점을 지난다는 점을 놓치거나, 비례상수의 부호에 따른 기울기 방향을 혼동할 때 검색되어야 한다.",
+    "keywords": [
+      "정비례 그래프",
+      "원점",
+      "직선",
+      "비례상수 부호"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_005"
+    ],
+    "examples_of_use": [
+      "정비례 그래프를 해석하는 상황",
+      "기울기 방향을 판단하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PP_003",
+    "node_type": "PP",
+    "title": "반비례 그래프의 성질",
+    "definition": "반비례 y=a/x의 그래프는 두 개의 곡선으로 이루어지며, a의 부호에 따라 제1·3사분면 또는 제2·4사분면에 나타난다.",
+    "description": "반비례 그래프를 직선처럼 생각하거나, 상수 a의 부호에 따른 사분면 위치를 혼동할 때 검색되어야 한다.",
+    "keywords": [
+      "반비례 그래프",
+      "사분면",
+      "a의 부호",
+      "곡선"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_006"
+    ],
+    "examples_of_use": [
+      "반비례 그래프가 놓이는 사분면을 판정하는 상황",
+      "그래프 개형을 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PC_001",
+    "node_type": "PC",
+    "title": "좌표 읽기와 점 찍기 계산",
+    "definition": "좌표평면에서 점의 좌표를 읽거나 주어진 좌표를 가진 점을 정확히 찍는 계산 단위이다.",
+    "description": "x축 방향과 y축 방향을 뒤바꾸거나, 음수 좌표를 잘못 표시할 때 검색되어야 한다.",
+    "keywords": [
+      "좌표 읽기",
+      "점 찍기",
+      "x축",
+      "y축"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_002"
+    ],
+    "examples_of_use": [
+      "점 (-2,3)을 찍는 상황",
+      "그래프 위 점의 좌표를 읽는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PC_002",
+    "node_type": "PC",
+    "title": "표를 그래프로 나타내기 계산",
+    "definition": "수량의 대응표를 바탕으로 순서쌍을 만들고 좌표평면에 그래프로 나타내는 계산 단위이다.",
+    "description": "표의 값 순서를 바꾸거나, 일정한 눈금 간격을 유지하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "표를 그래프로",
+      "순서쌍",
+      "눈금"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_004"
+    ],
+    "examples_of_use": [
+      "값의 표를 그래프로 나타내는 상황",
+      "자료를 좌표평면에 옮기는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PC_003",
+    "node_type": "PC",
+    "title": "그래프 해석 계산",
+    "definition": "그래프 위 점의 좌표를 읽어 수량 관계, 증가·감소, 특정 값에서의 대응값을 해석하는 계산 단위이다.",
+    "description": "그래프를 보고 x와 y의 의미를 혼동하거나, 점 사이의 의미를 과도하게 해석할 때 검색되어야 한다.",
+    "keywords": [
+      "그래프 해석",
+      "증가",
+      "감소",
+      "좌표 읽기"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_004"
+    ],
+    "examples_of_use": [
+      "그래프에서 특정 시간의 값을 읽는 상황",
+      "그래프 의미를 해석하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PC_004",
+    "node_type": "PC",
+    "title": "정비례식 구하기 계산",
+    "definition": "정비례 관계에서 한 쌍의 값이나 그래프를 이용해 비례상수 a를 구하고 y=ax 식을 세우는 계산 단위이다.",
+    "description": "a를 y/x로 구해야 한다는 점을 놓치거나, 원점을 지나는 조건을 함께 확인하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "정비례식",
+      "비례상수",
+      "y=ax",
+      "a 구하기"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_005",
+      "MD1_GRAPH_PP_002"
+    ],
+    "examples_of_use": [
+      "(2,6)을 지나는 정비례식을 구하는 상황",
+      "표로부터 정비례식을 만드는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PC_005",
+    "node_type": "PC",
+    "title": "정비례 그래프 그리기 계산",
+    "definition": "정비례식 y=ax에서 몇 개의 점을 구해 원점을 지나는 직선 그래프로 나타내는 계산 단위이다.",
+    "description": "원점을 지나지 않게 그리거나, 점 두 개만 찍고 직선으로 잇지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "정비례 그래프 그리기",
+      "원점",
+      "직선"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_005",
+      "MD1_GRAPH_PP_002"
+    ],
+    "examples_of_use": [
+      "y=2x의 그래프를 그리는 상황",
+      "정비례 그래프 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PC_006",
+    "node_type": "PC",
+    "title": "반비례식 구하기 계산",
+    "definition": "반비례 관계에서 xy의 값이 일정함을 이용해 상수 a를 구하고 y=a/x 식을 세우는 계산 단위이다.",
+    "description": "a를 x+y로 구하려 하거나, 한 쌍의 값으로 곱이 일정함을 확인하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "반비례식",
+      "상수 a",
+      "xy 일정",
+      "y=a/x"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_006",
+      "MD1_GRAPH_PP_003"
+    ],
+    "examples_of_use": [
+      "(2,6)을 지나는 반비례식을 구하는 상황",
+      "표로부터 반비례식을 만드는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GRAPH_PC_007",
+    "node_type": "PC",
+    "title": "반비례 그래프 그리기 계산",
+    "definition": "반비례식 y=a/x에서 몇 개의 대응값을 구해 그래프의 두 갈래 곡선을 나타내는 계산 단위이다.",
+    "description": "x=0을 대입하려 하거나, 그래프를 직선처럼 잇는 오류가 있을 때 검색되어야 한다.",
+    "keywords": [
+      "반비례 그래프",
+      "곡선",
+      "대응값 표"
+    ],
+    "prerequisites": [
+      "MD1_GRAPH_PD_006",
+      "MD1_GRAPH_PP_003"
+    ],
+    "examples_of_use": [
+      "y=6/x의 그래프를 그리는 상황",
+      "반비례 그래프 문제"
+    ]
+  }
+]

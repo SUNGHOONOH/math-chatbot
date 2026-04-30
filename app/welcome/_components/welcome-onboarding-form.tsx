@@ -53,7 +53,7 @@ export function WelcomeOnboardingForm({
       try {
         setNicknameStatus('checking');
         const response = await fetch(
-          `/api/user/profile/check-nickname?nickname=${encodeURIComponent(trimmedNickname)}`,
+          `/api/user/profile?nickname=${encodeURIComponent(trimmedNickname)}`,
           {
             method: 'GET',
             signal: controller.signal,
@@ -145,22 +145,22 @@ export function WelcomeOnboardingForm({
   };
 
   return (
-    <div className="w-full rounded-[2rem] border border-zinc-200 bg-white p-8 shadow-[0_30px_90px_rgba(15,23,42,0.08)] md:p-10">
+    <div className="w-full rounded-4xl border border-zinc-200 bg-white p-8 shadow-[0_30px_90px_rgba(15,23,42,0.08)] md:p-10">
       <div className="mb-8 space-y-3">
         <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
-          Profile Setup
+          30초 설정
         </div>
         <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
-          딱 한 번, 학습용 프로필을 완성합니다.
+          AHA가 설명을 맞춰줄 수 있게 해주세요.
         </h2>
         <p className="text-sm leading-6 text-zinc-500">
-          실명도 좋고 닉네임도 괜찮습니다. 이 이름과 학년 정보가 리포트와 학습 히스토리에 연결됩니다.
+          이름은 실명이 아니어도 괜찮습니다. 학년 정보는 문제 풀이 설명과 리포트를 학생 수준에 맞추는 데 사용됩니다.
         </p>
       </div>
 
       <form className="space-y-6" onSubmit={handleSubmit}>
         <label className="block space-y-2">
-          <span className="text-sm font-medium text-zinc-700">이름 또는 닉네임</span>
+          <span className="text-sm font-medium text-zinc-700">AHA가 불러줄 이름</span>
           <div className="flex items-center gap-3 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 focus-within:border-zinc-400 focus-within:bg-white">
             <UserRound size={18} className="text-zinc-400" />
             <input
@@ -176,7 +176,7 @@ export function WelcomeOnboardingForm({
               }}
               maxLength={24}
               className="w-full bg-transparent text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
-              placeholder="예: 민서, mathcat, 김도윤"
+              placeholder="예: 민서, 수학냥이, 김도윤"
             />
           </div>
           <div className="flex min-h-5 items-center justify-between gap-3">
@@ -200,7 +200,7 @@ export function WelcomeOnboardingForm({
         </label>
 
         <label className="block space-y-2">
-          <span className="text-sm font-medium text-zinc-700">학년</span>
+          <span className="text-sm font-medium text-zinc-700">지금 배우는 학년</span>
           <select
             value={gradeLevel}
             onChange={(event) => {
@@ -239,11 +239,11 @@ export function WelcomeOnboardingForm({
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900">
                 <ShieldCheck size={16} className="text-emerald-600" />
-                AI 학습 진단 및 리포트 생성을 위한 데이터 활용에 동의합니다.
+                대화 내용을 바탕으로 학습 리포트를 만드는 데 동의합니다.
               </div>
               <p className="text-sm leading-6 text-zinc-600">
-                문제 풀이 대화와 세션 리포트는 학습 병목 진단, 요약 리포트, 개인화된 학습 경험 개선에 사용됩니다.
-                공개되지 않는 내부 학습 데이터로만 취급되며, 언제든 운영 정책에 따라 조정될 수 있습니다.
+                AHA는 문제 풀이 대화에서 어디서 생각이 멈췄는지 확인하고, 세션이 끝난 뒤 리포트로 정리합니다.
+                이 정보는 내 학습 기록과 리포트 생성을 위해 사용됩니다.
               </p>
             </div>
           </div>
@@ -261,7 +261,7 @@ export function WelcomeOnboardingForm({
           className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-zinc-900 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500"
         >
           {isSaving ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
-          학습 공간 시작하기
+          저장하고 문제 풀러 가기
         </button>
       </form>
     </div>

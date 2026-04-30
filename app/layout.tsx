@@ -14,8 +14,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AHA Socratic Tutor",
-  description: "AHA 소크라틱 튜터 — 정답을 주지 않습니다.",
+  title: {
+    default: "AHA — 소크라틱 AI 수학 튜터",
+    template: "%s | AHA"
+  },
+  description: "AHA는 정답을 주지 않습니다.",
+  icons: {  
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({

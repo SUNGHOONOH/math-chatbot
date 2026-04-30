@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 
+const { DEV_APP_ALLOWED_ORIGINS } = require('./dev-app.config.cjs');
+
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  allowedDevOrigins: DEV_APP_ALLOWED_ORIGINS,
+  env: {
+    NEXT_PUBLIC_DEV_APP_HOSTS: DEV_APP_ALLOWED_ORIGINS.join(','),
+  },
   turbopack: {
     root: '/Users/sunghoon/Desktop/AHA/web/aha-v5',
   },

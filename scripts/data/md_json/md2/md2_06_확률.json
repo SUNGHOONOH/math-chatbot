@@ -1,0 +1,231 @@
+[
+  {
+    "concept_code": "MD2_PROB_PD_001",
+    "node_type": "PD",
+    "title": "실험과 사건",
+    "definition": "결과가 우연에 의해 정해지는 시행을 실험이라 하고, 실험에서 일어날 수 있는 결과들의 모임을 사건이라고 한다.",
+    "description": "사건을 결과 하나와 항상 같다고 생각하거나, 실험과 시행의 맥락을 구분하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "실험",
+      "사건",
+      "결과",
+      "시행"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "주사위 던지기를 실험으로 보는 상황",
+      "사건을 설명하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_PROB_PD_002",
+    "node_type": "PD",
+    "title": "표본공간",
+    "definition": "한 실험에서 일어날 수 있는 모든 결과의 집합을 표본공간이라고 한다.",
+    "description": "가능한 결과를 빠뜨리거나, 순서가 중요한 경우와 아닌 경우를 구분하지 못해 표본공간을 잘못 만들 때 검색되어야 한다.",
+    "keywords": [
+      "표본공간",
+      "모든 결과",
+      "집합"
+    ],
+    "prerequisites": [
+      "MD2_PROB_PD_001"
+    ],
+    "examples_of_use": [
+      "동전 던지기의 표본공간을 만드는 상황",
+      "주사위 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_PROB_PD_003",
+    "node_type": "PD",
+    "title": "확률의 뜻",
+    "definition": "각 결과가 일어날 가능성이 모두 같은 실험에서, 사건 A의 확률은 (A가 일어나는 경우의 수)/(표본공간의 경우의 수) 이다.",
+    "description": "확률을 경우의 수 비율과 연결하지 못하거나, 모든 결과가 equally likely여야 한다는 조건을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "확률",
+      "경우의 수",
+      "같은 가능성"
+    ],
+    "prerequisites": [
+      "MD2_PROB_PD_002"
+    ],
+    "examples_of_use": [
+      "사건의 확률을 구하는 상황",
+      "확률의 뜻을 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_PROB_PD_004",
+    "node_type": "PD",
+    "title": "여사건",
+    "definition": "표본공간에서 사건 A가 일어나지 않는 사건을 A의 여사건이라고 한다.",
+    "description": "여사건을 반대 사건 정도로 막연히 보거나, 전체에서 빼는 구조를 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "여사건",
+      "전체에서 빼기",
+      "보완 사건"
+    ],
+    "prerequisites": [
+      "MD2_PROB_PD_001",
+      "MD2_PROB_PD_002"
+    ],
+    "examples_of_use": [
+      "A의 여사건을 구하는 상황",
+      "적어도 하나 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_PROB_PP_001",
+    "node_type": "PP",
+    "title": "확률의 범위",
+    "definition": "어떤 사건의 확률은 0 이상 1 이하이다.",
+    "description": "확률이 1보다 크거나 음수가 될 수 있다고 생각할 때 검색되어야 한다.",
+    "keywords": [
+      "확률 범위",
+      "0 이상 1 이하"
+    ],
+    "prerequisites": [
+      "MD2_PROB_PD_003"
+    ],
+    "examples_of_use": [
+      "확률 값의 타당성을 판단하는 상황",
+      "확률의 범위 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_PROB_PP_002",
+    "node_type": "PP",
+    "title": "전체확률과 여사건의 확률",
+    "definition": "사건 A의 확률을 P(A)라 하면, 여사건의 확률은 1-P(A)이다.",
+    "description": "여사건을 직접 세지 않아도 1에서 빼면 된다는 점을 놓치거나, 전체확률이 1이라는 구조를 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "여사건의 확률",
+      "1-P(A)",
+      "전체확률"
+    ],
+    "prerequisites": [
+      "MD2_PROB_PD_004"
+    ],
+    "examples_of_use": [
+      "적어도 하나 사건의 확률을 구하는 상황",
+      "여사건 활용 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_PROB_PP_003",
+    "node_type": "PP",
+    "title": "확률과 경우의 수의 연결",
+    "definition": "확률은 유리한 경우의 수와 전체 경우의 수의 비이며, 먼저 경우의 수를 정확히 세는 것이 중요하다.",
+    "description": "확률 계산에서 분자와 분모를 잘못 세거나, 경우의 수 문제와 확률 문제를 따로 보는 경향이 있을 때 검색되어야 한다.",
+    "keywords": [
+      "확률과 경우의 수",
+      "분자",
+      "분모"
+    ],
+    "prerequisites": [
+      "MD2_PROB_PD_003"
+    ],
+    "examples_of_use": [
+      "확률 문제를 경우의 수로 푸는 상황",
+      "전체 경우를 먼저 세는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_PROB_PC_001",
+    "node_type": "PC",
+    "title": "표본공간 만들기 계산",
+    "definition": "실험의 모든 결과를 빠짐없이 나열하거나 경우의 수로 세어 표본공간을 만드는 계산 단위이다.",
+    "description": "순서가 중요한 경우를 놓치거나, 중복된 결과를 제거하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "표본공간 계산",
+      "모든 결과",
+      "나열"
+    ],
+    "prerequisites": [
+      "MD2_PROB_PD_002"
+    ],
+    "examples_of_use": [
+      "주사위 두 번 던지기의 표본공간을 만드는 상황",
+      "표본공간 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_PROB_PC_002",
+    "node_type": "PC",
+    "title": "사건의 경우의 수 세기 계산",
+    "definition": "표본공간에서 사건에 해당하는 결과만 골라 경우의 수를 세는 계산 단위이다.",
+    "description": "사건 조건을 잘못 해석하거나, 경우를 중복·누락해서 셀 때 검색되어야 한다.",
+    "keywords": [
+      "사건의 경우의 수",
+      "유리한 경우",
+      "조건"
+    ],
+    "prerequisites": [
+      "MD2_PROB_PD_001",
+      "MD2_PROB_PD_002"
+    ],
+    "examples_of_use": [
+      "합이 7인 경우를 세는 상황",
+      "사건의 경우를 세는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_PROB_PC_003",
+    "node_type": "PC",
+    "title": "기본 확률 계산",
+    "definition": "유리한 경우의 수를 전체 경우의 수로 나누어 사건의 확률을 계산하는 단위이다.",
+    "description": "분자와 분모를 바꾸어 쓰거나, 약분을 못 하고 확률값 해석을 틀릴 때 검색되어야 한다.",
+    "keywords": [
+      "확률 계산",
+      "유리한 경우",
+      "전체 경우"
+    ],
+    "prerequisites": [
+      "MD2_PROB_PD_003",
+      "MD2_PROB_PP_003"
+    ],
+    "examples_of_use": [
+      "주사위 눈이 짝수일 확률을 구하는 상황",
+      "기본 확률 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_PROB_PC_004",
+    "node_type": "PC",
+    "title": "여사건을 이용한 확률 계산",
+    "definition": "직접 구하기 어려운 사건의 확률을 여사건의 확률을 이용해 1에서 빼는 방식으로 계산하는 단위이다.",
+    "description": "전체에서 무엇을 빼야 하는지 못 정하거나, 여사건을 잘못 설정할 때 검색되어야 한다.",
+    "keywords": [
+      "여사건 활용",
+      "1에서 빼기",
+      "확률 계산"
+    ],
+    "prerequisites": [
+      "MD2_PROB_PP_002"
+    ],
+    "examples_of_use": [
+      "적어도 하나가 나올 확률을 구하는 상황",
+      "여사건 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_PROB_PC_005",
+    "node_type": "PC",
+    "title": "확률 해석 계산",
+    "definition": "구한 확률의 크기를 비교하거나, 확률값이 의미하는 가능성의 크기를 해석하는 계산 단위이다.",
+    "description": "확률값을 비율과 연결하지 못하거나, 0과 1에 가까운 확률의 의미를 잘못 해석할 때 검색되어야 한다.",
+    "keywords": [
+      "확률 해석",
+      "비교",
+      "가능성의 크기"
+    ],
+    "prerequisites": [
+      "MD2_PROB_PP_001"
+    ],
+    "examples_of_use": [
+      "두 사건의 가능성을 비교하는 상황",
+      "확률값 해석 문제"
+    ]
+  }
+]

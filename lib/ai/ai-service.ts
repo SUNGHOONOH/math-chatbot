@@ -533,10 +533,10 @@ async function retrieveStrategyGraphConceptPool(
 ): Promise<Array<{ concept_code: string; matched_text: string; similarity: number }>> {
   const supabase = getSupabaseAdmin();
   const retrievalTexts = [
+    problemText.trim(),
     dialogueTranscript.trim()
       ? `[Problem Text]\n${problemText}\n\n[Full Conversation Transcript]\n${dialogueTranscript}`.trim()
-      : problemText.trim(),
-    problemText.trim(),
+      : '',
   ].filter((text, index, texts) => text && texts.indexOf(text) === index);
 
   if (retrievalTexts.length === 0) {
@@ -617,10 +617,6 @@ async function retrieveStrategyGraphConceptPool(
         });
       }
     }
-
-    if (deduped.size > 0) {
-      break;
-    }
   }
 
   if (deduped.size === 0) {
@@ -629,7 +625,7 @@ async function retrieveStrategyGraphConceptPool(
 
   return Array.from(deduped.values())
     .sort((a, b) => b.similarity - a.similarity)
-    .slice(0, 15);
+    .slice(0, 20);
 }
 
 function parseBracketKeyValueText(text: string): Record<string, string> | null {
@@ -1647,7 +1643,7 @@ export async function extractAndUpdateRequiredConcepts({
     const text = await hfGenerateText({
       model: TEXT_MODEL,
       inputs: buildConceptExtractionInput(contextForLLM),
-      parameters: { max_new_tokens: 2048, temperature: 0.1 },
+      parameters: { max_new_tokens: 3072, temperature: 0.1 },
       responseFormat: requiredConceptsResponseFormat,
     });
 

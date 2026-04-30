@@ -113,10 +113,10 @@ export function SimpleCalculator({ onClose }: SimpleCalculatorProps) {
   };
 
   const buttons: ButtonDef[] = [
-    { label: 'AC',  variant: 'fn', action: pressAllClear },
+    { label: 'AC', variant: 'fn', action: pressAllClear },
     { label: '+/−', variant: 'fn', action: pressToggleSign },
-    { label: '%',   variant: 'fn', action: pressPercent },
-    { label: '÷',  variant: 'op', action: () => pushOperator('÷') },
+    { label: '%', variant: 'fn', action: pressPercent },
+    { label: '÷', variant: 'op', action: () => pushOperator('÷') },
 
     { label: '7', variant: 'num', action: () => pushDigit('7') },
     { label: '8', variant: 'num', action: () => pushDigit('8') },
@@ -139,10 +139,10 @@ export function SimpleCalculator({ onClose }: SimpleCalculatorProps) {
   ];
 
   const variantClass: Record<string, string> = {
-    fn:  'bg-zinc-200 text-zinc-700 hover:bg-zinc-300',
-    op:  'bg-emerald-500 text-white hover:bg-emerald-400',
+    fn: 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300',
+    op: 'bg-emerald-500 text-white hover:bg-emerald-400',
     num: 'bg-zinc-100 text-zinc-800 hover:bg-zinc-200',
-    eq:  'bg-emerald-600 text-white hover:bg-emerald-500',
+    eq: 'bg-emerald-600 text-white hover:bg-emerald-500',
   };
 
   return (

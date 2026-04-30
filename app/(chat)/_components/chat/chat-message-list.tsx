@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Bot, Loader2 } from 'lucide-react';
+import { Camera, Loader2, MessageCircleQuestion } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useChatStore } from '@/lib/store/use-chat-store';
 import { ChatMessageItem } from './chat-message-item';
@@ -18,14 +18,37 @@ export function ChatMessageList() {
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-zinc-50/50">
+    <div className="native-chat-scroll-pad flex-1 overflow-y-auto overflow-x-hidden overscroll-x-none bg-[#f7f8f6] px-4 pb-4 sm:p-6 sm:pt-6 space-y-5 sm:space-y-6">
       {messages.length === 0 && !isInitializing ? (
-        <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-          <div className="w-16 h-16 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 shadow-sm">
-            <Bot size={32} />
+        <div className="flex min-h-full flex-col items-center justify-center text-center">
+          <div className="w-full max-w-md space-y-5">
+            <div className="space-y-2">
+              <h2 className="text-[26px] font-bold leading-tight tracking-normal text-zinc-950 sm:text-3xl">
+                어디서 막혔는지 바로 시작해볼까요?
+              </h2>
+              <p className="mx-auto max-w-sm text-[15px] leading-6 text-zinc-500">
+                문제 사진을 올리거나 풀이가 멈춘 지점을 적으면, 필요한 질문부터 이어갑니다.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new Event('aha:open-camera'))}
+                className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-zinc-950 px-3 text-sm font-bold text-white shadow-sm active:scale-[0.99]"
+              >
+                <Camera size={17} />
+                사진 찍기
+              </button>
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new Event('aha:focus-chat-input'))}
+                className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-zinc-200 bg-white px-3 text-sm font-bold text-zinc-800 shadow-sm active:scale-[0.99]"
+              >
+                <MessageCircleQuestion size={17} />
+                직접 입력
+              </button>
+            </div>
           </div>
-          <h2 className="text-2xl font-bold text-zinc-800">어떤 수학 문제를 도와줄까요?</h2>
-          <p className="text-zinc-500 max-w-sm">수학 문제 사진을 찍어 올리거나, 텍스트로 질문해 주세요.</p>
         </div>
       ) : (
         messages.map((message, index) => {
@@ -52,8 +75,8 @@ export function ChatMessageList() {
           transition={{ duration: 0.3 }}
           className="flex gap-4 justify-start"
         >
-          <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm">
-            <Bot size={18} />
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 text-xs font-bold text-emerald-600 shadow-sm">
+            A
           </div>
           <div className="bg-white border border-zinc-100 rounded-2xl rounded-tl-sm px-6 py-4 flex items-center gap-1 shadow-sm">
             <div className="w-2 h-2 bg-zinc-300 rounded-full animate-bounce [animation-delay:-0.3s]" />

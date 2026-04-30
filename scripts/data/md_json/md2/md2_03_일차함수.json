@@ -1,0 +1,311 @@
+[
+  {
+    "concept_code": "MD2_FUNC_PD_001",
+    "node_type": "PD",
+    "title": "함수",
+    "definition": "한 집합의 각 원소에 다른 집합의 원소가 하나씩만 대응될 때 이를 함수라고 한다.",
+    "description": "한 입력에 여러 출력이 허용된다고 생각하거나, 대응 관계의 유일성을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "함수",
+      "대응",
+      "유일성"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "대응이 함수인지 판단하는 상황",
+      "함수의 뜻을 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PD_002",
+    "node_type": "PD",
+    "title": "일차함수",
+    "definition": "y=ax+b(a≠0) 꼴로 나타나는 함수를 일차함수라고 한다.",
+    "description": "정비례 y=ax와 일차함수를 구분하지 못하거나, 상수항이 있어도 일차함수가 된다는 점을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "일차함수",
+      "y=ax+b",
+      "상수항"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PD_001"
+    ],
+    "examples_of_use": [
+      "y=2x+3이 일차함수인지 보는 상황",
+      "식의 형태를 판정하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PD_003",
+    "node_type": "PD",
+    "title": "일차함수의 그래프",
+    "definition": "일차함수의 그래프는 직선이다.",
+    "description": "그래프가 직선이라는 사실은 알아도, 식의 각 부분이 그래프와 어떻게 연결되는지 모를 때 검색되어야 한다.",
+    "keywords": [
+      "일차함수 그래프",
+      "직선"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PD_002"
+    ],
+    "examples_of_use": [
+      "일차함수 그래프를 그리는 상황",
+      "그래프를 해석하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PD_004",
+    "node_type": "PD",
+    "title": "기울기",
+    "definition": "일차함수 y=ax+b에서 a를 기울기라고 하며, x가 1 증가할 때 y가 변하는 양을 뜻한다.",
+    "description": "기울기를 직선의 가파름 정도로만 막연히 이해하거나, 증가량/변화량과 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "기울기",
+      "변화량",
+      "a"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PD_002"
+    ],
+    "examples_of_use": [
+      "기울기를 읽는 상황",
+      "기울기의 의미를 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PD_005",
+    "node_type": "PD",
+    "title": "y절편",
+    "definition": "일차함수 y=ax+b에서 b는 그래프가 y축과 만나는 점의 y좌표이다.",
+    "description": "절편을 x절편과 혼동하거나, b가 그래프에서 무엇을 뜻하는지 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "y절편",
+      "b",
+      "y축과 만나는 점"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PD_002"
+    ],
+    "examples_of_use": [
+      "y절편을 읽는 상황",
+      "절편을 찾는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PD_006",
+    "node_type": "PD",
+    "title": "일차함수와 일차방정식의 관계",
+    "definition": "일차함수의 그래프와 좌표축 또는 다른 직선의 교점은 관련된 일차방정식 또는 연립방정식의 해와 연결된다.",
+    "description": "그래프와 방정식을 별개로만 보고, 교점의 좌표를 해와 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "교점",
+      "일차방정식",
+      "연립방정식",
+      "그래프"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PD_003"
+    ],
+    "examples_of_use": [
+      "두 직선의 교점을 해로 보는 상황",
+      "그래프와 방정식 관계 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PP_001",
+    "node_type": "PP",
+    "title": "기울기와 증가·감소",
+    "definition": "기울기가 양수이면 그래프는 오른쪽으로 갈수록 증가하고, 음수이면 감소한다.",
+    "description": "직선의 방향을 기울기 부호와 연결하지 못하거나, 기울기가 0인 경우와 혼동할 때 검색되어야 한다.",
+    "keywords": [
+      "기울기 부호",
+      "증가",
+      "감소"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PD_004"
+    ],
+    "examples_of_use": [
+      "그래프의 증가·감소를 판단하는 상황",
+      "기울기 부호를 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PP_002",
+    "node_type": "PP",
+    "title": "평행과 기울기",
+    "definition": "두 직선이 평행하면 기울기가 같다.",
+    "description": "기울기가 같다는 조건을 평행과 연결하지 못하거나, y절편까지 같아야 평행이라고 오해할 때 검색되어야 한다.",
+    "keywords": [
+      "평행",
+      "기울기 같음",
+      "직선"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PD_004"
+    ],
+    "examples_of_use": [
+      "두 직선이 평행인지 판단하는 상황",
+      "기울기로 평행을 판정하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PP_003",
+    "node_type": "PP",
+    "title": "두 점을 지나는 직선의 기울기",
+    "definition": "두 점 (x1,y1), (x2,y2)를 지나는 직선의 기울기는 (y2-y1)/(x2-x1)이다.",
+    "description": "x의 변화량과 y의 변화량 순서를 뒤바꾸거나, 분모와 분자를 바꿀 때 검색되어야 한다.",
+    "keywords": [
+      "두 점 사이 기울기",
+      "변화량",
+      "직선"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PD_004"
+    ],
+    "examples_of_use": [
+      "두 점을 지나는 직선의 기울기를 구하는 상황",
+      "좌표로 기울기를 계산하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PP_004",
+    "node_type": "PP",
+    "title": "교점과 연립방정식의 해",
+    "definition": "두 일차함수의 그래프의 교점 좌표는 두 식을 연립한 연립방정식의 해이다.",
+    "description": "교점을 그래프 위 점으로만 보고 수식 해와 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "교점",
+      "연립방정식의 해",
+      "좌표"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PD_006"
+    ],
+    "examples_of_use": [
+      "두 직선의 교점을 구하는 상황",
+      "그래프와 연립방정식을 연결하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PC_001",
+    "node_type": "PC",
+    "title": "일차함수 식 판정 계산",
+    "definition": "주어진 식이 y=ax+b 꼴인지 정리해 보고 일차함수인지 판정하는 계산 단위이다.",
+    "description": "정리 전 모양만 보고 판단하거나, a=0인 경우를 걸러내지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "일차함수 판정",
+      "y=ax+b",
+      "정리"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PD_002"
+    ],
+    "examples_of_use": [
+      "식이 일차함수인지 판정하는 상황",
+      "형태를 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PC_002",
+    "node_type": "PC",
+    "title": "기울기와 절편 읽기 계산",
+    "definition": "일차함수 y=ax+b에서 기울기 a와 y절편 b를 읽어내는 계산 단위이다.",
+    "description": "부호를 잘못 읽거나, x의 계수와 상수항을 뒤바꿀 때 검색되어야 한다.",
+    "keywords": [
+      "기울기 읽기",
+      "절편 읽기",
+      "a",
+      "b"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PD_004",
+      "MD2_FUNC_PD_005"
+    ],
+    "examples_of_use": [
+      "y=-2x+5에서 기울기와 절편을 읽는 상황",
+      "그래프 요소를 읽는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PC_003",
+    "node_type": "PC",
+    "title": "일차함수 그래프 그리기 계산",
+    "definition": "기울기와 y절편 또는 두 점을 이용해 일차함수의 그래프를 직선으로 그리는 계산 단위이다.",
+    "description": "점 하나만 찍고 직선을 못 그리거나, 기울기 변화량을 잘못 적용할 때 검색되어야 한다.",
+    "keywords": [
+      "그래프 그리기",
+      "기울기",
+      "절편",
+      "두 점"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PD_003",
+      "MD2_FUNC_PD_004",
+      "MD2_FUNC_PD_005"
+    ],
+    "examples_of_use": [
+      "y=x-2의 그래프를 그리는 상황",
+      "두 점으로 직선을 그리는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PC_004",
+    "node_type": "PC",
+    "title": "두 점을 지나는 일차함수 식 구하기 계산",
+    "definition": "두 점의 좌표로 기울기를 구한 뒤, 한 점을 대입해 일차함수의 식을 구하는 계산 단위이다.",
+    "description": "기울기를 잘못 구하거나, 구한 기울기를 식에 반영하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "직선의 식",
+      "두 점",
+      "기울기",
+      "대입"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PP_003"
+    ],
+    "examples_of_use": [
+      "두 점을 지나는 직선의 식을 구하는 상황",
+      "좌표로 식을 만드는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PC_005",
+    "node_type": "PC",
+    "title": "그래프 해석 계산",
+    "definition": "그래프에서 기울기, 절편, 증가·감소, 교점을 읽어 상황을 해석하는 계산 단위이다.",
+    "description": "좌표를 잘못 읽거나, 기울기와 증가량을 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "그래프 해석",
+      "기울기",
+      "절편",
+      "교점"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PP_001"
+    ],
+    "examples_of_use": [
+      "그래프를 보고 함수식의 성질을 읽는 상황",
+      "상황을 해석하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_FUNC_PC_006",
+    "node_type": "PC",
+    "title": "교점 구하기 계산",
+    "definition": "두 직선의 식을 연립하거나 그래프에서 읽어 교점 좌표를 구하는 계산 단위이다.",
+    "description": "교점을 x값 하나로만 적거나, 연립 계산 후 순서쌍으로 정리하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "교점 계산",
+      "연립방정식",
+      "순서쌍"
+    ],
+    "prerequisites": [
+      "MD2_FUNC_PP_004"
+    ],
+    "examples_of_use": [
+      "두 직선의 교점을 구하는 상황",
+      "연립방정식으로 교점을 찾는 문제"
+    ]
+  }
+]

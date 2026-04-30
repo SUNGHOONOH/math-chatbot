@@ -13,6 +13,7 @@ import { DASHBOARD_TOP_N_CONCEPTS } from '@/lib/constants';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowRight, ChartColumnIncreasing, CircleCheckBig, TriangleAlert } from 'lucide-react';
+import { LogoutButton } from './_components/logout-button';
 
 // ── 집계 유틸리티 ──
 function countOccurrences(arr: string[]): Map<string, number> {
@@ -53,23 +54,34 @@ export default async function DashboardPage() {
   // ── 데이터 페칭 (Supabase JOIN 활용하여 한 번에) ──
 
   // 1. 마스터 개념: session_reports → mastered_concepts 집계
-  const { data: reports } = await supabase
+  const { data: reports, error: reportError } = await supabase
     .from('session_reports')
-    .select('mastered_concepts, tutoring_sessions!inner(student_id)')
+    .select(`
+      mastered_concepts,
+      tutoring_sessions!inner (
+        student_id
+      )
+    `)
     .eq('tutoring_sessions.student_id', user.id);
+
+  if (reportError) {
+    console.error('[Dashboard] reportError:', reportError);
+  }
 
   const allMastered: string[] = [];
   if (reports) {
     for (const report of reports) {
-      if (Array.isArray(report.mastered_concepts)) {
+      const concepts = (report as any).mastered_concepts;
+      if (Array.isArray(concepts)) {
         allMastered.push(
-          ...report.mastered_concepts.filter((concept): concept is string =>
+          ...concepts.filter((concept: any): concept is string =>
             typeof concept === 'string' && isKnownConceptCodeShape(concept)
           )
         );
       }
     }
   }
+
   const masteredRanking = topN(countOccurrences(allMastered), DASHBOARD_TOP_N_CONCEPTS);
 
   // 2. 취약 개념: learning_bottlenecks (is_resolved = false) 집계
@@ -119,8 +131,8 @@ export default async function DashboardPage() {
     .eq('student_id', user.id);
 
   return (
-    <div className="space-y-8">
-      <header className="rounded-[28px] border border-zinc-200 bg-white px-6 py-6 shadow-sm md:px-8">
+    <div className="safe-bottom w-full max-w-[100vw] space-y-6 overflow-x-hidden pb-2 sm:space-y-8">
+      <header className="rounded-2xl border border-zinc-200 bg-white px-5 py-5 shadow-sm sm:rounded-[28px] sm:px-6 sm:py-6 md:px-8">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
@@ -128,43 +140,46 @@ export default async function DashboardPage() {
               Learning Dashboard
             </div>
             <div className="space-y-2">
-              <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">나의 학습 대시보드</h1>
+              <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">나의 학습 대시보드</h1>
               <p className="max-w-2xl text-sm leading-6 text-zinc-500">
                 총 {totalSessions || 0}개의 문제를 풀었습니다. 최근 세션을 바탕으로 강점 개념과 반복해서 막히는 개념을 정리했습니다.
               </p>
             </div>
           </div>
 
-          <Link
-            href="/chat/new"
-            className="inline-flex items-center gap-2 rounded-2xl border border-zinc-200 bg-zinc-900 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800"
-          >
-            새 질문 시작하기
-            <ArrowRight size={16} />
-          </Link>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:flex md:items-center">
+            <Link
+              href="/chat/new"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl border border-zinc-200 bg-zinc-900 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800"
+            >
+              새 질문 시작하기
+              <ArrowRight size={16} />
+            </Link>
+            <LogoutButton />
+          </div>
         </div>
       </header>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* 마스터 개념 순위 */}
-        <section className="space-y-4 rounded-[28px] border border-zinc-200 bg-white p-6 shadow-sm">
+        <section className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:rounded-[28px] sm:p-6">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-emerald-700">
             <CircleCheckBig size={18} />
-            마스터한 개념 Top {masteredRanking.length}
+            잘한 개념 Top {masteredRanking.length}
           </h2>
           {masteredRanking.length === 0 ? (
             <p className="text-sm text-zinc-400">아직 데이터가 없습니다. 문제를 풀어보세요.</p>
           ) : (
             <ul className="space-y-3">
               {masteredRanking.map((item, i) => (
-	                <li key={item.concept} className="flex items-center justify-between rounded-2xl border border-zinc-100 bg-zinc-50 px-4 py-3">
+	                <li key={item.concept} className="flex items-center justify-between gap-3 rounded-2xl border border-zinc-100 bg-zinc-50 px-4 py-3">
 	                  <div className="flex items-center gap-3">
 	                    <span className="text-lg font-bold text-emerald-600">{i + 1}</span>
 	                    <div className="flex flex-col">
 	                      <span className="text-sm text-zinc-800">{getConceptLabel(item.concept)}</span>
 	                    </div>
 	                  </div>
-                  <span className="text-xs text-zinc-500">{item.count}회 마스터</span>
+                  <span className="shrink-0 text-xs text-zinc-500">{item.count}회 마스터</span>
                 </li>
               ))}
             </ul>
@@ -172,7 +187,7 @@ export default async function DashboardPage() {
         </section>
 
         {/* 취약 개념 순위 */}
-        <section className="space-y-4 rounded-[28px] border border-zinc-200 bg-white p-6 shadow-sm">
+        <section className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:rounded-[28px] sm:p-6">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-rose-700">
             <TriangleAlert size={18} />
             취약 개념 Top {weakRanking.length}
@@ -183,14 +198,14 @@ export default async function DashboardPage() {
             <ul className="space-y-3">
 	              {weakRanking.map((item, i) => (
 	                <li key={item.concept} className="space-y-2 rounded-2xl border border-zinc-100 bg-zinc-50 px-4 py-3">
-	                  <div className="flex items-center justify-between">
+	                  <div className="flex items-center justify-between gap-3">
 	                    <div className="flex items-center gap-3">
 	                      <span className="text-lg font-bold text-rose-600">{i + 1}</span>
 	                      <div className="flex flex-col">
 	                        <span className="text-sm text-zinc-800">{getConceptLabel(item.concept)}</span>
 	                      </div>
 	                    </div>
-	                    <span className="text-xs text-zinc-500">{item.count}회 미해결</span>
+	                    <span className="shrink-0 text-xs text-zinc-500">{item.count}회 미해결</span>
 	                  </div>
                   <Link
                     href={`/practice?concept=${encodeURIComponent(item.concept)}`}

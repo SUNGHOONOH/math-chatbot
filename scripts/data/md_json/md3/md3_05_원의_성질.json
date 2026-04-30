@@ -1,0 +1,282 @@
+[
+  {
+    "concept_code": "MD3_CIRC_PD_001",
+    "node_type": "PD",
+    "title": "원과 현",
+    "definition": "원의 중심에서 같은 거리에 있는 점들의 모임이 원이며, 원 위의 두 점을 이은 선분을 현이라고 한다.",
+    "description": "현과 지름을 혼동하거나, 원의 기본 요소를 구분하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "원",
+      "현",
+      "중심"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "현을 찾는 상황",
+      "원의 요소 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_CIRC_PD_002",
+    "node_type": "PD",
+    "title": "원주각과 중심각",
+    "definition": "원의 중심을 꼭짓점으로 하는 각을 중심각, 원 위의 한 점을 꼭짓점으로 하는 각을 원주각이라고 한다.",
+    "description": "중심각과 원주각을 꼭짓점 위치로 구분하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "중심각",
+      "원주각",
+      "꼭짓점"
+    ],
+    "prerequisites": [
+      "MD3_CIRC_PD_001"
+    ],
+    "examples_of_use": [
+      "중심각과 원주각을 구분하는 상황",
+      "각 이름 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_CIRC_PD_003",
+    "node_type": "PD",
+    "title": "원주각의 성질",
+    "definition": "한 호에 대한 원주각의 크기는 그 호에 대한 중심각의 크기의 절반이다.",
+    "description": "중심각과 원주각의 배수 관계를 거꾸로 적용하거나, 같은 호에 대한 각인지 확인하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "원주각의 성질",
+      "중심각의 절반",
+      "같은 호"
+    ],
+    "prerequisites": [
+      "MD3_CIRC_PD_002"
+    ],
+    "examples_of_use": [
+      "원주각의 크기를 구하는 상황",
+      "호와 각 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_CIRC_PD_004",
+    "node_type": "PD",
+    "title": "원에 내접하는 사각형",
+    "definition": "네 꼭짓점이 모두 한 원 위에 있는 사각형을 원에 내접하는 사각형이라고 한다.",
+    "description": "한 원 위에 있다는 조건을 놓치거나, 일반 사각형과 구분하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "내접사각형",
+      "원 위의 네 점"
+    ],
+    "prerequisites": [
+      "MD3_CIRC_PD_001",
+      "MD3_CIRC_PD_003"
+    ],
+    "examples_of_use": [
+      "내접사각형을 보는 상황",
+      "정의를 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_CIRC_PD_005",
+    "node_type": "PD",
+    "title": "접선",
+    "definition": "원과 한 점에서만 만나는 직선을 원의 접선이라고 한다.",
+    "description": "한 점에서 만난다는 조건을 놓치거나, 접선과 할선을 구분하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "접선",
+      "한 점에서 만남",
+      "원"
+    ],
+    "prerequisites": [
+      "MD3_CIRC_PD_001"
+    ],
+    "examples_of_use": [
+      "접선을 찾는 상황",
+      "원과 직선의 관계 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_CIRC_PD_006",
+    "node_type": "PD",
+    "title": "접선과 반지름의 관계",
+    "definition": "원의 접점에서 접선은 그 점을 지나는 반지름과 수직이다.",
+    "description": "접선과 반지름이 이루는 각을 90°로 보지 못하거나, 접점이 아닌 곳의 반지름과 연결할 때 검색되어야 한다.",
+    "keywords": [
+      "접선",
+      "반지름",
+      "수직",
+      "접점"
+    ],
+    "prerequisites": [
+      "MD3_CIRC_PD_005"
+    ],
+    "examples_of_use": [
+      "접선과 반지름 관계를 이용하는 상황",
+      "직각 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_CIRC_PP_001",
+    "node_type": "PP",
+    "title": "같은 호에 대한 원주각",
+    "definition": "같은 호에 대한 원주각의 크기는 서로 같다.",
+    "description": "같은 호인지 판단하지 못하거나, 위치만 비슷하면 같은 원주각이라고 생각할 때 검색되어야 한다.",
+    "keywords": [
+      "같은 호",
+      "원주각 같음"
+    ],
+    "prerequisites": [
+      "MD3_CIRC_PD_003"
+    ],
+    "examples_of_use": [
+      "원주각이 같은 이유를 설명하는 상황",
+      "각 계산 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_CIRC_PP_002",
+    "node_type": "PP",
+    "title": "지름에 대한 원주각",
+    "definition": "지름을 한 변으로 하는 원주각의 크기는 90°이다.",
+    "description": "왜 직각이 되는지 원주각 성질과 연결하지 못하거나, 지름인지 확인하지 않고 적용할 때 검색되어야 한다.",
+    "keywords": [
+      "지름",
+      "원주각",
+      "직각"
+    ],
+    "prerequisites": [
+      "MD3_CIRC_PD_003"
+    ],
+    "examples_of_use": [
+      "직각을 찾는 상황",
+      "지름과 원주각 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_CIRC_PP_003",
+    "node_type": "PP",
+    "title": "내접사각형의 성질",
+    "definition": "원에 내접하는 사각형에서는 마주 보는 두 각의 크기의 합이 180°이다.",
+    "description": "이웃한 각의 합으로 착각하거나, 내접사각형 조건 없이 적용할 때 검색되어야 한다.",
+    "keywords": [
+      "내접사각형 성질",
+      "마주 보는 각",
+      "180도"
+    ],
+    "prerequisites": [
+      "MD3_CIRC_PD_004"
+    ],
+    "examples_of_use": [
+      "내접사각형의 각을 구하는 상황",
+      "성질 활용 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_CIRC_PP_004",
+    "node_type": "PP",
+    "title": "한 점에서 그은 두 접선의 길이",
+    "definition": "원 밖의 한 점에서 그은 두 접선의 길이는 서로 같다.",
+    "description": "접선의 길이가 같다는 성질을 못 떠올리거나, 같은 바깥점에서 그은 경우라는 조건을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "두 접선의 길이",
+      "원 밖의 한 점"
+    ],
+    "prerequisites": [
+      "MD3_CIRC_PD_006"
+    ],
+    "examples_of_use": [
+      "접선의 길이를 구하는 상황",
+      "길이 관계 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_CIRC_PC_001",
+    "node_type": "PC",
+    "title": "중심각과 원주각 계산",
+    "definition": "같은 호에 대한 중심각과 원주각의 관계를 이용해 각의 크기를 계산하는 단위이다.",
+    "description": "2배 또는 1/2 관계를 거꾸로 적용하거나, 같은 호 대응을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "중심각 계산",
+      "원주각 계산",
+      "2배 관계"
+    ],
+    "prerequisites": [
+      "MD3_CIRC_PD_003"
+    ],
+    "examples_of_use": [
+      "중심각과 원주각을 구하는 상황",
+      "각 계산 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_CIRC_PC_002",
+    "node_type": "PC",
+    "title": "같은 호에 대한 원주각 활용 계산",
+    "definition": "같은 호에 대한 원주각의 크기가 같음을 이용해 각의 크기를 계산하는 단위이다.",
+    "description": "같은 호를 잘못 잡거나, 각 위치를 읽지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "같은 호 원주각",
+      "각 계산"
+    ],
+    "prerequisites": [
+      "MD3_CIRC_PP_001"
+    ],
+    "examples_of_use": [
+      "원주각이 같은 것을 이용하는 상황",
+      "도형 해석 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_CIRC_PC_003",
+    "node_type": "PC",
+    "title": "내접사각형의 각 계산",
+    "definition": "내접사각형의 마주 보는 각의 합이 180°임을 이용해 각을 계산하는 단위이다.",
+    "description": "마주 보는 각이 아닌 이웃한 각으로 계산하거나, 내접사각형 여부를 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "내접사각형 계산",
+      "마주 보는 각",
+      "180도"
+    ],
+    "prerequisites": [
+      "MD3_CIRC_PP_003"
+    ],
+    "examples_of_use": [
+      "내접사각형의 미지각을 구하는 상황",
+      "각 계산 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_CIRC_PC_004",
+    "node_type": "PC",
+    "title": "접선과 반지름 관계 활용 계산",
+    "definition": "접점에서 접선과 반지름이 수직임을 이용해 각이나 길이를 계산하는 단위이다.",
+    "description": "수직 관계를 놓치거나, 접점이 아닌 위치에 적용할 때 검색되어야 한다.",
+    "keywords": [
+      "접선 계산",
+      "반지름 수직",
+      "접점"
+    ],
+    "prerequisites": [
+      "MD3_CIRC_PD_006"
+    ],
+    "examples_of_use": [
+      "직각을 이용해 각을 구하는 상황",
+      "접선 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_CIRC_PC_005",
+    "node_type": "PC",
+    "title": "두 접선의 길이 활용 계산",
+    "definition": "한 점에서 그은 두 접선의 길이가 같음을 이용해 길이를 계산하는 단위이다.",
+    "description": "같은 바깥점 조건을 놓치거나, 접선 구간을 잘못 잡을 때 검색되어야 한다.",
+    "keywords": [
+      "접선의 길이 계산",
+      "같은 바깥점"
+    ],
+    "prerequisites": [
+      "MD3_CIRC_PP_004"
+    ],
+    "examples_of_use": [
+      "두 접선 길이를 구하는 상황",
+      "길이 관계 문제"
+    ]
+  }
+]

@@ -32,10 +32,29 @@ type AhaMomentItem = {
   utterance: string;
 };
 
-type AhaMomentDisplaySegment = {
-  type: 'text' | 'math';
-  value: string;
-};
+function cleanProblemStatementForReport(text: string): string {
+  return text
+    .replace(/\[\s*시각\s*정보\s*복원\s*\][\s\S]*?(?=\n\s*\[[^\]]+\]|\n\s*(?:문제|원문)\s*[:：]|$)/gi, '')
+    .replace(/\[\s*그래프\s*정보\s*\][\s\S]*?(?=\n\s*\[[^\]]+\]|\n\s*(?:문제|원문)\s*[:：]|$)/gi, '')
+    .replace(/^\s*(?:문제|원문)\s*[:：]\s*/gim, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function maskInternalConceptCodes(text: string, conceptDisplayMap: Record<string, string>): string {
+  let cleaned = text;
+
+  for (const [code, label] of Object.entries(conceptDisplayMap)) {
+    if (!code || !label) continue;
+    cleaned = cleaned.replaceAll(code, label);
+  }
+
+  return cleaned
+    .replace(/\[?([A-Z0-9]+_(?:PD|PP|PC)_[A-Z0-9_]+)\]?/gi, '해당 개념')
+    .replace(/\[해당 개념\]/g, '해당 개념')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -49,7 +68,7 @@ function getMetricNumber(value: unknown, key: string): number | null {
 
 function AhaMomentUtterance({ text }: { text: string }) {
   return (
-    <div className="prose prose-sm max-w-none prose-amber leading-relaxed [&_*]:my-0 [&_p]:inline">
+    <div className="prose prose-sm max-w-none prose-amber leading-relaxed **:my-0 [&_p]:inline">
       <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
         {text}
       </ReactMarkdown>
@@ -103,7 +122,6 @@ export default async function SessionReportPage({
   const summaryGenerationFailed = report.reportState.summaryStatus === 'fallback';
   const hasNewDialogueSinceReport = report.reportState.hasNewDialogueSinceReport;
   const persistedReport = report.persistedReport;
-  const pathComparison = persistedReport?.pathComparison ?? null;
   const hasGraphData = analysis.graphData.phases.length > 0;
   const missingCoreAnalysis = analysis.requiredConcepts.length === 0 || !hasGraphData;
   const ahaMoments = normalizeAhaMomentItems(persistedReport?.ahaMoments);
@@ -117,6 +135,10 @@ export default async function SessionReportPage({
   const turnCount = Math.floor(dialogueLogs.length / 2);
   const visibleDialogueLogs = dialogueLogs.slice(0, 3);
   const hiddenDialogueLogs = dialogueLogs.slice(3);
+  const displayedProblemText = cleanProblemStatementForReport(session.extractedText) || session.extractedText;
+  const displayedTutorSummary = persistedReport
+    ? maskInternalConceptCodes(persistedReport.aiTutorSummary.trim(), report.conceptDisplayMap)
+    : '';
   const renderDialogueLog = (log: (typeof dialogueLogs)[number]) => (
     <div
       key={log.id}
@@ -137,10 +159,10 @@ export default async function SessionReportPage({
   );
 
   return (
-    <div className="h-full overflow-y-auto bg-zinc-50">
+    <div className="h-full overflow-y-auto overflow-x-hidden overscroll-x-none bg-zinc-50">
       {/* 헤더 */}
-      <div className="bg-white border-b border-zinc-200 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="safe-top sticky top-0 z-10 border-b border-zinc-200 bg-white">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4 sm:px-6">
           <Link
             href={`/chat/${sessionId}`}
             className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition-colors"
@@ -155,7 +177,7 @@ export default async function SessionReportPage({
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 py-8 pb-12 space-y-6">
+      <div className="safe-bottom mx-auto max-w-3xl space-y-6 px-5 py-6 pb-12 sm:px-6 sm:py-8">
         {/* 상태 헤더 */}
         <div className="bg-white rounded-2xl border border-zinc-200 p-6">
           <div className="flex items-center gap-2 mb-2">
@@ -165,9 +187,9 @@ export default async function SessionReportPage({
             </span>
             <span className="text-xs text-zinc-400">{sessionDate}</span>
           </div>
-          <div className="prose prose-sm prose-zinc max-w-none text-sm leading-relaxed [&_*]:my-0">
+          <div className="prose prose-sm prose-zinc max-w-none text-sm leading-relaxed **:my-0">
             <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-              {session.extractedText}
+              {displayedProblemText}
             </ReactMarkdown>
           </div>
           <div className="grid grid-cols-3 gap-4 mt-5 pt-5 border-t border-zinc-100">
@@ -237,7 +259,10 @@ export default async function SessionReportPage({
           {analysis.requiredConcepts.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {analysis.requiredConcepts.map((concept, i) => (
-                <span key={i} className="px-3 py-1.5 bg-zinc-100 text-zinc-700 text-xs font-medium rounded-full">
+                <span
+                  key={i}
+                  className="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-full border border-emerald-100"
+                >
                   {conceptLabel(concept)}
                 </span>
               ))}
@@ -311,8 +336,7 @@ export default async function SessionReportPage({
         {hasGraphData ? (
           <PathVisualizer
             graphData={analysis.graphData}
-            studentEstimatedPath={pathComparison?.studentEstimatedPath}
-            pathFeedbackKo={pathComparison?.pathFeedback}
+            bottlenecks={bottlenecks}
             conceptDisplayMap={report.conceptDisplayMap}
           />
         ) : (
@@ -352,7 +376,7 @@ export default async function SessionReportPage({
                 </p>
                 <div className="prose prose-sm prose-zinc max-w-none text-sm leading-relaxed">
                   <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-                    {persistedReport.aiTutorSummary.trim() || '저장된 튜터 요약이 없습니다.'}
+                    {displayedTutorSummary || '저장된 튜터 요약이 없습니다.'}
                   </ReactMarkdown>
                 </div>
               </div>
@@ -379,7 +403,7 @@ export default async function SessionReportPage({
 
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-400 mb-2">
-                  Mastered Concepts
+                  잘한 개념
                 </p>
                 {persistedReport.masteredConcepts.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
@@ -394,7 +418,7 @@ export default async function SessionReportPage({
                   </div>
                 ) : (
                   <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3">
-                    <p className="text-sm font-medium text-zinc-800">확정된 마스터 개념이 없습니다.</p>
+                    <p className="text-sm font-medium text-zinc-800">확정된 잘한 개념이 없습니다.</p>
                     <p className="text-xs text-zinc-500 mt-1">학생이 스스로 적용한 것으로 검증된 개념만 표시합니다.</p>
                   </div>
                 )}

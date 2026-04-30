@@ -2,7 +2,7 @@ import { BarChart2, Loader2 } from 'lucide-react';
 
 export default function ReportLoading() {
   return (
-    <div className="min-h-screen bg-zinc-50 flex flex-col items-center justify-center gap-4">
+    <div className="safe-top safe-bottom flex min-h-[100dvh] flex-col items-center justify-center gap-4 bg-zinc-50 px-5">
       <div className="w-14 h-14 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center justify-center">
         <BarChart2 size={24} className="text-emerald-500" />
       </div>

@@ -1,0 +1,1479 @@
+[
+    {
+        "concept_code": "M2_LIMIT_PD_001",
+        "node_type": "PD",
+        "title": "함수의 극한의 정의",
+        "definition": "함수 f(x)에서 x의 값이 a가 아니면서 a에 한없이 가까워질 때, f(x)의 값이 일정한 값 L에 한없이 가까워지면 L을 함수 f(x)의 x=a에서의 극한값이라 하고 lim(x→a) f(x) = L로 나타낸다.",
+        "description": "극한값과 함수값을 혼동하거나, 'x가 a가 아니면서'라는 조건을 놓쳐 f(a)를 극한값으로 바로 대입할 때 검색되어야 한다. 함수의 극한 단원 전체의 출발점이 되는 정의다.",
+        "keywords": [
+            "함수의 극한",
+            "극한값",
+            "lim",
+            "x→a",
+            "수렴",
+            "한없이 가까워지다"
+        ],
+        "prerequisites": [],
+        "examples_of_use": [
+            "함수의 극한값을 구하는 기본 문제",
+            "극한값이 존재하는지 판단하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_LIMIT_PD_002",
+        "node_type": "PD",
+        "title": "무한대에서의 함수의 극한",
+        "definition": "함수 f(x)에서 x의 값이 한없이 커질 때(x→∞) 또는 x의 값이 음수이면서 그 절댓값이 한없이 커질 때(x→-∞) f(x)의 값이 일정한 값 L에 한없이 가까워지면 lim(x→∞) f(x) = L 또는 lim(x→-∞) f(x) = L로 나타낸다.",
+        "description": "x→∞와 x→-∞를 혼동하거나, 무한대로 갈 때 함수값이 수렴하는 것과 발산하는 것을 구분하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "x→∞",
+            "x→-∞",
+            "무한대",
+            "수렴",
+            "발산"
+        ],
+        "prerequisites": [
+            "M2_LIMIT_PD_001"
+        ],
+        "examples_of_use": [
+            "x→∞일 때 함수의 극한값을 구하는 문제",
+            "분수함수에서 x→∞일 때 극한 판단"
+        ]
+    },
+    {
+        "concept_code": "M2_LIMIT_PD_003",
+        "node_type": "PD",
+        "title": "함수의 발산",
+        "definition": "함수 f(x)에서 x의 값이 a에 한없이 가까워질 때 f(x)의 값이 한없이 커지면 양의 무한대로 발산한다고 하고 lim(x→a) f(x) = ∞로, 음수이면서 절댓값이 한없이 커지면 음의 무한대로 발산한다고 하고 lim(x→a) f(x) = -∞로 나타낸다.",
+        "description": "발산과 극한값이 존재하지 않는 경우를 구분하지 못하거나, 양의 무한대 발산과 음의 무한대 발산의 차이를 놓칠 때 검색되어야 한다.",
+        "keywords": [
+            "발산",
+            "양의 무한대",
+            "음의 무한대",
+            "∞",
+            "-∞"
+        ],
+        "prerequisites": [
+            "M2_LIMIT_PD_001"
+        ],
+        "examples_of_use": [
+            "함수의 발산 여부를 판단하는 문제",
+            "극한값이 존재하지 않는 경우를 판별하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_LIMIT_PD_004",
+        "node_type": "PD",
+        "title": "좌극한과 우극한의 정의 및 극한의 존재 조건",
+        "definition": "함수 f(x)에서 x의 값이 a보다 크면서 a에 한없이 가까워질 때 f(x)→L이면 L을 우극한이라 하고 lim(x→a+) f(x) = L로, x의 값이 a보다 작으면서 a에 한없이 가까워질 때 f(x)→L이면 L을 좌극한이라 하고 lim(x→a-) f(x) = L로 나타낸다. 좌극한과 우극한이 모두 존재하고 그 값이 L로 같으면 lim(x→a) f(x) = L로 정의한다.",
+        "description": "좌극한과 우극한의 방향을 혼동하거나, 그래프에서 접근 방향을 잘못 읽을 때 검색되어야 한다. 교과서 정의에는 텍스트적 측면(기호 해석)과 그래프적 측면(곡선을 따라가는 시각적 이미지)이 동시에 포함되어 있다.",
+        "keywords": [
+            "좌극한",
+            "우극한",
+            "x→a+",
+            "x→a-",
+            "한쪽 극한",
+            "접근 방향",
+            "극한 존재 조건"
+        ],
+        "prerequisites": [
+            "M2_LIMIT_PD_001"
+        ],
+        "examples_of_use": [
+            "그래프에서 좌극한과 우극한을 읽는 문제",
+            "좌극한과 우극한이 다른 경우를 판별하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_LIMIT_PP_001",
+        "node_type": "PP",
+        "title": "함수의 극한에 대한 성질",
+        "definition": "두 함수 f(x), g(x)에 대하여 lim(x→a) f(x) = α, lim(x→a) g(x) = β (α, β는 실수)일 때, lim cf(x) = cα, lim(f(x)±g(x)) = α±β, lim f(x)g(x) = αβ, lim f(x)/g(x) = α/β (β≠0)이다.",
+        "description": "극한값이 존재하지 않는 함수에 극한의 성질을 적용하거나, 각 함수의 극한이 존재할 때만 성질이 성립한다는 전제를 놓칠 때 검색되어야 한다.",
+        "keywords": [
+            "극한의 성질",
+            "합의 극한",
+            "곱의 극한",
+            "몫의 극한",
+            "상수배"
+        ],
+        "prerequisites": [
+            "M2_LIMIT_PD_001"
+        ],
+        "examples_of_use": [
+            "두 함수의 극한을 이용하여 식의 극한값을 구하는 문제",
+            "극한의 성질을 적용할 수 있는 조건을 확인하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_LIMIT_PP_002",
+        "node_type": "PP",
+        "title": "미정계수 결정 원리",
+        "definition": "lim(x→a) f(x)/g(x) = α(α는 실수)일 때, lim(x→a) g(x)=0이면 lim(x→a) f(x)=0이어야 한다. 또한 lim(x→a) f(x)=0이고 α≠0이면 lim(x→a) g(x)=0이어야 한다.",
+        "description": "분모가 0으로 가는데 극한값이 존재하면 분자도 0으로 가야 한다는 핵심 원리를 떠올리지 못할 때 검색되어야 한다. 미정계수를 포함한 극한 문제에서 가장 자주 쓰이는 성질이다.",
+        "keywords": [
+            "미정계수",
+            "분모→0이면 분자→0",
+            "극한값 존재 조건"
+        ],
+        "prerequisites": [
+            "M2_LIMIT_PP_001"
+        ],
+        "examples_of_use": [
+            "극한값이 존재할 조건으로 상수를 결정하는 문제",
+            "lim(x→a) (x²+c)/(x-a) = k에서 c를 구하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_LIMIT_PP_003",
+        "node_type": "PP",
+        "title": "함수의 극한의 대소 관계",
+        "definition": "lim(x→a) f(x) = α, lim(x→a) g(x) = β일 때, a에 가까운 모든 x에 대하여 f(x)≤g(x)이면 α≤β이다. 또한 f(x)≤h(x)≤g(x)이고 α=β이면 lim(x→a) h(x) = α이다.",
+        "description": "극한의 대소 관계에서 등호 포함 여부를 혼동하거나, 양 끝 극한이 같아야 한다는 조건을 놓칠 때 검색되어야 한다.",
+        "keywords": [
+            "대소 관계",
+            "극한 부등식"
+        ],
+        "prerequisites": [
+            "M2_LIMIT_PP_001"
+        ],
+        "examples_of_use": [
+            "부등식으로 주어진 함수의 극한을 구하는 문제",
+            "극한의 대소 관계를 이용한 증명"
+        ]
+    },
+    {
+        "concept_code": "M2_CONT_PD_001",
+        "node_type": "PD",
+        "title": "함수의 연속의 정의",
+        "definition": "함수 f(x)가 실수 a에 대하여 ① f(x)가 x=a에서 정의되어 있고, ② lim(x→a) f(x)가 존재하며, ③ lim(x→a) f(x) = f(a)를 만족시키면 함수 f(x)는 x=a에서 연속이라고 한다.",
+        "description": "연속의 세 가지 조건 중 하나를 빠뜨리거나, 극한값만 구하고 함수값과의 일치를 확인하지 않을 때 검색되어야 한다.",
+        "keywords": [
+            "연속",
+            "연속의 정의",
+            "세 가지 조건",
+            "lim f(x) = f(a)"
+        ],
+        "prerequisites": [
+            "M2_LIMIT_PD_001",
+            "M2_LIMIT_PD_004"
+        ],
+        "examples_of_use": [
+            "구간별 정의 함수의 연속 여부를 판단하는 문제",
+            "연속이 되도록 미정계수를 결정하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_CONT_PD_002",
+        "node_type": "PD",
+        "title": "함수의 불연속",
+        "definition": "함수 f(x)가 x=a에서 연속이 아닐 때, 함수 f(x)는 x=a에서 불연속이라고 한다.",
+        "description": "불연속이 발생하는 구체적 원인(정의 안 됨, 극한 존재하지 않음, 극한값≠함수값)을 구분하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "불연속",
+            "불연속점"
+        ],
+        "prerequisites": [
+            "M2_CONT_PD_001"
+        ],
+        "examples_of_use": [
+            "불연속점을 찾는 문제",
+            "불연속의 원인을 판별하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_CONT_PD_003",
+        "node_type": "PD",
+        "title": "구간에서의 연속",
+        "definition": "함수 f(x)가 열린구간 (a,b)의 모든 x에서 연속이면 열린구간에서 연속, 추가로 lim(x→a+) f(x) = f(a), lim(x→b-) f(x) = f(b)이면 닫힌구간 [a,b]에서 연속이라고 한다.",
+        "description": "열린구간과 닫힌구간에서의 연속 개념을 혼동하거나, 닫힌구간의 양 끝점에서의 연속 조건을 놓칠 때 검색되어야 한다.",
+        "keywords": [
+            "구간 연속",
+            "열린구간",
+            "닫힌구간",
+            "끝점 연속"
+        ],
+        "prerequisites": [
+            "M2_CONT_PD_001"
+        ],
+        "examples_of_use": [
+            "닫힌구간에서의 연속 조건을 확인하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_CONT_PD_004",
+        "node_type": "PD",
+        "title": "최대·최소 정리",
+        "definition": "함수 f(x)가 닫힌구간 [a,b]에서 연속이면 함수 f(x)는 이 구간에서 반드시 최댓값과 최솟값을 갖는다.",
+        "description": "닫힌구간이 아닌 구간에서 최대·최소 정리를 적용하거나, 연속이 아닌 함수에서 최댓값·최솟값이 반드시 존재한다고 단정할 때 검색되어야 한다.",
+        "keywords": [
+            "최대·최소 정리",
+            "닫힌구간",
+            "연속",
+            "최댓값",
+            "최솟값"
+        ],
+        "prerequisites": [
+            "M2_CONT_PD_003"
+        ],
+        "examples_of_use": [
+            "닫힌구간에서 연속함수의 최댓값·최솟값 존재를 보장하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_CONT_PD_005",
+        "node_type": "PD",
+        "title": "사잇값 정리",
+        "definition": "함수 f(x)가 닫힌구간 [a,b]에서 연속이고 f(a)≠f(b)이면, f(a)와 f(b) 사이의 임의의 값 k에 대하여 f(c)=k인 c가 열린구간 (a,b)에 적어도 하나 존재한다.",
+        "description": "사잇값 정리의 전제 조건(닫힌구간에서 연속)을 확인하지 않거나, f(a)f(b)<0이면 실근이 존재한다는 활용을 떠올리지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "사잇값 정리",
+            "중간값 정리",
+            "f(a)f(b)<0",
+            "실근 존재"
+        ],
+        "prerequisites": [
+            "M2_CONT_PD_003"
+        ],
+        "examples_of_use": [
+            "f(a)f(b)<0을 이용해 실근의 존재를 보이는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_CONT_PP_001",
+        "node_type": "PP",
+        "title": "연속함수의 사칙연산 성질",
+        "definition": "두 함수 f(x), g(x)가 x=a에서 연속이면 cf(x), f(x)±g(x), f(x)g(x), f(x)/g(x) (g(a)≠0)도 x=a에서 연속이다.",
+        "description": "새로운 함수를 만들었을 때 연속 여부를 판단하지 못하거나, 분모가 0이 되는 경우를 놓칠 때 검색되어야 한다. 특히 1/f(x)에서 f(a)=0이면 불연속이 된다.",
+        "keywords": [
+            "연속함수 성질",
+            "합 차 곱 몫",
+            "다항함수 연속"
+        ],
+        "prerequisites": [
+            "M2_CONT_PD_001"
+        ],
+        "examples_of_use": [
+            "1/f(x)가 연속이 되려면 f(x)≠0이어야 하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_CONT_PP_002",
+        "node_type": "PP",
+        "title": "다항함수는 실수 전체에서 연속",
+        "definition": "모든 다항함수는 실수 전체의 집합에서 연속이다.",
+        "description": "다항함수의 극한값을 구할 때 직접 대입이 가능하다는 점을 놓치거나, 다항함수가 아닌 함수에 이 성질을 적용할 때 검색되어야 한다.",
+        "keywords": [
+            "다항함수",
+            "실수 전체",
+            "연속",
+            "직접 대입"
+        ],
+        "prerequisites": [
+            "M2_CONT_PP_001"
+        ],
+        "examples_of_use": [
+            "다항함수니까 극한값 = 대입값이라고 판단하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFF_PD_001",
+        "node_type": "PD",
+        "title": "평균변화율의 정의",
+        "definition": "함수 y=f(x)에서 x의 값이 a에서 b까지 변할 때, Δy/Δx = (f(b)-f(a))/(b-a)를 평균변화율이라 한다. 기하적으로는 곡선 위의 두 점 (a,f(a)), (b,f(b))를 지나는 직선의 기울기와 같다.",
+        "description": "평균변화율을 단순 차이로만 이해하고 기하적 의미와 연결하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "평균변화율",
+            "Δy/Δx",
+            "기울기",
+            "증분"
+        ],
+        "prerequisites": [],
+        "examples_of_use": [
+            "x의 값이 a에서 b까지 변할 때 평균변화율을 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFF_PD_002",
+        "node_type": "PD",
+        "title": "미분계수의 정의",
+        "definition": "함수 y=f(x)의 x=a에서의 미분계수 f'(a)는 f'(a) = lim(Δx→0) (f(a+Δx)-f(a))/Δx = lim(h→0) (f(a+h)-f(a))/h = lim(x→a) (f(x)-f(a))/(x-a)이다. 미분계수가 존재하면 f(x)는 x=a에서 미분가능하다고 한다.",
+        "description": "미분계수의 세 가지 동치 표현을 자유롭게 전환하지 못하거나, 극한의 형태에서 미분계수임을 인식하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "미분계수",
+            "f'(a)",
+            "순간변화율",
+            "lim(h→0)",
+            "lim(x→a)",
+            "미분가능"
+        ],
+        "prerequisites": [
+            "M2_DIFF_PD_001",
+            "M2_LIMIT_PD_001"
+        ],
+        "examples_of_use": [
+            "정의를 이용해 미분계수를 구하는 문제",
+            "주어진 극한식에서 미분계수를 인식하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFF_PD_003",
+        "node_type": "PD",
+        "title": "도함수의 정의",
+        "definition": "함수 y=f(x)가 정의역에 속하는 모든 x에서 미분가능할 때, 각 x에 미분계수 f'(x)를 대응시키는 함수 f'(x) = lim(h→0) (f(x+h)-f(x))/h를 도함수라 한다. f'(x)에 x=a를 대입하면 미분계수 f'(a)가 된다.",
+        "description": "미분계수(특정 점)와 도함수(함수)를 구분하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "도함수",
+            "f'(x)",
+            "y'",
+            "dy/dx",
+            "미분법"
+        ],
+        "prerequisites": [
+            "M2_DIFF_PD_002"
+        ],
+        "examples_of_use": [
+            "도함수의 정의를 이용해 도함수를 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFF_PP_001",
+        "node_type": "PP",
+        "title": "미분계수의 기하적 의미",
+        "definition": "함수 y=f(x)의 x=a에서의 미분계수 f'(a)는 곡선 y=f(x) 위의 점 (a, f(a))에서의 접선의 기울기와 같다.",
+        "description": "미분계수가 접선의 기울기라는 기하적 의미를 연결하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "접선의 기울기",
+            "기하적 의미",
+            "접선"
+        ],
+        "prerequisites": [
+            "M2_DIFF_PD_002"
+        ],
+        "examples_of_use": [
+            "곡선 위의 점에서의 접선의 기울기를 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFF_PP_002",
+        "node_type": "PP",
+        "title": "미분가능과 연속의 관계",
+        "definition": "함수 f(x)가 x=a에서 미분가능하면 함수 f(x)는 x=a에서 연속이다. 역은 성립하지 않는다.",
+        "description": "연속이면 미분가능하다고 잘못 판단하거나(반례: f(x)=|x|는 x=0에서 연속이지만 미분불가능), 미분가능성의 확인 없이 미분계수를 구하려 할 때 검색되어야 한다.",
+        "keywords": [
+            "미분가능",
+            "연속",
+            "역 성립 안 함",
+            "|x|"
+        ],
+        "prerequisites": [
+            "M2_DIFF_PD_002",
+            "M2_CONT_PD_001"
+        ],
+        "examples_of_use": [
+            "미분가능하면 연속임을 이용하는 상황",
+            "|f(x)| 형태 함수의 미분가능성을 판단하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PD_001",
+        "node_type": "PD",
+        "title": "함수의 증가와 감소의 정의",
+        "definition": "함수 f(x)가 어떤 구간에 속하는 임의의 두 실수 x₁, x₂에 대하여, x₁<x₂일 때 f(x₁)<f(x₂)이면 증가, f(x₁)>f(x₂)이면 감소한다고 한다.",
+        "description": "증가·감소의 정의를 도함수의 부호와 혼동할 때 검색되어야 한다.",
+        "keywords": [
+            "증가",
+            "감소",
+            "x₁<x₂이면 f(x₁)<f(x₂)"
+        ],
+        "prerequisites": [],
+        "examples_of_use": [
+            "증가·감소의 정의를 확인하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PD_002",
+        "node_type": "PD",
+        "title": "함수의 극대와 극소의 정의",
+        "definition": "함수 f(x)에서 x=a를 포함하는 어떤 열린구간에 속하는 모든 x에 대하여 f(x)≤f(a)이면 x=a에서 극대라 하고 f(a)를 극댓값, f(x)≥f(b)이면 x=b에서 극소라 하고 f(b)를 극솟값이라 한다.",
+        "description": "극값과 최댓값·최솟값을 혼동하거나, 극대·극소의 정의를 f'(a)=0과 혼동할 때 검색되어야 한다.",
+        "keywords": [
+            "극대",
+            "극소",
+            "극값",
+            "극댓값",
+            "극솟값"
+        ],
+        "prerequisites": [],
+        "examples_of_use": [
+            "극대·극소의 정의를 확인하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PD_003",
+        "node_type": "PD",
+        "title": "함수의 최댓값과 최솟값의 정의",
+        "definition": "닫힌구간 [a,b]에서 연속인 함수 f(x)의 극값과 양 끝값 f(a), f(b) 중 가장 큰 값이 최댓값, 가장 작은 값이 최솟값이다.",
+        "description": "극값만 비교하고 양 끝값을 빠뜨리거나, 극값과 최댓값·최솟값을 혼동할 때 검색되어야 한다.",
+        "keywords": [
+            "최댓값",
+            "최솟값",
+            "극값",
+            "끝값 비교"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PD_002",
+            "M2_CONT_PD_004"
+        ],
+        "examples_of_use": [
+            "닫힌구간에서 함수의 최댓값·최솟값을 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PD_004",
+        "node_type": "PD",
+        "title": "속도와 가속도의 정의",
+        "definition": "수직선 위를 움직이는 점 P의 위치가 x=f(t)일 때, 속도 v=dx/dt=f'(t), 가속도 a=dv/dt이다. 속도의 부호가 운동 방향을 나타낸다.",
+        "description": "위치, 속도, 가속도의 미분 관계를 혼동하거나, 속도의 부호가 운동 방향을 나타낸다는 점을 놓칠 때 검색되어야 한다.",
+        "keywords": [
+            "속도",
+            "가속도",
+            "위치",
+            "v=f'(t)",
+            "a=v'(t)",
+            "운동 방향"
+        ],
+        "prerequisites": [
+            "M2_DIFF_PD_003"
+        ],
+        "examples_of_use": [
+            "시각 t에서의 속도와 가속도를 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PP_001",
+        "node_type": "PP",
+        "title": "접선의 방정식",
+        "definition": "함수 f(x)가 x=a에서 미분가능할 때, 곡선 y=f(x) 위의 점 (a, f(a))에서의 접선의 방정식은 y - f(a) = f'(a)(x - a)이다.",
+        "description": "접점의 좌표를 잘못 설정하거나, 접선의 기울기를 f'(a)로 구하지 않을 때 검색되어야 한다.",
+        "keywords": [
+            "접선의 방정식",
+            "접점",
+            "f'(a)",
+            "기울기"
+        ],
+        "prerequisites": [
+            "M2_DIFF_PP_001"
+        ],
+        "examples_of_use": [
+            "곡선 위의 점에서의 접선을 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PP_002",
+        "node_type": "PP",
+        "title": "기울기가 주어진 접선 구하기",
+        "definition": "기울기가 m이고 곡선 y=f(x)에 접하는 직선은 접점 (a, f(a))에서 f'(a)=m을 만족시키는 a를 구한 후 y-f(a)=m(x-a)로 구한다.",
+        "description": "접점을 설정하지 않고 바로 직선의 방정식을 세우거나, f'(a)=m에서 a를 구하는 과정을 빠뜨릴 때 검색되어야 한다.",
+        "keywords": [
+            "기울기 주어진 접선",
+            "f'(a)=m",
+            "접점 설정"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PP_001"
+        ],
+        "examples_of_use": [
+            "기울기가 주어진 접선의 방정식을 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PP_003",
+        "node_type": "PP",
+        "title": "곡선 밖의 점에서 접선 구하기",
+        "definition": "곡선 y=f(x) 위에 없는 점 (p,q)에서 접선을 구할 때, 접점 (a, f(a))를 설정하고 접선이 (p,q)를 지나는 조건에서 a를 구한다.",
+        "description": "점 (p,q)를 접점으로 착각하거나, 접점을 설정하지 않고 바로 직선을 세울 때 검색되어야 한다.",
+        "keywords": [
+            "외부 점에서 접선",
+            "접점 설정",
+            "대입"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PP_001"
+        ],
+        "examples_of_use": [
+            "곡선 밖의 점에서 곡선에 그은 접선을 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PP_004",
+        "node_type": "PP",
+        "title": "롤의 정리",
+        "definition": "함수 f(x)가 닫힌구간 [a,b]에서 연속이고 열린구간 (a,b)에서 미분가능할 때, f(a)=f(b)이면 f'(c)=0인 c가 열린구간 (a,b)에 적어도 하나 존재한다.",
+        "description": "롤의 정리의 전제 조건(닫힌구간 연속, 열린구간 미분가능, 양 끝값 같음)을 확인하지 않을 때 검색되어야 한다.",
+        "keywords": [
+            "롤의 정리",
+            "f(a)=f(b)",
+            "f'(c)=0"
+        ],
+        "prerequisites": [
+            "M2_DIFF_PD_002",
+            "M2_CONT_PD_003"
+        ],
+        "examples_of_use": [
+            "f'(c)=0인 c의 존재를 보이는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PP_005",
+        "node_type": "PP",
+        "title": "평균값 정리",
+        "definition": "함수 f(x)가 닫힌구간 [a,b]에서 연속이고 열린구간 (a,b)에서 미분가능할 때, (f(b)-f(a))/(b-a) = f'(c)인 c가 열린구간 (a,b)에 적어도 하나 존재한다.",
+        "description": "평균변화율과 순간변화율이 같아지는 점이 존재한다는 핵심 의미를 파악하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "평균값 정리",
+            "평균변화율=순간변화율",
+            "f'(c)"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PP_004"
+        ],
+        "examples_of_use": [
+            "평균값 정리를 만족시키는 c를 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PP_006",
+        "node_type": "PP",
+        "title": "도함수의 부호와 증가·감소의 관계",
+        "definition": "함수 f(x)가 열린구간에서 미분가능할 때, f'(x)>0이면 증가, f'(x)<0이면 감소한다.",
+        "description": "f'(x)의 부호와 증가·감소의 관계를 혼동하거나, f'(x)=0인 점에서의 처리를 잘못할 때 검색되어야 한다.",
+        "keywords": [
+            "f'(x)>0 증가",
+            "f'(x)<0 감소",
+            "도함수 부호"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PD_001",
+            "M2_DIFF_PD_003"
+        ],
+        "examples_of_use": [
+            "함수의 증가·감소 구간을 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PP_007",
+        "node_type": "PP",
+        "title": "극값과 미분계수의 관계",
+        "definition": "함수 f(x)가 x=a에서 미분가능하고 극값을 가지면 f'(a)=0이다. 역은 성립하지 않는다.",
+        "description": "f'(a)=0이면 반드시 극값을 갖는다고 판단하거나, 역이 성립하지 않음(예: f(x)=x³)을 인지하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "극값이면 f'=0",
+            "역 성립 안 함",
+            "x³ 반례"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PD_002",
+            "M2_DIFF_PD_002"
+        ],
+        "examples_of_use": [
+            "극값 조건에서 미정계수를 결정하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PP_008",
+        "node_type": "PP",
+        "title": "미분가능한 함수의 극대·극소 판정",
+        "definition": "f'(a)=0일 때, x=a 좌우에서 f'(x)의 부호가 양→음이면 극대, 음→양이면 극소이다.",
+        "description": "부호 변화를 확인하지 않고 f'(a)=0만으로 극값을 단정하거나, 부호 변화 방향을 혼동할 때 검색되어야 한다.",
+        "keywords": [
+            "극대극소 판정",
+            "부호 변화",
+            "양→음 극대",
+            "음→양 극소"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PP_006",
+            "M2_DIFFAPP_PP_007"
+        ],
+        "examples_of_use": [
+            "삼차함수의 극대·극소를 판정하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PP_009",
+        "node_type": "PP",
+        "title": "함수의 그래프 개형",
+        "definition": "함수 y=f(x)의 정의역, 치역, 증가·감소, 극대·극소, 좌표축과의 교점을 종합하여 그래프의 개형을 그릴 수 있다.",
+        "description": "증감표만 작성하고 그래프 개형을 그리지 못하거나, 극값과 교점을 종합하여 전체 모양을 판단하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "그래프 개형",
+            "증감표",
+            "극값",
+            "교점",
+            "다항함수 그래프"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PP_006",
+            "M2_DIFFAPP_PP_008"
+        ],
+        "examples_of_use": [
+            "삼차함수의 그래프 개형을 그리는 문제",
+            "그래프 개형을 이용해 방정식의 실근을 판단하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PP_010",
+        "node_type": "PP",
+        "title": "방정식의 실근의 개수와 그래프",
+        "definition": "방정식 f(x)=k의 서로 다른 실근의 개수는 함수 y=f(x)의 그래프와 직선 y=k의 교점의 개수와 같다.",
+        "description": "방정식의 실근 개수를 대수적으로만 구하려 하고, 그래프와 수평선의 교점으로 해석하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "실근의 개수",
+            "그래프",
+            "교점",
+            "y=k"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PP_009"
+        ],
+        "examples_of_use": [
+            "삼차방정식의 서로 다른 실근의 개수를 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PP_011",
+        "node_type": "PP",
+        "title": "부등식 증명에 미분 활용",
+        "definition": "어떤 구간에서 f(x)≥0이 성립함을 보이려면 그 구간에서 f(x)의 최솟값이 0 이상임을 보이면 된다.",
+        "description": "부등식을 f(x)≥0 꼴로 변형한 뒤 최솟값을 구하는 전략을 떠올리지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "부등식 증명",
+            "최솟값≥0",
+            "미분 활용"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PD_003",
+            "M2_DIFFAPP_PP_006"
+        ],
+        "examples_of_use": [
+            "모든 x에 대해 f(x)≥g(x)임을 증명하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEG_PD_001",
+        "node_type": "PD",
+        "title": "부정적분의 정의",
+        "definition": "함수 F(x)의 도함수가 f(x), 즉 F'(x)=f(x)일 때 F(x)를 f(x)의 부정적분이라 하고, ∫f(x)dx = F(x) + C (C는 적분상수)로 나타낸다.",
+        "description": "부정적분에 적분상수 C를 빠뜨리거나, 미분과 적분의 역연산 관계를 이해하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "부정적분",
+            "적분상수",
+            "C",
+            "역미분",
+            "∫f(x)dx"
+        ],
+        "prerequisites": [
+            "M2_DIFF_PD_003"
+        ],
+        "examples_of_use": [
+            "도함수로부터 원래 함수를 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEG_PD_002",
+        "node_type": "PD",
+        "title": "정적분의 정의",
+        "definition": "함수 f(x)의 한 부정적분을 F(x)라 할 때, ∫[a,b] f(x)dx = F(b) - F(a)를 f(x)의 a에서 b까지의 정적분이라 한다.",
+        "description": "F(b)-F(a)의 순서를 바꾸거나, 부정적분을 구한 후 적분상수를 넣는 실수를 할 때 검색되어야 한다.",
+        "keywords": [
+            "정적분",
+            "F(b)-F(a)",
+            "적분 구간",
+            "상한 하한"
+        ],
+        "prerequisites": [
+            "M2_INTEG_PD_001"
+        ],
+        "examples_of_use": [
+            "정적분의 값을 계산하는 기본 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEG_PP_001",
+        "node_type": "PP",
+        "title": "부정적분의 성질",
+        "definition": "∫kf(x)dx = k∫f(x)dx (k≠0), ∫(f(x)±g(x))dx = ∫f(x)dx ± ∫g(x)dx이다.",
+        "description": "적분의 선형성을 이용하지 못하거나, 곱의 적분을 각각 적분한 것의 곱으로 잘못 처리할 때 검색되어야 한다.",
+        "keywords": [
+            "부정적분 성질",
+            "상수배",
+            "합의 적분",
+            "선형성"
+        ],
+        "prerequisites": [
+            "M2_INTEG_PD_001"
+        ],
+        "examples_of_use": [
+            "복잡한 다항식을 항별로 적분하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEG_PP_002",
+        "node_type": "PP",
+        "title": "정적분의 기본 성질",
+        "definition": "∫[a,a] f(x)dx = 0, ∫[a,b] f(x)dx = -∫[b,a] f(x)dx, ∫[a,b] f(x)dx = ∫[a,b] f(t)dt이다.",
+        "description": "상한과 하한이 같을 때 0이 됨을 놓치거나, 구간을 뒤집으면 부호가 바뀜을 잊을 때 검색되어야 한다.",
+        "keywords": [
+            "정적분 성질",
+            "구간 뒤집기",
+            "부호",
+            "적분 변수"
+        ],
+        "prerequisites": [
+            "M2_INTEG_PD_002"
+        ],
+        "examples_of_use": [
+            "적분 구간을 뒤집어 부호를 조절하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEG_PP_003",
+        "node_type": "PP",
+        "title": "정적분의 성질",
+        "definition": "∫[a,b] kf(x)dx = k∫[a,b] f(x)dx, ∫[a,b](f±g)dx = ∫[a,b]f dx ± ∫[a,b]g dx, 그리고 ∫[a,b]f dx + ∫[b,c]f dx = ∫[a,c]f dx이다.",
+        "description": "구간을 나누어 적분하는 성질을 활용하지 못하거나, 절댓값이 포함된 함수를 구간별로 나누지 않을 때 검색되어야 한다.",
+        "keywords": [
+            "정적분의 성질",
+            "구간 분할",
+            "합의 정적분"
+        ],
+        "prerequisites": [
+            "M2_INTEG_PD_002"
+        ],
+        "examples_of_use": [
+            "절댓값 함수의 정적분을 구간 분할로 계산하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEG_PP_004",
+        "node_type": "PP",
+        "title": "정적분과 미분의 관계",
+        "definition": "함수 f(t)가 연속일 때, d/dx ∫[a,x] f(t)dt = f(x)이다.",
+        "description": "정적분으로 정의된 함수를 미분할 때 이 관계를 떠올리지 못하거나, 상한이 x가 아닌 경우의 변환을 놓칠 때 검색되어야 한다.",
+        "keywords": [
+            "정적분과 미분",
+            "d/dx ∫f(t)dt = f(x)"
+        ],
+        "prerequisites": [
+            "M2_INTEG_PD_002",
+            "M2_DIFF_PD_003"
+        ],
+        "examples_of_use": [
+            "정적분으로 정의된 함수를 미분하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEG_PP_005",
+        "node_type": "PP",
+        "title": "다항함수의 성질을 이용한 정적분",
+        "definition": "다항함수 f(x)가 모든 실수 x에 대하여 f(-x)=f(x)이면 ∫[-a,a] f(x)dx = 2∫[0,a] f(x)dx이고, f(-x)=-f(x)이면 ∫[-a,a] f(x)dx = 0이다.",
+        "description": "대칭성을 이용한 정적분 계산을 떠올리지 못하거나, 함수의 대칭 여부 판별을 잘못할 때 검색되어야 한다.",
+        "keywords": [
+            "대칭 적분",
+            "f(-x)=f(x)",
+            "f(-x)=-f(x)",
+            "원점대칭",
+            "y축대칭"
+        ],
+        "prerequisites": [
+            "M2_INTEG_PD_002"
+        ],
+        "examples_of_use": [
+            "대칭 구간에서 원점대칭 함수의 정적분이 0임을 이용하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEG_PP_006",
+        "node_type": "PP",
+        "title": "정적분으로 표시된 함수의 극한",
+        "definition": "함수 f(x)가 연속일 때, lim(h→0) (1/h)∫[a,a+h] f(t)dt = f(a)이고, lim(x→a) 1/(x-a) ∫[a,x] f(t)dt = f(a)이다.",
+        "description": "정적분의 극한을 미분계수의 정의와 연결하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "정적분의 극한",
+            "lim 1/h ∫",
+            "미분계수와 연결"
+        ],
+        "prerequisites": [
+            "M2_INTEG_PP_004"
+        ],
+        "examples_of_use": [
+            "정적분으로 표시된 극한값을 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEGAPP_PP_001",
+        "node_type": "PP",
+        "title": "곡선과 x축 사이의 넓이",
+        "definition": "함수 f(x)가 [a,b]에서 연속일 때, 곡선 y=f(x)와 x축 및 두 직선 x=a, x=b로 둘러싸인 부분의 넓이 S = ∫[a,b] |f(x)| dx이다.",
+        "description": "절댓값을 빠뜨려 부호가 있는 정적분을 넓이로 오해하거나, f(x)가 음수인 구간에서 부호 처리를 하지 않을 때 검색되어야 한다.",
+        "keywords": [
+            "넓이",
+            "x축",
+            "절댓값",
+            "∫|f(x)|dx"
+        ],
+        "prerequisites": [
+            "M2_INTEG_PD_002"
+        ],
+        "examples_of_use": [
+            "곡선과 x축 사이의 넓이를 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEGAPP_PP_002",
+        "node_type": "PP",
+        "title": "두 곡선 사이의 넓이",
+        "definition": "두 연속함수 f(x), g(x)에 대하여 두 곡선 y=f(x), y=g(x) 및 두 직선 x=a, x=b로 둘러싸인 부분의 넓이 S = ∫[a,b] |f(x)-g(x)| dx이다.",
+        "description": "어느 함수가 위에 있는지 판단하지 못하거나, 교차하는 구간에서 구간을 나누지 않을 때 검색되어야 한다.",
+        "keywords": [
+            "두 곡선 넓이",
+            "|f(x)-g(x)|",
+            "교점",
+            "구간 분할"
+        ],
+        "prerequisites": [
+            "M2_INTEGAPP_PP_001"
+        ],
+        "examples_of_use": [
+            "두 곡선으로 둘러싸인 넓이를 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEGAPP_PP_003",
+        "node_type": "PP",
+        "title": "두 곡선으로 둘러싸인 두 부분의 넓이가 같은 조건",
+        "definition": "[a,c]에서 f(x)≥g(x), [c,b]에서 f(x)≤g(x)이고, 둘러싸인 두 부분의 넓이가 각각 S₁, S₂일 때, S₁=S₂이면 ∫[a,b](f(x)-g(x))dx = 0이다.",
+        "description": "두 부분의 넓이가 같다는 조건을 정적분=0으로 변환하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "넓이 같음",
+            "정적분=0",
+            "S₁=S₂"
+        ],
+        "prerequisites": [
+            "M2_INTEGAPP_PP_002"
+        ],
+        "examples_of_use": [
+            "두 부분의 넓이가 같을 조건으로 상수를 결정하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEGAPP_PP_004",
+        "node_type": "PP",
+        "title": "속도와 거리의 적분 관계",
+        "definition": "속도 v(t)에 대하여, 시각 a에서 b까지의 위치 변화량은 ∫[a,b] v(t)dt이고, 움직인 거리는 ∫[a,b] |v(t)| dt이다.",
+        "description": "위치 변화량과 움직인 거리를 혼동하거나, 속도가 음수인 구간에서 절댓값 처리를 하지 않을 때 검색되어야 한다.",
+        "keywords": [
+            "위치 변화량",
+            "움직인 거리",
+            "∫v(t)dt",
+            "∫|v(t)|dt"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PD_004",
+            "M2_INTEG_PD_002"
+        ],
+        "examples_of_use": [
+            "시각 a에서 b까지 움직인 거리를 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_LIMIT_PC_001",
+        "node_type": "PC",
+        "title": "그래프에서 좌극한·우극한 읽기",
+        "definition": "함수 y=f(x)의 그래프에서 x=a의 왼쪽·오른쪽 방향으로 곡선을 따라가 극한값을 읽는 계산 단위이다.",
+        "description": "빈 원(○)과 채워진 점(●)의 의미를 혼동하거나, 접근 방향(좌/우)을 반대로 읽거나, 극한값과 함수값을 혼동할 때 검색되어야 한다.",
+        "keywords": [
+            "그래프 극한",
+            "좌극한",
+            "우극한",
+            "빈 원",
+            "채워진 점",
+            "접근 방향"
+        ],
+        "prerequisites": [
+            "M2_LIMIT_PD_004"
+        ],
+        "examples_of_use": [
+            "그래프에서 lim(x→a+) f(x)와 lim(x→a-) f(x)를 읽는 상황",
+            "그래프에서 극한값과 함수값이 다른 경우를 판별하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_LIMIT_PC_002",
+        "node_type": "PC",
+        "title": "극한 존재 여부 판정 계산",
+        "definition": "좌극한과 우극한을 각각 구한 뒤 같으면 극한 존재, 다르면 극한 존재하지 않음으로 판정하는 계산 단위이다.",
+        "description": "좌극한과 우극한 중 하나만 구하고 극한이 존재한다고 단정하거나, 구간별 정의 함수에서 경계점의 좌극한·우극한을 각각 계산하지 않을 때 검색되어야 한다.",
+        "keywords": [
+            "극한 존재 판정",
+            "좌극한=우극한",
+            "구간별 함수"
+        ],
+        "prerequisites": [
+            "M2_LIMIT_PD_004"
+        ],
+        "examples_of_use": [
+            "구간별 정의 함수에서 경계점의 극한 존재 여부를 판정하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_LIMIT_PC_003",
+        "node_type": "PC",
+        "title": "0/0 꼴 인수분해 약분 계산",
+        "definition": "0/0 꼴임을 인식하고, 분자와 분모를 인수분해하여 공통인수를 약분한 후 대입하여 극한값을 구하는 계산 단위이다.",
+        "description": "0/0 꼴임을 인식하지 못하거나, 공통인수를 찾지 못하거나, 약분 후 대입을 빠뜨릴 때 검색되어야 한다.",
+        "keywords": [
+            "인수분해",
+            "공통인수",
+            "약분",
+            "0/0"
+        ],
+        "prerequisites": [
+            "M2_LIMIT_PP_001"
+        ],
+        "examples_of_use": [
+            "lim(x→2) (x²-4)/(x-2) 형태의 계산",
+            "삼차식 이상의 인수분해 후 약분"
+        ]
+    },
+    {
+        "concept_code": "M2_LIMIT_PC_004",
+        "node_type": "PC",
+        "title": "0/0 꼴 유리화 계산",
+        "definition": "0/0 꼴에서 무리식이 있을 때, 유리화한 후 공통인수를 약분하여 극한값을 구하는 계산 단위이다.",
+        "description": "유리화 대상(분모인지 분자인지)을 잘못 선택하거나, 유리화 후 전개를 틀릴 때 검색되어야 한다.",
+        "keywords": [
+            "유리화",
+            "무리식",
+            "0/0"
+        ],
+        "prerequisites": [
+            "M2_LIMIT_PP_001"
+        ],
+        "examples_of_use": [
+            "lim(x→3) (x²-2x-3)/(√(x+6)-3) 형태의 계산"
+        ]
+    },
+    {
+        "concept_code": "M2_LIMIT_PC_005",
+        "node_type": "PC",
+        "title": "∞/∞ 꼴 최고차항 나누기 계산",
+        "definition": "∞/∞ 꼴임을 인식하고, 분모의 최고차항으로 분모와 분자를 각각 나눈 후 극한값을 구하는 계산 단위이다.",
+        "description": "분모가 아닌 분자의 최고차항으로 나누거나, 1/x 등이 0으로 가는 것을 놓칠 때 검색되어야 한다.",
+        "keywords": [
+            "최고차항 나누기",
+            "∞/∞",
+            "계수의 비"
+        ],
+        "prerequisites": [
+            "M2_LIMIT_PP_001",
+            "M2_LIMIT_PD_002"
+        ],
+        "examples_of_use": [
+            "lim(x→∞) (3x²+1)/(2x²+5x) 형태의 계산"
+        ]
+    },
+    {
+        "concept_code": "M2_LIMIT_PC_006",
+        "node_type": "PC",
+        "title": "∞-∞ 꼴 유리화 계산",
+        "definition": "∞-∞ 꼴임을 인식하고, 무리식이면 유리화, 다항식이면 최고차항으로 묶어 극한값을 구하는 계산 단위이다.",
+        "description": "유리화를 떠올리지 못하거나, x→-∞일 때 √(x²) = |x| = -x 처리를 놓칠 때 검색되어야 한다.",
+        "keywords": [
+            "∞-∞ 유리화",
+            "√(x²+ax)-x"
+        ],
+        "prerequisites": [
+            "M2_LIMIT_PP_001",
+            "M2_LIMIT_PD_002"
+        ],
+        "examples_of_use": [
+            "lim(x→∞)(√(x²+2x) - x) 계산",
+            "lim(x→-∞)(√(4x²+3x) + 2x) 계산"
+        ]
+    },
+    {
+        "concept_code": "M2_LIMIT_PC_007",
+        "node_type": "PC",
+        "title": "미정계수 결정 계산",
+        "definition": "극한값이 존재할 조건(분모→0이면 분자→0)을 적용하여 조건식을 세우고, 연립방정식으로 상수를 결정하는 계산 단위이다.",
+        "description": "분모가 0으로 가는 것은 인식했지만 분자도 0으로 가야 한다는 조건을 세우지 못하거나, 연립방정식 풀이를 틀릴 때 검색되어야 한다.",
+        "keywords": [
+            "미정계수",
+            "분모→0 분자→0",
+            "상수 결정"
+        ],
+        "prerequisites": [
+            "M2_LIMIT_PP_002"
+        ],
+        "examples_of_use": [
+            "극한값이 존재하도록 상수를 결정하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_CONT_PC_001",
+        "node_type": "PC",
+        "title": "연속 조건으로 미정계수 결정 계산",
+        "definition": "구간별 정의 함수에서 경계점의 좌극한, 우극한, 함수값을 같게 놓아 미정계수를 결정하는 계산 단위이다. 1/f(x) 형태에서 f(x)≠0 조건을 세우는 것도 포함한다.",
+        "description": "세 가지 조건 중 하나를 빠뜨리거나, f(x)=0이 되는 점을 찾지 않을 때 검색되어야 한다.",
+        "keywords": [
+            "연속 조건",
+            "미정계수",
+            "좌극한=우극한=함수값",
+            "1/f(x)",
+            "분모≠0"
+        ],
+        "prerequisites": [
+            "M2_CONT_PD_001",
+            "M2_CONT_PP_001"
+        ],
+        "examples_of_use": [
+            "구간별 정의 함수가 x=a에서 연속이 되도록 상수를 구하는 문제",
+            "1/(f(x)-5x)가 실수 전체에서 연속일 조건을 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_CONT_PC_002",
+        "node_type": "PC",
+        "title": "사잇값 정리 적용 계산",
+        "definition": "f(a)와 f(b)의 부호를 계산하고, f(a)f(b)<0이면 열린구간 (a,b)에 실근이 존재함을 보이는 계산 단위이다. 연속성 확인이 선행되어야 한다.",
+        "description": "연속성 확인을 빠뜨리거나, f(a)와 f(b)의 부호를 잘못 계산할 때 검색되어야 한다.",
+        "keywords": [
+            "사잇값 정리 적용",
+            "f(a)f(b)<0",
+            "실근 존재"
+        ],
+        "prerequisites": [
+            "M2_CONT_PD_005"
+        ],
+        "examples_of_use": [
+            "방정식의 실근이 특정 구간에 있음을 보이는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFF_PC_001",
+        "node_type": "PC",
+        "title": "평균변화율 계산",
+        "definition": "(f(b)-f(a))/(b-a) 공식에 구체적인 함수와 값을 대입하여 평균변화율을 계산하는 단위이다.",
+        "description": "분자와 분모의 순서를 바꾸거나, 함수값을 잘못 계산할 때 검색되어야 한다.",
+        "keywords": [
+            "평균변화율 계산",
+            "(f(b)-f(a))/(b-a)"
+        ],
+        "prerequisites": [
+            "M2_DIFF_PD_001"
+        ],
+        "examples_of_use": [
+            "x가 1에서 3까지 변할 때 f(x)=x²의 평균변화율을 구하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFF_PC_002",
+        "node_type": "PC",
+        "title": "미분계수 정의식 계산",
+        "definition": "lim(h→0) (f(a+h)-f(a))/h 또는 lim(x→a) (f(x)-f(a))/(x-a) 형태에서 미분계수를 계산하는 단위이다. 변형된 형태에서 미분계수를 인식하는 것도 포함.",
+        "description": "주어진 극한식을 미분계수 정의와 연결하지 못하거나, 변형된 형태에서 미분계수를 추출하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "미분계수 계산",
+            "정의식",
+            "극한→미분계수 인식"
+        ],
+        "prerequisites": [
+            "M2_DIFF_PD_002"
+        ],
+        "examples_of_use": [
+            "정의를 이용해 f'(2)를 구하는 상황",
+            "변형된 극한식에서 미분계수를 인식하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFF_PC_003",
+        "node_type": "PC",
+        "title": "미분가능성 판정 계산",
+        "definition": "좌미분계수와 우미분계수를 각각 구하여 같으면 미분가능, 다르면 미분불가능으로 판정하는 계산 단위이다.",
+        "description": "연속성만 확인하고 미분가능성을 확인하지 않거나, 좌·우 미분계수의 일치 여부를 검토하지 않을 때 검색되어야 한다.",
+        "keywords": [
+            "미분가능성 판정",
+            "좌미분계수",
+            "우미분계수"
+        ],
+        "prerequisites": [
+            "M2_DIFF_PD_002",
+            "M2_DIFF_PP_002"
+        ],
+        "examples_of_use": [
+            "구간별 정의 함수가 x=a에서 미분가능한 조건을 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFF_PC_004",
+        "node_type": "PC",
+        "title": "다항함수 미분 계산",
+        "definition": "(x^n)' = nx^(n-1), (상수)' = 0, (x)' = 1 공식과 (cf)' = cf', (f±g)' = f'±g' 규칙을 적용하여 다항함수의 도함수를 구하는 계산 단위이다.",
+        "description": "지수를 1 줄이는 것을 잊거나, 항별 미분에서 계수를 잘못 처리할 때 검색되어야 한다.",
+        "keywords": [
+            "다항함수 미분",
+            "항별 미분",
+            "nx^(n-1)",
+            "합의 미분",
+            "상수배 미분"
+        ],
+        "prerequisites": [
+            "M2_DIFF_PD_003"
+        ],
+        "examples_of_use": [
+            "f(x)=3x⁴-2x³+x-5의 도함수를 구하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFF_PC_005",
+        "node_type": "PC",
+        "title": "곱의 미분법 계산",
+        "definition": "(f(x)g(x))' = f'(x)g(x) + f(x)g'(x) 공식을 적용하여 두 함수의 곱의 도함수를 구하는 계산 단위이다. 세 함수의 곱으로 확장하는 것도 포함.",
+        "description": "곱의 미분법 공식을 잘못 적용하거나(f'g' 형태로 오해), 세 함수의 곱에서 항을 빠뜨릴 때 검색되어야 한다.",
+        "keywords": [
+            "곱의 미분법",
+            "f'g+fg'"
+        ],
+        "prerequisites": [
+            "M2_DIFF_PD_003"
+        ],
+        "examples_of_use": [
+            "(x²+1)(3x-2)를 곱의 미분법으로 미분하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PC_001",
+        "node_type": "PC",
+        "title": "곡선 위의 점에서의 접선 계산",
+        "definition": "접점 (a, f(a))에서 f'(a)를 구하고 y-f(a)=f'(a)(x-a)로 접선을 세우는 계산 단위이다.",
+        "description": "접점의 y좌표를 잘못 계산하거나, f'(a) 대신 f(a)를 기울기로 사용할 때 검색되어야 한다.",
+        "keywords": [
+            "접선 계산",
+            "접점"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PP_001"
+        ],
+        "examples_of_use": [
+            "곡선 y=x³ 위의 점 (1,1)에서의 접선을 구하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PC_002",
+        "node_type": "PC",
+        "title": "기울기 조건 접선 계산",
+        "definition": "f'(a)=m을 풀어 접점의 x좌표 a를 구한 뒤 접선을 세우는 계산 단위이다.",
+        "description": "f'(a)=m 방정식을 세우지 못하거나, 해가 여러 개일 때 접선이 여러 개임을 놓칠 때 검색되어야 한다.",
+        "keywords": [
+            "기울기 접선",
+            "f'(a)=m"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PP_002"
+        ],
+        "examples_of_use": [
+            "기울기가 6인 접선을 구하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PC_003",
+        "node_type": "PC",
+        "title": "외부 점에서 접선 계산",
+        "definition": "접점 (a, f(a))를 설정하고, 접선에 외부 점 (p,q)를 대입하여 a를 구하는 계산 단위이다.",
+        "description": "외부 점을 접점으로 착각하거나, a에 대한 방정식을 잘못 풀 때 검색되어야 한다.",
+        "keywords": [
+            "외부 점 접선",
+            "접점 설정"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PP_003"
+        ],
+        "examples_of_use": [
+            "점 (-1,0)에서 곡선 y=x²+3에 그은 접선을 구하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PC_004",
+        "node_type": "PC",
+        "title": "증가·감소 구간 판정 계산",
+        "definition": "f'(x)를 구하고 f'(x)=0의 근을 찾은 뒤 증감표를 작성하여 증가·감소 구간을 판정하는 계산 단위이다.",
+        "description": "f'(x)=0의 근을 빠뜨리거나, 구간별 f'(x)의 부호를 잘못 판정할 때 검색되어야 한다.",
+        "keywords": [
+            "증감 판정",
+            "f'(x)=0",
+            "증감표"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PP_006"
+        ],
+        "examples_of_use": [
+            "삼차함수의 증가·감소 구간을 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PC_005",
+        "node_type": "PC",
+        "title": "극값 계산",
+        "definition": "f'(x)=0의 근에서 부호 변화를 확인하여 극대·극소를 판정한 뒤 f(a)를 계산하는 단위이다.",
+        "description": "f'(a)=0인 a를 찾았지만 부호 변화를 확인하지 않거나, 극값을 구할 때 f'(a)와 f(a)를 혼동할 때 검색되어야 한다.",
+        "keywords": [
+            "극값 계산",
+            "극대 극소",
+            "부호 변화"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PP_008"
+        ],
+        "examples_of_use": [
+            "삼차함수의 극댓값과 극솟값을 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PC_006",
+        "node_type": "PC",
+        "title": "닫힌구간 최댓값·최솟값 계산",
+        "definition": "닫힌구간에서 극값과 양 끝값을 모두 구해서 비교하는 계산 단위이다.",
+        "description": "극값만 비교하고 양 끝값을 빠뜨리거나, 구간 밖의 극값을 포함시킬 때 검색되어야 한다.",
+        "keywords": [
+            "최댓값 최솟값",
+            "닫힌구간",
+            "극값+끝값 비교"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PD_003"
+        ],
+        "examples_of_use": [
+            "닫힌구간 [-2,2]에서 함수의 최댓값·최솟값을 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PC_007",
+        "node_type": "PC",
+        "title": "방정식 실근 개수 판정 계산",
+        "definition": "그래프 개형을 그리고, y=k와의 교점 개수를 극값과 k의 대소 관계로 판정하는 계산 단위이다.",
+        "description": "그래프 개형을 그리지 않고 대수적으로만 풀려 하거나, 극값과 k의 대소를 놓칠 때 검색되어야 한다.",
+        "keywords": [
+            "실근 개수",
+            "그래프 교점",
+            "극값과 k 비교"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PP_010"
+        ],
+        "examples_of_use": [
+            "x³-3x=k의 실근 개수를 k의 범위별로 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PC_008",
+        "node_type": "PC",
+        "title": "부등식 증명용 최솟값 계산",
+        "definition": "f(x)≥0 꼴로 변형하고, f(x)의 최솟값을 구하여 (최솟값)≥0임을 보이는 계산 단위이다.",
+        "description": "부등식을 f(x)≥0 꼴로 변형하지 못하거나, 최솟값 계산을 틀릴 때 검색되어야 한다.",
+        "keywords": [
+            "부등식 증명",
+            "최솟값≥0"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PP_011"
+        ],
+        "examples_of_use": [
+            "x≥0에서 x³+4≥3x²이 성립함을 보이는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_DIFFAPP_PC_009",
+        "node_type": "PC",
+        "title": "속도·가속도 계산",
+        "definition": "x=f(t)를 미분하여 v=f'(t), 다시 미분하여 a=v'(t)를 구하는 절차. v=0인 시각(방향 전환)을 구하는 것도 포함.",
+        "description": "위치→속도→가속도 미분 관계를 혼동하거나, v=0인 시각을 구하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "속도 계산",
+            "가속도 계산",
+            "v=f'(t)",
+            "운동 방향"
+        ],
+        "prerequisites": [
+            "M2_DIFFAPP_PD_004"
+        ],
+        "examples_of_use": [
+            "x=t³-4t에서 시각 t=2의 속도와 가속도를 구하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEG_PC_001",
+        "node_type": "PC",
+        "title": "다항함수 부정적분 계산",
+        "definition": "∫x^n dx = x^(n+1)/(n+1) + C 공식과 선형성을 항별로 적용하여 부정적분을 구하는 계산 단위이다. 적분상수를 초기조건으로 결정하는 것도 포함.",
+        "description": "지수를 올리고 나누는 것을 반대로 하거나, 적분상수 C를 빠뜨릴 때 검색되어야 한다.",
+        "keywords": [
+            "부정적분 계산",
+            "x^(n+1)/(n+1)",
+            "적분상수"
+        ],
+        "prerequisites": [
+            "M2_INTEG_PD_001",
+            "M2_INTEG_PP_001"
+        ],
+        "examples_of_use": [
+            "∫(3x²-2x+1)dx를 계산하는 상황",
+            "f'(x)에서 f(x)를 구하고 초기조건으로 C를 결정하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEG_PC_002",
+        "node_type": "PC",
+        "title": "정적분 계산",
+        "definition": "부정적분 F(x)를 구한 뒤 F(b)-F(a)를 계산하는 단위이다.",
+        "description": "F(b)-F(a)의 순서를 바꾸거나, 계수를 틀릴 때 검색되어야 한다.",
+        "keywords": [
+            "정적분 계산",
+            "F(b)-F(a)"
+        ],
+        "prerequisites": [
+            "M2_INTEG_PD_002"
+        ],
+        "examples_of_use": [
+            "∫[1,3] (x²-1)dx를 계산하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEG_PC_003",
+        "node_type": "PC",
+        "title": "절댓값 정적분 구간 분할 계산",
+        "definition": "f(x)=0의 근을 구하여 구간을 나누고, 각 구간에서 부호에 따라 적분하는 계산 단위이다.",
+        "description": "f(x)=0의 근을 빠뜨리거나, 구간별 부호 판정을 잘못할 때 검색되어야 한다.",
+        "keywords": [
+            "절댓값 적분",
+            "구간 분할",
+            "부호 판정"
+        ],
+        "prerequisites": [
+            "M2_INTEG_PP_003"
+        ],
+        "examples_of_use": [
+            "∫[-2,2] |x²-2x-3|dx를 구간 분할하여 계산하는 상황"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEG_PC_004",
+        "node_type": "PC",
+        "title": "정적분과 미분의 관계 활용 계산",
+        "definition": "정적분이 포함된 등식의 양변을 미분하여 f(x)를 구하는 계산 단위이다. x=a 대입으로 초기조건을 세우는 것도 포함.",
+        "description": "양변을 미분하는 것을 떠올리지 못하거나, 초기조건을 세우지 않을 때 검색되어야 한다.",
+        "keywords": [
+            "정적분 미분",
+            "양변 미분",
+            "초기조건"
+        ],
+        "prerequisites": [
+            "M2_INTEG_PP_004"
+        ],
+        "examples_of_use": [
+            "정적분으로 정의된 함수에서 f(x)를 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEG_PC_005",
+        "node_type": "PC",
+        "title": "다항함수의 성질을 이용한 정적분 계산",
+        "definition": "대칭 구간 [-a,a]에서 원점대칭 함수의 정적분은 0, y축대칭 함수의 정적분은 2배로 계산하는 단위이다.",
+        "description": "함수의 대칭 여부를 판별하지 못하거나, 곱 형태에서 각 인수의 대칭성을 따로 판단하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "대칭 적분 계산",
+            "원점대칭=0",
+            "y축대칭=2배"
+        ],
+        "prerequisites": [
+            "M2_INTEG_PP_005"
+        ],
+        "examples_of_use": [
+            "∫[-2,2] (f(x)+g(x))² dx에서 대칭성을 이용하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEGAPP_PC_001",
+        "node_type": "PC",
+        "title": "곡선과 x축 사이 넓이 계산",
+        "definition": "f(x)=0의 근을 구하여 구간을 나누고, 각 구간에서 부호에 따라 적분하여 넓이를 구하는 단위이다.",
+        "description": "절댓값을 빠뜨리거나, x축과의 교점을 찾지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "곡선 넓이",
+            "x축",
+            "교점",
+            "절댓값"
+        ],
+        "prerequisites": [
+            "M2_INTEGAPP_PP_001"
+        ],
+        "examples_of_use": [
+            "y=x³-3x²+2x와 x축으로 둘러싸인 넓이를 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEGAPP_PC_002",
+        "node_type": "PC",
+        "title": "두 곡선 사이 넓이 계산",
+        "definition": "두 곡선의 교점을 구하고, 구간별로 위에 있는 함수를 판정하여 ∫(위-아래)dx를 합산하는 단위이다.",
+        "description": "교점을 빠뜨리거나, 어느 함수가 위에 있는지 판정하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "두 곡선 넓이",
+            "교점",
+            "|f-g|"
+        ],
+        "prerequisites": [
+            "M2_INTEGAPP_PP_002"
+        ],
+        "examples_of_use": [
+            "y=x³와 y=x로 둘러싸인 넓이를 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEGAPP_PC_003",
+        "node_type": "PC",
+        "title": "넓이 같음 조건으로 상수 결정 계산",
+        "definition": "S₁=S₂ 조건을 ∫(f(x)-g(x))dx=0으로 변환하고, 적분을 실행하여 상수를 결정하는 단위이다.",
+        "description": "넓이가 같다는 조건을 정적분=0으로 변환하지 못할 때 검색되어야 한다.",
+        "keywords": [
+            "넓이 같음",
+            "정적분=0",
+            "상수 결정"
+        ],
+        "prerequisites": [
+            "M2_INTEGAPP_PP_003"
+        ],
+        "examples_of_use": [
+            "두 부분의 넓이가 같을 때 상수를 구하는 문제"
+        ]
+    },
+    {
+        "concept_code": "M2_INTEGAPP_PC_004",
+        "node_type": "PC",
+        "title": "위치 변화량과 이동 거리 계산",
+        "definition": "위치 변화량은 ∫v(t)dt를 바로 계산하고, 거리는 v(t)=0인 시각을 찾아 구간을 나누어 ∫|v(t)|dt를 합산하는 단위이다.",
+        "description": "위치 변화량과 거리를 혼동하거나, v(t)=0인 시각을 찾지 않을 때 검색되어야 한다.",
+        "keywords": [
+            "위치 변화량",
+            "이동 거리",
+            "v=0 구간 분할"
+        ],
+        "prerequisites": [
+            "M2_INTEGAPP_PP_004"
+        ],
+        "examples_of_use": [
+            "v(t)=2t²-6t에서 t=0~4까지 움직인 거리를 구하는 문제"
+        ]
+    }
+]

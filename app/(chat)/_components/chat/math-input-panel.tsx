@@ -7,7 +7,7 @@
 // 계산/정답 기능은 의도적으로 제외합니다.
 // ============================================================
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { X, ChevronRight, FlaskConical } from 'lucide-react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -32,12 +32,40 @@ function renderPreview(latex: string): string {
   }
 }
 
+function removeHangul(value: string): string {
+  return value.replace(/[ㄱ-ㅎㅏ-ㅣ가-힣]/g, '');
+}
+
 export function MathInputPanel({ latex, onChange, onInsert, onClose }: MathInputPanelProps) {
   const mathFieldRef = useRef<(HTMLElement & { value: string }) | null>(null);
 
+  const showMathKeyboard = useCallback(() => {
+    mathFieldRef.current?.focus();
+    window.mathVirtualKeyboard?.show?.();
+    window.setTimeout(() => {
+      mathFieldRef.current?.focus();
+      window.mathVirtualKeyboard?.show?.();
+    }, 0);
+    window.setTimeout(() => {
+      mathFieldRef.current?.focus();
+      window.mathVirtualKeyboard?.show?.();
+    }, 180);
+  }, []);
+
   // MathLive SSR 안전 로드
   useEffect(() => {
-    import('mathlive').catch(() => {});
+    import('mathlive')
+      .then(() => showMathKeyboard())
+      .catch(() => {});
+  }, [showMathKeyboard]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      mathFieldRef.current?.focus();
+      showMathKeyboard();
+    }, 160);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   // math-field ref 연결 + 이벤트 바인딩
@@ -45,9 +73,19 @@ export function MathInputPanel({ latex, onChange, onInsert, onClose }: MathInput
     (el: HTMLElement | null) => {
       if (!el) return;
       mathFieldRef.current = el as HTMLElement & { value: string };
+      el.addEventListener('beforeinput', (e: Event) => {
+        const inputEvent = e as InputEvent;
+        if (inputEvent.data && /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(inputEvent.data)) {
+          e.preventDefault();
+        }
+      });
       el.addEventListener('input', (e: Event) => {
         const target = e.target as HTMLElement & { value: string };
-        onChange(target.value ?? '');
+        const cleaned = removeHangul(target.value ?? '');
+        if (cleaned !== target.value) {
+          target.value = cleaned;
+        }
+        onChange(cleaned);
       });
     },
     [onChange]
@@ -79,7 +117,12 @@ export function MathInputPanel({ latex, onChange, onInsert, onClose }: MathInput
           <math-field
             ref={setupMathField}
             virtual-keyboard-mode="onfocus"
-            math-virtual-keyboard-policy="sandboxed"
+            math-virtual-keyboard-policy="manual"
+            virtualKeyboardMode="manual"
+            mathVirtualKeyboardPolicy="manual"
+            onFocus={showMathKeyboard}
+            onPointerDown={showMathKeyboard}
+            onClick={showMathKeyboard}
             style={{
               width: '100%',
               border: '1.5px solid #e4e4e7',
@@ -90,7 +133,7 @@ export function MathInputPanel({ latex, onChange, onInsert, onClose }: MathInput
             }}
           />
           <p className="text-[10px] text-zinc-400 mt-1.5 pl-1">
-            분수(/), 지수(^), 루트(√), π, 괄호 등을 직접 입력하거나 키보드를 사용하세요
+            수식만 입력해 주세요. 한글 설명은 아래 채팅 입력창에 적어주세요.
           </p>
         </div>
 

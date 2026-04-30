@@ -1,13 +1,13 @@
 // ============================================================
 // AHA v5 — CLI 시드 스크립트: concept_nodes_reference
 // ============================================================
-// 사용법: npx tsx scripts/data/seed.ts
+// 사용법: node scripts/data/seed.ts m2_json md_json
 // .env.local의 SUPABASE_SERVICE_ROLE_KEY를 사용합니다.
 // concept_code 기준 upsert로 중복 안전합니다.
 // ============================================================
 
 import { createClient } from '@supabase/supabase-js';
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync, statSync, readdirSync } from 'fs';
 import { resolve } from 'path';
 import { config } from 'dotenv';
 
@@ -36,22 +36,22 @@ interface ConceptNode {
 }
 
 async function main() {
-  // 1. 실행 시 인자로 파일명을 받을 수 있게 함 (기본값: concept_nodes_m1.json)
-  const argFile = process.argv[2];
-  const targetFile = argFile || 'concept_nodes_m1.json';
-  const filePath = resolve(__dirname, targetFile);
-  
-  let nodes: ConceptNode[];
+  // 1. 실행 시 파일/디렉터리를 받을 수 있게 함
+  // 예:
+  // - pnpm tsx scripts/data/seed.ts m2_json
+  // - pnpm tsx scripts/data/seed.ts md_json
+  // - pnpm tsx scripts/data/seed.ts m2_json md_json
+  const targets = process.argv.slice(2);
+  const targetPaths = targets.length > 0 ? targets : ['m1_json/concept_nodes_m1.json'];
+  const files = targetPaths.flatMap(resolveJsonFiles);
+  const nodes = files.flatMap(readConceptNodes);
 
-  try {
-    const raw = readFileSync(filePath, 'utf-8');
-    nodes = JSON.parse(raw);
-  } catch (err) {
-    console.error(`❌ ${filePath} 파일을 읽을 수 없습니다:`, err);
+  if (nodes.length === 0) {
+    console.error('❌ 시드할 개념 노드가 없습니다.');
     process.exit(1);
   }
 
-  console.log(`📦 ${nodes.length}개의 개념 노드를 시드합니다...`);
+  console.log(`📦 ${files.length}개 JSON 파일에서 ${nodes.length}개의 개념 노드를 시드합니다...`);
 
   // 2. Upsert (concept_code 기준, 중복 시 UPDATE)
   const { data, error } = await supabase
@@ -79,6 +79,50 @@ async function main() {
 
   console.log(`✅ ${data?.length || 0}개의 개념 노드가 성공적으로 시드되었습니다.`);
   process.exit(0);
+}
+
+function resolveJsonFiles(targetPath: string): string[] {
+  const absolutePath = resolve(__dirname, targetPath);
+
+  if (!existsSync(absolutePath)) {
+    console.error(`❌ 경로를 찾을 수 없습니다: ${absolutePath}`);
+    process.exit(1);
+  }
+
+  if (statSync(absolutePath).isFile()) {
+    return isSeedJsonFile(absolutePath) ? [absolutePath] : [];
+  }
+
+  return readdirSync(absolutePath, { withFileTypes: true })
+    .flatMap((entry) => {
+      const childPath = resolve(absolutePath, entry.name);
+      return entry.isDirectory() ? resolveJsonFiles(childPath) : isSeedJsonFile(childPath) ? [childPath] : [];
+    })
+    .sort();
+}
+
+function isSeedJsonFile(filePath: string): boolean {
+  return filePath.endsWith('.json') && !filePath.endsWith('README_index.json');
+}
+
+function readConceptNodes(filePath: string): ConceptNode[] {
+  try {
+    const raw = readFileSync(filePath, 'utf-8');
+    const parsed = JSON.parse(raw);
+
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+
+    if (parsed && typeof parsed === 'object') {
+      return Object.values(parsed).flatMap((value) => Array.isArray(value) ? value as ConceptNode[] : []);
+    }
+
+    return [];
+  } catch (err) {
+    console.error(`❌ ${filePath} 파일을 읽을 수 없습니다:`, err);
+    process.exit(1);
+  }
 }
 
 main();

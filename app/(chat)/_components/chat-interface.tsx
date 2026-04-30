@@ -69,7 +69,15 @@ export default function ChatInterface({
   }, [currentSessionId, requestKickoff, streamResponse]);
 
   return (
-    <div className="flex flex-col h-full bg-white overflow-hidden">
+    <div className="relative flex h-full w-full max-w-[100vw] flex-col overflow-hidden overscroll-x-none bg-white">
+      <div className="native-chat-header-pad pointer-events-none absolute inset-x-0 top-0 z-40 bg-white/85 backdrop-blur md:hidden">
+        <div className="ml-16 flex h-16 items-start pr-4">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-bold text-zinc-950">AHA Tutor</p>
+            <p className="truncate text-[11px] font-medium text-zinc-500">사진을 올리고 막힌 지점부터 시작하세요</p>
+          </div>
+        </div>
+      </div>
       {/* 1. 메시지 영역 */}
       <ChatMessageList />
 

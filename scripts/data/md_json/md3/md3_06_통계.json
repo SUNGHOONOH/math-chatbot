@@ -1,0 +1,251 @@
+[
+  {
+    "concept_code": "MD3_STAT_PD_001",
+    "node_type": "PD",
+    "title": "대푯값",
+    "definition": "자료의 특징을 대표하는 값으로 평균, 중앙값, 최빈값 등이 있다.",
+    "description": "대푯값을 하나의 값만 있는 것으로 생각하거나, 각 대푯값의 역할을 구분하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "대푯값",
+      "평균",
+      "중앙값",
+      "최빈값"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "자료의 대푯값을 구하는 상황",
+      "평균·중앙값·최빈값 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_STAT_PD_002",
+    "node_type": "PD",
+    "title": "산포도",
+    "definition": "자료가 흩어진 정도를 나타내는 값을 산포도라고 하며, 대표적으로 범위와 분산, 표준편차가 있다.",
+    "description": "대푯값과 산포도를 구분하지 못하거나, 자료의 흩어짐을 수치로 본다는 점을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "산포도",
+      "흩어진 정도",
+      "범위",
+      "분산",
+      "표준편차"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "산포도를 설명하는 상황",
+      "자료의 퍼짐 정도 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_STAT_PD_003",
+    "node_type": "PD",
+    "title": "평균",
+    "definition": "자료의 값을 모두 더한 후 자료의 개수로 나눈 값을 평균이라고 한다.",
+    "description": "총합을 개수로 나누는 기본 구조를 놓치거나, 분모를 자료 수가 아닌 다른 값으로 둘 때 검색되어야 한다.",
+    "keywords": [
+      "평균",
+      "총합",
+      "자료의 개수"
+    ],
+    "prerequisites": [
+      "MD3_STAT_PD_001"
+    ],
+    "examples_of_use": [
+      "평균을 구하는 상황",
+      "대푯값 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_STAT_PD_004",
+    "node_type": "PD",
+    "title": "중앙값과 최빈값",
+    "definition": "자료를 크기순으로 나열했을 때 가운데 있는 값을 중앙값, 가장 많이 나타나는 값을 최빈값이라고 한다.",
+    "description": "자료를 정렬하지 않고 중앙값을 찾거나, 최빈값을 최댓값과 혼동할 때 검색되어야 한다.",
+    "keywords": [
+      "중앙값",
+      "최빈값",
+      "정렬"
+    ],
+    "prerequisites": [
+      "MD3_STAT_PD_001"
+    ],
+    "examples_of_use": [
+      "중앙값을 구하는 상황",
+      "최빈값 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_STAT_PD_005",
+    "node_type": "PD",
+    "title": "분산",
+    "definition": "각 자료와 평균의 차를 제곱한 값들의 평균을 분산이라고 한다.",
+    "description": "편차 제곱을 하지 않거나, 평균과의 차를 먼저 구해야 한다는 구조를 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "분산",
+      "평균과의 차",
+      "제곱"
+    ],
+    "prerequisites": [
+      "MD3_STAT_PD_003",
+      "MD3_STAT_PD_002"
+    ],
+    "examples_of_use": [
+      "분산을 구하는 상황",
+      "산포도 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_STAT_PD_006",
+    "node_type": "PD",
+    "title": "표준편차",
+    "definition": "분산의 양의 제곱근을 표준편차라고 한다.",
+    "description": "분산과 표준편차를 같은 값처럼 여기거나, 제곱근을 취하는 마지막 단계를 빠뜨릴 때 검색되어야 한다.",
+    "keywords": [
+      "표준편차",
+      "분산의 제곱근"
+    ],
+    "prerequisites": [
+      "MD3_STAT_PD_005"
+    ],
+    "examples_of_use": [
+      "표준편차를 구하는 상황",
+      "산포도 비교 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_STAT_PP_001",
+    "node_type": "PP",
+    "title": "평균을 기준으로 한 자료의 분포",
+    "definition": "평균은 자료의 중심을 나타내지만, 평균만 같아도 자료의 흩어진 정도는 다를 수 있다.",
+    "description": "평균이 같으면 분포도 같다고 생각하거나, 산포도의 필요성을 이해하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "평균과 분포",
+      "산포도 필요성"
+    ],
+    "prerequisites": [
+      "MD3_STAT_PD_002",
+      "MD3_STAT_PD_003"
+    ],
+    "examples_of_use": [
+      "평균이 같은 두 집단을 비교하는 상황",
+      "산포도 필요성 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_STAT_PP_002",
+    "node_type": "PP",
+    "title": "분산과 표준편차의 관계",
+    "definition": "분산이 클수록 표준편차도 크며, 자료가 평균으로부터 더 멀리 흩어져 있다는 뜻이다.",
+    "description": "분산과 표준편차를 계산법으로만 외우고, 실제 흩어진 정도와 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "분산",
+      "표준편차",
+      "흩어진 정도"
+    ],
+    "prerequisites": [
+      "MD3_STAT_PD_005",
+      "MD3_STAT_PD_006"
+    ],
+    "examples_of_use": [
+      "두 자료의 흩어진 정도를 비교하는 상황",
+      "산포도 해석 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_STAT_PC_001",
+    "node_type": "PC",
+    "title": "평균 계산",
+    "definition": "자료의 총합을 자료의 개수로 나누어 평균을 구하는 계산 단위이다.",
+    "description": "총합 계산을 틀리거나, 개수를 잘못 셀 때 검색되어야 한다.",
+    "keywords": [
+      "평균 계산",
+      "총합",
+      "자료 수"
+    ],
+    "prerequisites": [
+      "MD3_STAT_PD_003"
+    ],
+    "examples_of_use": [
+      "평균을 구하는 상황",
+      "평균 계산 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_STAT_PC_002",
+    "node_type": "PC",
+    "title": "중앙값과 최빈값 계산",
+    "definition": "자료를 크기순으로 정렬한 뒤 중앙값과 최빈값을 찾는 계산 단위이다.",
+    "description": "정렬 없이 중앙값을 찾거나, 빈도 비교를 정확히 하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "중앙값 계산",
+      "최빈값 계산",
+      "정렬"
+    ],
+    "prerequisites": [
+      "MD3_STAT_PD_004"
+    ],
+    "examples_of_use": [
+      "중앙값을 구하는 상황",
+      "최빈값 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_STAT_PC_003",
+    "node_type": "PC",
+    "title": "분산 계산",
+    "definition": "평균을 구하고 각 자료에서 평균을 뺀 뒤, 그 값을 제곱하여 평균내어 분산을 구하는 계산 단위이다.",
+    "description": "평균과의 차를 바로 평균내거나, 제곱 단계를 빠뜨릴 때 검색되어야 한다.",
+    "keywords": [
+      "분산 계산",
+      "편차 제곱",
+      "평균"
+    ],
+    "prerequisites": [
+      "MD3_STAT_PD_005"
+    ],
+    "examples_of_use": [
+      "분산을 구하는 상황",
+      "산포도 계산 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_STAT_PC_004",
+    "node_type": "PC",
+    "title": "표준편차 계산",
+    "definition": "분산을 구한 뒤 양의 제곱근을 취해 표준편차를 구하는 계산 단위이다.",
+    "description": "분산까지만 구하고 끝내거나, 제곱근 계산을 틀릴 때 검색되어야 한다.",
+    "keywords": [
+      "표준편차 계산",
+      "제곱근",
+      "분산"
+    ],
+    "prerequisites": [
+      "MD3_STAT_PD_006",
+      "MD3_STAT_PC_003"
+    ],
+    "examples_of_use": [
+      "표준편차를 구하는 상황",
+      "산포도 계산 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_STAT_PC_005",
+    "node_type": "PC",
+    "title": "대푯값과 산포도 비교 해석 계산",
+    "definition": "두 자료 집단의 평균, 중앙값, 최빈값, 분산, 표준편차를 비교하여 자료의 특성을 해석하는 계산 단위이다.",
+    "description": "값은 구했지만 어떤 집단이 더 고르거나 흩어졌는지 해석하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "자료 비교",
+      "대푯값 비교",
+      "산포도 비교"
+    ],
+    "prerequisites": [
+      "MD3_STAT_PP_001",
+      "MD3_STAT_PP_002"
+    ],
+    "examples_of_use": [
+      "두 집단을 비교하는 상황",
+      "해석 문제"
+    ]
+  }
+]

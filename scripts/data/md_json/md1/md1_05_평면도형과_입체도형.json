@@ -1,0 +1,413 @@
+[
+  {
+    "concept_code": "MD1_GEO2_PD_001",
+    "node_type": "PD",
+    "title": "다각형",
+    "definition": "한 평면 위의 여러 선분으로 둘러싸인 도형을 다각형이라고 한다.",
+    "description": "곡선이 포함된 도형도 다각형으로 보거나, 평면도형과 입체도형을 구분하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "다각형",
+      "선분",
+      "평면도형"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "다각형을 고르는 상황",
+      "도형을 분류하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PD_002",
+    "node_type": "PD",
+    "title": "정다각형",
+    "definition": "모든 변의 길이가 같고 모든 각의 크기가 같은 다각형을 정다각형이라고 한다.",
+    "description": "변만 같거나 각만 같아도 정다각형이라고 생각할 때 검색되어야 한다.",
+    "keywords": [
+      "정다각형",
+      "모든 변 같음",
+      "모든 각 같음"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_001"
+    ],
+    "examples_of_use": [
+      "정오각형을 설명하는 상황",
+      "정다각형을 판정하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PD_003",
+    "node_type": "PD",
+    "title": "원, 반지름, 지름",
+    "definition": "한 점에서 같은 거리에 있는 점들의 모임을 원이라 하고, 그 점을 원의 중심, 중심과 원 위의 점을 이은 선분을 반지름, 중심을 지나는 현을 지름이라 한다.",
+    "description": "원과 원판을 혼동하거나, 반지름과 지름의 관계를 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "원",
+      "중심",
+      "반지름",
+      "지름"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "원의 중심과 반지름을 찾는 상황",
+      "지름을 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PD_004",
+    "node_type": "PD",
+    "title": "부채꼴",
+    "definition": "원에서 두 반지름과 그 사이의 호로 둘러싸인 도형을 부채꼴이라고 한다.",
+    "description": "호를 포함한 넓이 영역이라는 점을 놓치거나, 중심각과 부채꼴을 따로 보지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "부채꼴",
+      "호",
+      "중심각"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_003"
+    ],
+    "examples_of_use": [
+      "부채꼴을 구분하는 상황",
+      "부채꼴의 중심각을 보는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PD_005",
+    "node_type": "PD",
+    "title": "다면체",
+    "definition": "여러 개의 평면 다각형으로 둘러싸인 입체도형을 다면체라고 한다.",
+    "description": "곡면이 있는 입체도형까지 다면체로 보거나, 면·모서리·꼭짓점의 개념을 혼동할 때 검색되어야 한다.",
+    "keywords": [
+      "다면체",
+      "면",
+      "모서리",
+      "꼭짓점"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_001"
+    ],
+    "examples_of_use": [
+      "정육면체가 다면체인지 판단하는 상황",
+      "다면체의 요소를 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PD_006",
+    "node_type": "PD",
+    "title": "회전체",
+    "definition": "평면도형을 한 직선을 축으로 하여 회전시켜 얻는 입체도형을 회전체라고 한다.",
+    "description": "회전체와 다면체를 혼동하거나, 어떤 평면도형을 돌려 얻는지 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "회전체",
+      "회전축",
+      "원기둥",
+      "원뿔",
+      "구"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_001"
+    ],
+    "examples_of_use": [
+      "직사각형을 돌려 원기둥을 만드는 상황",
+      "회전체를 분류하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PD_007",
+    "node_type": "PD",
+    "title": "겉넓이",
+    "definition": "입체도형의 바깥쪽 전체 넓이를 겉넓이라고 한다.",
+    "description": "겉넓이를 단면의 넓이와 혼동하거나, 밑면·옆면을 모두 합해야 한다는 점을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "겉넓이",
+      "입체도형",
+      "전체 넓이"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_005",
+      "MD1_GEO2_PD_006"
+    ],
+    "examples_of_use": [
+      "직육면체의 겉넓이를 구하는 상황",
+      "원기둥의 겉넓이 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PD_008",
+    "node_type": "PD",
+    "title": "부피",
+    "definition": "입체도형이 차지하는 공간의 크기를 부피라고 한다.",
+    "description": "넓이와 부피를 혼동하거나, 단위를 제곱단위와 세제곱단위로 구분하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "부피",
+      "공간의 크기",
+      "세제곱단위"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_005",
+      "MD1_GEO2_PD_006"
+    ],
+    "examples_of_use": [
+      "직육면체의 부피를 구하는 상황",
+      "원기둥의 부피 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PP_001",
+    "node_type": "PP",
+    "title": "다각형의 대각선 수",
+    "definition": "n각형의 한 꼭짓점에서 그을 수 있는 대각선은 n-3개이고, 전체 대각선의 수는 n(n-3)/2개이다.",
+    "description": "대각선을 변과 함께 세거나, 중복 계산을 조정하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "대각선",
+      "n각형",
+      "대각선 수"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_001"
+    ],
+    "examples_of_use": [
+      "오각형의 대각선 수를 구하는 상황",
+      "n각형 일반식을 적용하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PP_002",
+    "node_type": "PP",
+    "title": "반지름과 지름의 관계",
+    "definition": "지름은 반지름의 2배이다.",
+    "description": "지름과 반지름을 바꾸어 쓰거나, 길이 관계를 원의 둘레 공식과 혼동할 때 검색되어야 한다.",
+    "keywords": [
+      "지름",
+      "반지름",
+      "2배"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_003"
+    ],
+    "examples_of_use": [
+      "반지름이 주어졌을 때 지름을 구하는 상황",
+      "지름과 반지름 관계 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PP_003",
+    "node_type": "PP",
+    "title": "전개도와 겉넓이의 관계",
+    "definition": "입체도형의 겉넓이는 전개도의 넓이와 같다.",
+    "description": "전개도를 그릴 수는 있지만 겉넓이 계산으로 연결하지 못하거나, 겹치는 면을 중복 계산할 때 검색되어야 한다.",
+    "keywords": [
+      "전개도",
+      "겉넓이",
+      "입체도형"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_007"
+    ],
+    "examples_of_use": [
+      "전개도로 겉넓이를 구하는 상황",
+      "입체도형의 겉넓이 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PP_004",
+    "node_type": "PP",
+    "title": "부피의 기본 원리",
+    "definition": "기둥 모양 입체도형의 부피는 밑넓이×높이로 구한다.",
+    "description": "밑면을 잘못 잡거나, 높이를 옆모서리 길이와 혼동할 때 검색되어야 한다.",
+    "keywords": [
+      "부피 원리",
+      "밑넓이×높이",
+      "기둥"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_008"
+    ],
+    "examples_of_use": [
+      "직육면체 부피를 구하는 상황",
+      "원기둥 부피 공식을 이해하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PC_001",
+    "node_type": "PC",
+    "title": "다각형과 정다각형 판정 계산",
+    "definition": "도형의 변, 각, 곡선 여부를 보고 다각형인지, 정다각형인지 판정하는 단위이다.",
+    "description": "조건 하나만 보고 정다각형으로 결론 내리거나, 곡선이 있는 도형을 다각형으로 분류할 때 검색되어야 한다.",
+    "keywords": [
+      "다각형 판정",
+      "정다각형 판정"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_001",
+      "MD1_GEO2_PD_002"
+    ],
+    "examples_of_use": [
+      "도형을 분류하는 상황",
+      "정다각형 여부를 판단하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PC_002",
+    "node_type": "PC",
+    "title": "대각선 수 계산",
+    "definition": "꼭짓점 수를 이용해 다각형의 대각선 수를 계산하는 단위이다.",
+    "description": "한 꼭짓점 기준 개수와 전체 개수를 혼동하거나, 중복을 나누지 않을 때 검색되어야 한다.",
+    "keywords": [
+      "대각선 수 계산",
+      "n각형"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PP_001"
+    ],
+    "examples_of_use": [
+      "육각형의 대각선 수를 구하는 상황",
+      "일반식 적용 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PC_003",
+    "node_type": "PC",
+    "title": "원과 부채꼴 요소 읽기 계산",
+    "definition": "그림에서 중심, 반지름, 지름, 현, 호, 중심각, 부채꼴을 구분하고 읽는 계산 단위이다.",
+    "description": "현과 지름을 혼동하거나, 부채꼴의 경계를 잘못 읽을 때 검색되어야 한다.",
+    "keywords": [
+      "원 요소",
+      "부채꼴 요소",
+      "중심각",
+      "호"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_003",
+      "MD1_GEO2_PD_004"
+    ],
+    "examples_of_use": [
+      "부채꼴의 중심각을 찾는 상황",
+      "원의 요소를 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PC_004",
+    "node_type": "PC",
+    "title": "다면체의 면·모서리·꼭짓점 세기",
+    "definition": "다면체를 보고 면, 모서리, 꼭짓점의 개수를 세는 계산 단위이다.",
+    "description": "숨겨진 면이나 모서리를 놓치거나, 회전체와 섞어 세려고 할 때 검색되어야 한다.",
+    "keywords": [
+      "다면체 계산",
+      "면",
+      "모서리",
+      "꼭짓점"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_005"
+    ],
+    "examples_of_use": [
+      "정육면체의 면 수를 세는 상황",
+      "다면체의 요소를 세는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PC_005",
+    "node_type": "PC",
+    "title": "회전체 판정과 대응 평면도형 찾기 계산",
+    "definition": "주어진 회전체가 어떤 평면도형을 회전시켜 생기는지, 또는 어떤 회전체인지 판정하는 계산 단위이다.",
+    "description": "원기둥·원뿔·구를 구분하지 못하거나, 회전축을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "회전체 판정",
+      "회전축",
+      "원기둥",
+      "원뿔",
+      "구"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_006"
+    ],
+    "examples_of_use": [
+      "직사각형을 돌려 생기는 입체를 찾는 상황",
+      "회전체를 분류하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PC_006",
+    "node_type": "PC",
+    "title": "직육면체와 정육면체의 겉넓이 계산",
+    "definition": "모든 면의 넓이를 더하여 직육면체와 정육면체의 겉넓이를 계산하는 단위이다.",
+    "description": "같은 넓이의 면 개수를 잘못 세거나, 밑면을 빠뜨릴 때 검색되어야 한다.",
+    "keywords": [
+      "겉넓이 계산",
+      "직육면체",
+      "정육면체"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_007",
+      "MD1_GEO2_PP_003"
+    ],
+    "examples_of_use": [
+      "직육면체의 겉넓이를 구하는 상황",
+      "정육면체 겉넓이 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PC_007",
+    "node_type": "PC",
+    "title": "원기둥의 겉넓이 계산",
+    "definition": "옆면의 전개도와 두 밑면의 넓이를 합하여 원기둥의 겉넓이를 계산하는 단위이다.",
+    "description": "옆면을 직사각형으로 보지 못하거나, 밑면 두 개를 모두 더하지 않을 때 검색되어야 한다.",
+    "keywords": [
+      "원기둥 겉넓이",
+      "전개도",
+      "밑면 두 개"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_007",
+      "MD1_GEO2_PP_003"
+    ],
+    "examples_of_use": [
+      "원기둥 겉넓이를 구하는 상황",
+      "전개도를 활용하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PC_008",
+    "node_type": "PC",
+    "title": "직육면체와 정육면체의 부피 계산",
+    "definition": "밑넓이×높이 또는 가로×세로×높이로 직육면체와 정육면체의 부피를 계산하는 단위이다.",
+    "description": "세 길이를 곱하지 않거나, 넓이 단위와 부피 단위를 혼동할 때 검색되어야 한다.",
+    "keywords": [
+      "부피 계산",
+      "직육면체",
+      "정육면체",
+      "밑넓이×높이"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_008",
+      "MD1_GEO2_PP_004"
+    ],
+    "examples_of_use": [
+      "직육면체 부피를 구하는 상황",
+      "정육면체 부피 문제"
+    ]
+  },
+  {
+    "concept_code": "MD1_GEO2_PC_009",
+    "node_type": "PC",
+    "title": "원기둥의 부피 계산",
+    "definition": "밑면인 원의 넓이에 높이를 곱해 원기둥의 부피를 계산하는 단위이다.",
+    "description": "밑넓이를 원의 넓이로 계산하지 못하거나, 반지름과 지름을 혼동할 때 검색되어야 한다.",
+    "keywords": [
+      "원기둥 부피",
+      "원 넓이",
+      "밑넓이×높이"
+    ],
+    "prerequisites": [
+      "MD1_GEO2_PD_008",
+      "MD1_GEO2_PP_002",
+      "MD1_GEO2_PP_004"
+    ],
+    "examples_of_use": [
+      "원기둥의 부피를 구하는 상황",
+      "반지름이 주어진 원기둥 문제"
+    ]
+  }
+]

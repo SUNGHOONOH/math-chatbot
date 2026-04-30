@@ -37,12 +37,15 @@ interface ConceptNode {
   embedding: number[] | null;
 }
 
+type ConceptNodeListItem = Pick<ConceptNode, 'id' | 'concept_code' | 'node_type' | 'title'>;
+
 interface ConceptAlias {
   id: string;
   concept_code: string;
   alias_text: string;
   failure_type: string;
-  embedding: number[] | null;
+  created_at: string;
+  embedding?: number[] | null;
 }
 
 function TagInput({
@@ -116,15 +119,18 @@ export default function KnowledgeManagementPanel() {
   const [activeTab, setActiveTab] = useState<TabId>('concepts');
   const [stats, setStats] = useState({ referenceNull: 0, aliasNull: 0 });
   const [isGenerating, setIsGenerating] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     fetchStats();
   }, []);
 
+  const triggerRefresh = () => setRefreshKey(prev => prev + 1);
+
   async function fetchStats() {
     const [{ count: refCount }, { count: aliasCount }] = await Promise.all([
-      supabase.from('concept_nodes_reference').select('*', { count: 'exact', head: true }).is('embedding', null),
-      supabase.from('concept_aliases').select('*', { count: 'exact', head: true }).is('embedding', null),
+      supabase.from('concept_nodes_reference').select('id', { count: 'exact', head: true }).is('embedding', null),
+      supabase.from('concept_aliases').select('id', { count: 'exact', head: true }).is('embedding', null),
     ]);
     setStats({ referenceNull: refCount || 0, aliasNull: aliasCount || 0 });
   }
@@ -137,6 +143,7 @@ export default function KnowledgeManagementPanel() {
       if (res.ok) {
         alert(`${data.generated}개의 임베딩이 생성되었습니다.`);
         await fetchStats();
+        triggerRefresh();
       } else {
         alert(data.error);
       }
@@ -204,44 +211,76 @@ export default function KnowledgeManagementPanel() {
       </div>
 
       <main className="flex-1 overflow-hidden">
-        {activeTab === 'concepts' && <ConceptNodesTab onStatsChange={fetchStats} />}
-        {activeTab === 'aliases' && <ConceptAliasesTab onStatsChange={fetchStats} />}
+        {activeTab === 'concepts' && <ConceptNodesTab onStatsChange={fetchStats} refreshKey={refreshKey} />}
+        {activeTab === 'aliases' && <ConceptAliasesTab onStatsChange={fetchStats} refreshKey={refreshKey} />}
       </main>
     </div>
   );
 }
 
-function ConceptNodesTab({ onStatsChange }: { onStatsChange: () => void }) {
-  const [concepts, setConcepts] = useState<ConceptNode[]>([]);
+function ConceptNodesTab({ onStatsChange, refreshKey }: { onStatsChange: () => void, refreshKey: number }) {
+  const [concepts, setConcepts] = useState<ConceptNodeListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<ConceptNode | null>(null);
+  const [selectedLoading, setSelectedLoading] = useState(false);
   const [editForm, setEditForm] = useState<Partial<ConceptNode>>({});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetchConcepts();
-  }, []);
+  }, [refreshKey]);
+
+  useEffect(() => {
+    if (selected && !concepts.some(c => c.id === selected.id)) {
+      setSelected(null);
+      setEditForm({});
+    }
+  }, [concepts, selected]);
 
   async function fetchConcepts() {
     setLoading(true);
-    const { data } = await supabase.from('concept_nodes_reference').select('*').order('concept_code', { ascending: true });
-    if (data) setConcepts(data as any[]);
+    const { data } = await supabase
+      .from('concept_nodes_reference')
+      .select('id, concept_code, title, node_type')
+      .order('concept_code', { ascending: true });
+    if (data) setConcepts(data as ConceptNodeListItem[]);
     setLoading(false);
   }
 
-  const selectConcept = useCallback((c: ConceptNode) => {
-    setSelected(c);
+  const applySelectedConcept = useCallback((concept: ConceptNode) => {
+    setSelected(concept);
     setEditForm({
-      title: c.title,
-      node_type: c.node_type,
-      definition: c.definition,
-      description: c.description,
-      keywords: [...(c.keywords || [])],
-      prerequisites: [...(c.prerequisites || [])],
-      examples_of_use: [...(c.examples_of_use || [])],
+      title: concept.title,
+      node_type: concept.node_type,
+      definition: concept.definition,
+      description: concept.description,
+      keywords: [...(concept.keywords || [])],
+      prerequisites: [...(concept.prerequisites || [])],
+      examples_of_use: [...(concept.examples_of_use || [])],
     });
   }, []);
+
+  const fetchConceptDetail = useCallback(async (id: string) => {
+    setSelectedLoading(true);
+    const { data, error } = await supabase
+      .from('concept_nodes_reference')
+      .select('id, concept_code, node_type, title, definition, description, keywords, prerequisites, examples_of_use, embedding')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      alert(`개념 상세 조회 실패: ${error.message}`);
+    } else if (data) {
+      applySelectedConcept(data as ConceptNode);
+    }
+
+    setSelectedLoading(false);
+  }, [applySelectedConcept]);
+
+  const selectConcept = useCallback((c: ConceptNodeListItem) => {
+    fetchConceptDetail(c.id);
+  }, [fetchConceptDetail]);
 
   async function handleSave() {
     if (!selected) return;
@@ -263,6 +302,7 @@ function ConceptNodesTab({ onStatsChange }: { onStatsChange: () => void }) {
       if (error) throw error;
       alert('저장되었습니다.');
       await fetchConcepts();
+      await fetchConceptDetail(selected.id);
       onStatsChange();
     } catch (err: any) {
       alert(`저장 실패: ${err.message}`);
@@ -357,7 +397,11 @@ function ConceptNodesTab({ onStatsChange }: { onStatsChange: () => void }) {
       </aside>
 
       <div className="flex-1 overflow-y-auto p-8">
-        {!selected ? (
+        {selectedLoading ? (
+          <div className="flex items-center justify-center h-full text-zinc-400 text-sm">
+            <Loader2 className="animate-spin" size={18} />
+          </div>
+        ) : !selected ? (
           <div className="flex items-center justify-center h-full text-zinc-400 text-sm">
             <div className="text-center space-y-2">
               <BrainCircuit size={32} className="mx-auto text-zinc-300" />
@@ -466,7 +510,7 @@ function ConceptNodesTab({ onStatsChange }: { onStatsChange: () => void }) {
             </div>
 
             <div className="bg-zinc-50 rounded-xl p-4 flex items-center justify-between">
-              <span className="text-[11px] text-zinc-500">임베딩 상태: {selected.embedding ? '✅ 생성됨' : '⚠️ 미생성'}</span>
+              <span className="text-[11px] text-zinc-500">임베딩 상태: {(selected.embedding && selected.embedding.length > 0) ? '✅ 생성됨' : '⚠️ 미생성'}</span>
               <span className="text-[10px] text-zinc-400 font-mono">id: {selected.id.slice(0, 8)}...</span>
             </div>
           </div>
@@ -476,7 +520,7 @@ function ConceptNodesTab({ onStatsChange }: { onStatsChange: () => void }) {
   );
 }
 
-function ConceptAliasesTab({ onStatsChange }: { onStatsChange: () => void }) {
+function ConceptAliasesTab({ onStatsChange, refreshKey }: { onStatsChange: () => void, refreshKey: number }) {
   const [concepts, setConcepts] = useState<{ concept_code: string; title: string }[]>([]);
   const [aliases, setAliases] = useState<ConceptAlias[]>([]);
   const [loading, setLoading] = useState(true);
@@ -499,7 +543,8 @@ function ConceptAliasesTab({ onStatsChange }: { onStatsChange: () => void }) {
 
   useEffect(() => {
     fetchConcepts();
-  }, []);
+    if (selectedCode) fetchAliases(selectedCode);
+  }, [refreshKey]);
 
   async function fetchConcepts() {
     setLoading(true);
@@ -509,7 +554,11 @@ function ConceptAliasesTab({ onStatsChange }: { onStatsChange: () => void }) {
   }
 
   const fetchAliases = useCallback(async (code: string) => {
-    const { data } = await supabase.from('concept_aliases').select('*').eq('concept_code', code).order('created_at', { ascending: false });
+    const { data } = await supabase
+      .from('concept_aliases')
+      .select('id, concept_code, alias_text, failure_type, created_at')
+      .eq('concept_code', code)
+      .order('created_at', { ascending: false });
     if (data) setAliases(data as any[]);
   }, []);
 

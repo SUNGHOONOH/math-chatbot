@@ -1,0 +1,279 @@
+[
+  {
+    "concept_code": "MD3_TRI_PD_001",
+    "node_type": "PD",
+    "title": "삼각비",
+    "definition": "직각삼각형에서 한 예각에 대한 두 변의 길이의 비를 삼각비라고 한다.",
+    "description": "삼각비를 각 자체의 크기로 보거나, 직각삼각형이라는 전제와 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "삼각비",
+      "직각삼각형",
+      "길이의 비"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "삼각비의 뜻을 설명하는 상황",
+      "직각삼각형 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_TRI_PD_002",
+    "node_type": "PD",
+    "title": "sin, cos, tan의 정의",
+    "definition": "직각삼각형의 한 예각 θ에 대하여 sinθ=높이/빗변, cosθ=밑변/빗변, tanθ=높이/밑변 이다.",
+    "description": "분자·분모의 대응을 혼동하거나, 기준 각이 바뀌면 높이와 밑변도 바뀐다는 점을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "sin",
+      "cos",
+      "tan",
+      "높이",
+      "빗변",
+      "밑변"
+    ],
+    "prerequisites": [
+      "MD3_TRI_PD_001"
+    ],
+    "examples_of_use": [
+      "주어진 삼각형에서 sinθ를 구하는 상황",
+      "삼각비 정의 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_TRI_PD_003",
+    "node_type": "PD",
+    "title": "특수한 각의 삼각비",
+    "definition": "30°, 45°, 60°의 삼각비 값은 직각삼각형의 변의 비를 이용해 구할 수 있다.",
+    "description": "값을 외우기만 하고 왜 그런 값이 나오는지 직각삼각형과 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "30도",
+      "45도",
+      "60도",
+      "특수각",
+      "삼각비"
+    ],
+    "prerequisites": [
+      "MD3_TRI_PD_002"
+    ],
+    "examples_of_use": [
+      "sin30°, cos45°를 구하는 상황",
+      "특수각 삼각비 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_TRI_PD_004",
+    "node_type": "PD",
+    "title": "삼각비표",
+    "definition": "여러 각에 대한 삼각비 값을 정리한 표를 삼각비표라고 하며, 가까운 값을 찾는 데 사용할 수 있다.",
+    "description": "삼각비표에서 행과 열을 잘못 읽거나, 각과 값을 반대로 읽을 때 검색되어야 한다.",
+    "keywords": [
+      "삼각비표",
+      "값 읽기",
+      "근삿값"
+    ],
+    "prerequisites": [
+      "MD3_TRI_PD_002"
+    ],
+    "examples_of_use": [
+      "삼각비표에서 값을 읽는 상황",
+      "각을 추정하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_TRI_PD_005",
+    "node_type": "PD",
+    "title": "삼각비의 활용",
+    "definition": "직각삼각형에서 삼각비를 이용하면 길이와 각을 구할 수 있다.",
+    "description": "직각삼각형의 조건을 놓치거나, 무엇을 기준 각으로 잡아야 하는지 몰라 삼각비를 선택하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "삼각비 활용",
+      "길이 구하기",
+      "각 구하기"
+    ],
+    "prerequisites": [
+      "MD3_TRI_PD_002",
+      "MD3_TRI_PD_004"
+    ],
+    "examples_of_use": [
+      "높이를 구하는 상황",
+      "각을 구하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_TRI_PP_001",
+    "node_type": "PP",
+    "title": "기준 각에 따른 높이와 밑변의 변화",
+    "definition": "같은 직각삼각형에서도 기준으로 잡는 예각이 바뀌면 높이와 밑변의 역할이 달라진다.",
+    "description": "항상 같은 변을 높이 또는 밑변으로 정해 놓고 생각할 때 검색되어야 한다.",
+    "keywords": [
+      "기준 각",
+      "높이",
+      "밑변",
+      "역할 변화"
+    ],
+    "prerequisites": [
+      "MD3_TRI_PD_002"
+    ],
+    "examples_of_use": [
+      "기준 각이 바뀌는 상황",
+      "삼각비 정의 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_TRI_PP_002",
+    "node_type": "PP",
+    "title": "특수각 삼각비의 대칭 관계",
+    "definition": "30°, 60°의 sin과 cos 값은 서로 대응되고, 45°에서는 sin과 cos가 같다.",
+    "description": "특수각 값을 각각 따로 외우다가 구조적 대응을 보지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "특수각 대칭",
+      "sin",
+      "cos",
+      "45도"
+    ],
+    "prerequisites": [
+      "MD3_TRI_PD_003"
+    ],
+    "examples_of_use": [
+      "sin60°와 cos30°를 연결하는 상황",
+      "특수각 관계 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_TRI_PP_003",
+    "node_type": "PP",
+    "title": "삼각비와 실제 거리 측정",
+    "definition": "직각삼각형 구조를 만들 수 있으면 삼각비를 이용해 직접 재기 어려운 거리나 높이를 구할 수 있다.",
+    "description": "상황을 직각삼각형 모델로 바꾸지 못하거나, 필요한 변과 각을 정리하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "거리 측정",
+      "높이 측정",
+      "직각삼각형 모델"
+    ],
+    "prerequisites": [
+      "MD3_TRI_PD_005"
+    ],
+    "examples_of_use": [
+      "건물 높이를 구하는 상황",
+      "활용 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_TRI_PC_001",
+    "node_type": "PC",
+    "title": "삼각비 구하기 계산",
+    "definition": "직각삼각형의 변의 길이를 보고 sin, cos, tan 값을 계산하는 단위이다.",
+    "description": "분자·분모를 뒤바꾸거나, 빗변을 잘못 잡을 때 검색되어야 한다.",
+    "keywords": [
+      "sin 계산",
+      "cos 계산",
+      "tan 계산"
+    ],
+    "prerequisites": [
+      "MD3_TRI_PD_002",
+      "MD3_TRI_PP_001"
+    ],
+    "examples_of_use": [
+      "삼각비를 구하는 상황",
+      "정의 적용 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_TRI_PC_002",
+    "node_type": "PC",
+    "title": "특수각 삼각비 계산",
+    "definition": "30°, 45°, 60°의 삼각비 값을 이용해 계산하는 단위이다.",
+    "description": "값을 잘못 외웠거나, 루트 형태를 정리하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "특수각 계산",
+      "30도",
+      "45도",
+      "60도"
+    ],
+    "prerequisites": [
+      "MD3_TRI_PD_003",
+      "MD3_TRI_PP_002"
+    ],
+    "examples_of_use": [
+      "sin45°를 구하는 상황",
+      "특수각 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_TRI_PC_003",
+    "node_type": "PC",
+    "title": "삼각비표 읽기 계산",
+    "definition": "삼각비표에서 주어진 각의 삼각비 값을 읽거나, 주어진 값에 가까운 각을 찾는 계산 단위이다.",
+    "description": "행과 열을 잘못 읽거나, sin/cos/tan 항목을 혼동할 때 검색되어야 한다.",
+    "keywords": [
+      "삼각비표 읽기",
+      "값 찾기",
+      "각 찾기"
+    ],
+    "prerequisites": [
+      "MD3_TRI_PD_004"
+    ],
+    "examples_of_use": [
+      "삼각비표를 읽는 상황",
+      "표 활용 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_TRI_PC_004",
+    "node_type": "PC",
+    "title": "삼각비로 길이 구하기 계산",
+    "definition": "직각삼각형에서 한 각과 한 변의 길이를 이용해 나머지 변의 길이를 구하는 계산 단위이다.",
+    "description": "어떤 삼각비를 써야 할지 못 정하거나, 식을 세운 뒤 미지수를 정리하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "길이 구하기",
+      "삼각비 활용",
+      "식 세우기"
+    ],
+    "prerequisites": [
+      "MD3_TRI_PD_005"
+    ],
+    "examples_of_use": [
+      "높이 또는 밑변을 구하는 상황",
+      "길이 활용 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_TRI_PC_005",
+    "node_type": "PC",
+    "title": "삼각비로 각 구하기 계산",
+    "definition": "직각삼각형의 변의 길이 비나 삼각비표를 이용해 예각의 크기를 구하는 계산 단위이다.",
+    "description": "삼각비표를 잘못 읽거나, 주어진 변의 비에 맞는 삼각비 종류를 선택하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "각 구하기",
+      "삼각비표",
+      "변의 비"
+    ],
+    "prerequisites": [
+      "MD3_TRI_PD_004",
+      "MD3_TRI_PD_005"
+    ],
+    "examples_of_use": [
+      "각을 구하는 상황",
+      "삼각비 활용 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_TRI_PC_006",
+    "node_type": "PC",
+    "title": "거리·높이 활용 계산",
+    "definition": "실제 상황을 직각삼각형으로 모델링하고 삼각비를 사용해 거리나 높이를 계산하는 단위이다.",
+    "description": "문제 그림을 직각삼각형으로 단순화하지 못하거나, 수평거리·높이·시선 길이를 구분하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "활용 계산",
+      "거리",
+      "높이",
+      "모델링"
+    ],
+    "prerequisites": [
+      "MD3_TRI_PP_003"
+    ],
+    "examples_of_use": [
+      "건물 높이를 구하는 상황",
+      "그림 활용 문제"
+    ]
+  }
+]

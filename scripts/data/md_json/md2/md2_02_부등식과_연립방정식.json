@@ -1,0 +1,350 @@
+[
+  {
+    "concept_code": "MD2_INEQ_PD_001",
+    "node_type": "PD",
+    "title": "부등식",
+    "definition": "두 수 또는 두 식의 크고 작음을 >, <, ≥, ≤ 로 나타낸 식을 부등식이라고 한다.",
+    "description": "등식과 부등식을 구분하지 못하거나, 기호의 의미를 정확히 읽지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "부등식",
+      ">",
+      "<",
+      "≥",
+      "≤"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "부등식을 읽는 상황",
+      "등식과 부등식을 구분하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PD_002",
+    "node_type": "PD",
+    "title": "부등식의 성질",
+    "definition": "부등식의 양변에 같은 수를 더하거나 빼면 부등호 방향은 그대로이고, 같은 양수로 곱하거나 나누어도 그대로지만, 같은 음수로 곱하거나 나누면 부등호 방향이 바뀐다.",
+    "description": "음수로 곱하거나 나눌 때 부등호 방향이 바뀐다는 핵심을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "부등식의 성질",
+      "부등호 방향",
+      "음수"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PD_001"
+    ],
+    "examples_of_use": [
+      "양변에 같은 수를 더하는 상황",
+      "음수로 나눌 때 부등호를 바꾸는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PD_003",
+    "node_type": "PD",
+    "title": "일차부등식",
+    "definition": "미지수에 대한 식을 정리했을 때 ax+b>0, ax+b<0, ax+b≥0, ax+b≤0 꼴이 되는 부등식을 일차부등식이라고 한다.",
+    "description": "정리 전 모양만 보고 일차부등식으로 판단하거나, 계수가 0인 경우를 따로 보지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "일차부등식",
+      "ax+b",
+      "부등호"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PD_001"
+    ],
+    "examples_of_use": [
+      "2x+3<7을 일차부등식으로 보는 상황",
+      "식 정리 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PD_004",
+    "node_type": "PD",
+    "title": "연립일차부등식",
+    "definition": "두 개 이상의 일차부등식을 동시에 만족하는 값을 구하는 부등식을 연립일차부등식이라고 한다.",
+    "description": "각 부등식을 따로만 풀고 공통해를 구하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "연립일차부등식",
+      "공통해",
+      "교집합"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PD_003"
+    ],
+    "examples_of_use": [
+      "두 부등식의 공통해를 구하는 상황",
+      "연립부등식 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PD_005",
+    "node_type": "PD",
+    "title": "미지수가 2개인 일차방정식",
+    "definition": "두 미지수 x, y에 대한 식을 정리했을 때 ax+by=c 꼴이 되는 방정식을 미지수가 2개인 일차방정식이라고 한다.",
+    "description": "한 미지수 방정식과 구분하지 못하거나, 해를 수 하나로만 생각할 때 검색되어야 한다.",
+    "keywords": [
+      "미지수 2개",
+      "일차방정식",
+      "ax+by=c"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "2x+y=5를 보는 상황",
+      "일차방정식 형태를 판정하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PD_006",
+    "node_type": "PD",
+    "title": "연립방정식",
+    "definition": "둘 이상의 방정식을 동시에 만족하는 해를 구하는 방정식의 모음을 연립방정식이라고 한다.",
+    "description": "각 방정식의 해를 따로 구해도 된다고 생각하거나, 공통으로 만족하는 순서쌍의 의미를 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "연립방정식",
+      "공통해",
+      "순서쌍"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PD_005"
+    ],
+    "examples_of_use": [
+      "x+y=5, x-y=1의 공통해를 구하는 상황",
+      "연립방정식 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PD_007",
+    "node_type": "PD",
+    "title": "연립일차방정식",
+    "definition": "미지수가 2개인 일차방정식들로 이루어진 연립방정식을 연립일차방정식이라고 한다.",
+    "description": "연립방정식과 연립일차방정식을 구분하지 못하거나, 식을 정리해 일차인지 확인하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "연립일차방정식",
+      "미지수 2개",
+      "일차식"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PD_005",
+      "MD2_INEQ_PD_006"
+    ],
+    "examples_of_use": [
+      "두 식이 연립일차방정식인지 판정하는 상황",
+      "연립일차방정식 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PP_001",
+    "node_type": "PP",
+    "title": "부등식 해와 수직선의 관계",
+    "definition": "일차부등식의 해는 수직선 위의 구간이나 반직선 형태로 나타낼 수 있다.",
+    "description": "해를 수 하나처럼만 생각하거나, 수직선 표현과 해집합 표현을 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "부등식 해",
+      "수직선",
+      "구간",
+      "반직선"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PD_003"
+    ],
+    "examples_of_use": [
+      "x>2를 수직선으로 나타내는 상황",
+      "해집합을 수직선과 연결하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PP_002",
+    "node_type": "PP",
+    "title": "연립일차부등식의 공통해",
+    "definition": "연립일차부등식의 해는 각 부등식의 해집합의 공통부분이다.",
+    "description": "합집합처럼 처리하거나, 겹치는 구간만 취해야 한다는 점을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "공통해",
+      "교집합",
+      "연립부등식"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PD_004"
+    ],
+    "examples_of_use": [
+      "두 부등식의 공통구간을 찾는 상황",
+      "교집합 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PP_003",
+    "node_type": "PP",
+    "title": "연립방정식의 해의 의미",
+    "definition": "연립방정식의 해는 주어진 모든 방정식을 동시에 만족하는 값의 쌍이다.",
+    "description": "한 식만 만족하는 값을 해로 받아들이거나, 해를 순서 없는 두 수로 생각할 때 검색되어야 한다.",
+    "keywords": [
+      "연립방정식의 해",
+      "동시 만족",
+      "순서쌍"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PD_006"
+    ],
+    "examples_of_use": [
+      "(2,3)이 해인지 확인하는 상황",
+      "연립방정식 해의 의미 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PP_004",
+    "node_type": "PP",
+    "title": "가감법과 대입법의 선택",
+    "definition": "연립일차방정식은 한 문자를 소거하기 쉬우면 가감법, 한 식에서 문자를 쉽게 나타낼 수 있으면 대입법을 사용하면 편리하다.",
+    "description": "아무 방법이나 기계적으로 쓰다가 계산이 복잡해지거나, 식의 구조를 보고 전략을 선택하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "가감법",
+      "대입법",
+      "전략 선택"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PD_007"
+    ],
+    "examples_of_use": [
+      "계수가 반대인 식에서 가감법을 쓰는 상황",
+      "한 식이 y=... 꼴일 때 대입법을 쓰는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PC_001",
+    "node_type": "PC",
+    "title": "일차부등식 풀기 계산",
+    "definition": "부등식의 성질을 이용해 미지수를 한쪽으로 정리하여 일차부등식의 해를 구하는 계산 단위이다.",
+    "description": "이항은 했지만 부등호 방향을 음수 계산에서 바꾸지 못하거나, 정리를 끝까지 하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "일차부등식 계산",
+      "부등호",
+      "이항"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PD_002",
+      "MD2_INEQ_PD_003"
+    ],
+    "examples_of_use": [
+      "2x-3>5를 푸는 상황",
+      "계수가 음수인 부등식 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PC_002",
+    "node_type": "PC",
+    "title": "일차부등식의 해를 수직선에 나타내기 계산",
+    "definition": "구한 해를 수직선 위에 점과 선으로 나타내는 계산 단위이다.",
+    "description": "끝점 포함 여부를 ○, ●로 잘못 나타내거나, 부등호 방향과 반대로 칠할 때 검색되어야 한다.",
+    "keywords": [
+      "수직선 표시",
+      "끝점 포함",
+      "부등식 해"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PP_001",
+      "MD2_INEQ_PC_001"
+    ],
+    "examples_of_use": [
+      "x≤3을 수직선에 나타내는 상황",
+      "수직선 표현 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PC_003",
+    "node_type": "PC",
+    "title": "연립일차부등식 풀기 계산",
+    "definition": "각 일차부등식을 푼 뒤 해집합의 공통부분을 구해 연립일차부등식의 해를 구하는 계산 단위이다.",
+    "description": "각 부등식은 맞게 풀고도 최종 공통해를 잘못 정하거나, 겹치지 않는 경우를 처리하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "연립일차부등식 계산",
+      "공통해",
+      "교집합"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PP_002",
+      "MD2_INEQ_PC_001"
+    ],
+    "examples_of_use": [
+      "두 부등식의 공통해를 구하는 상황",
+      "연립부등식 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PC_004",
+    "node_type": "PC",
+    "title": "순서쌍 대입 확인 계산",
+    "definition": "주어진 순서쌍을 각 식에 대입하여 연립방정식의 해인지 확인하는 계산 단위이다.",
+    "description": "x값과 y값을 뒤바꾸어 넣거나, 한 식만 확인하고 끝낼 때 검색되어야 한다.",
+    "keywords": [
+      "순서쌍 대입",
+      "해 확인",
+      "연립방정식"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PP_003"
+    ],
+    "examples_of_use": [
+      "(1,2)가 해인지 확인하는 상황",
+      "순서쌍 검산 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PC_005",
+    "node_type": "PC",
+    "title": "가감법으로 연립일차방정식 풀기 계산",
+    "definition": "두 식을 더하거나 빼어 한 문자를 없앤 뒤 나머지 문자를 구하고 다시 대입해 해를 구하는 계산 단위이다.",
+    "description": "소거할 문자를 못 정하거나, 식을 더하고 뺄 때 부호 실수를 할 때 검색되어야 한다.",
+    "keywords": [
+      "가감법",
+      "소거",
+      "연립일차방정식"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PD_007",
+      "MD2_INEQ_PP_004"
+    ],
+    "examples_of_use": [
+      "x를 소거해 푸는 상황",
+      "가감법 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PC_006",
+    "node_type": "PC",
+    "title": "대입법으로 연립일차방정식 풀기 계산",
+    "definition": "한 식에서 한 문자를 다른 문자로 나타낸 뒤 다른 식에 대입해 해를 구하는 계산 단위이다.",
+    "description": "문자를 잘못 정리하거나, 대입 후 괄호와 부호 처리를 틀릴 때 검색되어야 한다.",
+    "keywords": [
+      "대입법",
+      "문자 정리",
+      "대입"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PD_007",
+      "MD2_INEQ_PP_004"
+    ],
+    "examples_of_use": [
+      "y를 x로 나타내어 푸는 상황",
+      "대입법 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_INEQ_PC_007",
+    "node_type": "PC",
+    "title": "연립일차방정식 활용 문제 식 세우기 계산",
+    "definition": "문장제의 수량 관계를 두 개의 일차방정식으로 나타내고 이를 풀어 해를 구하는 계산 단위이다.",
+    "description": "두 미지수를 적절히 정하지 못하거나, 식을 하나만 세우고 멈출 때 검색되어야 한다.",
+    "keywords": [
+      "활용 문제",
+      "식 세우기",
+      "연립일차방정식"
+    ],
+    "prerequisites": [
+      "MD2_INEQ_PC_005",
+      "MD2_INEQ_PC_006"
+    ],
+    "examples_of_use": [
+      "가격 문제를 연립방정식으로 푸는 상황",
+      "나이·거리 문제"
+    ]
+  }
+]

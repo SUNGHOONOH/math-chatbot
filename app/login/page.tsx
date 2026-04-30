@@ -10,7 +10,7 @@ export default async function LoginPage({
   const nextPath = sanitizeRedirectPath(next);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50 p-4">
+    <div className="app-height safe-top safe-bottom flex items-center justify-center bg-[#f7f8f6] px-4 py-6">
       <LoginForm nextPath={nextPath} />
     </div>
   );

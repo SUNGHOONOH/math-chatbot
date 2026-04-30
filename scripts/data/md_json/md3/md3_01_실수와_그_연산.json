@@ -1,0 +1,346 @@
+[
+  {
+    "concept_code": "MD3_REAL_PD_001",
+    "node_type": "PD",
+    "title": "제곱근",
+    "definition": "a≥0인 수 a에 대하여 제곱하여 a가 되는 수를 a의 제곱근이라고 한다.",
+    "description": "제곱근을 단순히 루트 기호와만 연결하거나, 제곱하여 원래 수가 되는 관계를 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "제곱근",
+      "루트",
+      "제곱하여 a"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "9의 제곱근을 구하는 상황",
+      "제곱근의 뜻을 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PD_002",
+    "node_type": "PD",
+    "title": "근호",
+    "definition": "a≥0일 때 a의 양의 제곱근을 √a로 나타내며 이를 근호라고 한다.",
+    "description": "제곱근과 √a를 같은 뜻으로만 생각해 ±를 구분하지 못하거나, √a가 항상 양수라는 점을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "근호",
+      "√a",
+      "양의 제곱근"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_001"
+    ],
+    "examples_of_use": [
+      "√9와 9의 제곱근을 구분하는 상황",
+      "근호의 뜻을 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PD_003",
+    "node_type": "PD",
+    "title": "무리수와 실수",
+    "definition": "유리수가 아닌 수를 무리수라고 하며, 유리수와 무리수를 통틀어 실수라고 한다.",
+    "description": "무리수를 단순히 루트가 있는 수로만 이해하거나, 실수 범위 안에 유리수와 무리수가 모두 포함된다는 점을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "무리수",
+      "실수",
+      "유리수",
+      "분류"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "√2를 무리수로 분류하는 상황",
+      "실수의 범위를 설명하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PD_004",
+    "node_type": "PD",
+    "title": "제곱근의 곱셈과 나눗셈",
+    "definition": "a≥0, b≥0일 때 √a·√b=√ab 이고, b>0일 때 √a/√b=√(a/b) 이다.",
+    "description": "근호 안팎의 곱셈·나눗셈 규칙을 혼동하거나, 음수나 0 조건을 놓친 채 기계적으로 적용할 때 검색되어야 한다.",
+    "keywords": [
+      "제곱근 곱셈",
+      "제곱근 나눗셈",
+      "근호 계산"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_002"
+    ],
+    "examples_of_use": [
+      "√2×√8을 계산하는 상황",
+      "√12/√3을 계산하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PD_005",
+    "node_type": "PD",
+    "title": "분모의 유리화",
+    "definition": "분모에 근호가 있는 식에 적절한 수를 곱하여 분모를 유리수로 바꾸는 것을 분모의 유리화라고 한다.",
+    "description": "왜 유리화를 하는지 이해하지 못하거나, 분자와 분모에 같은 수를 곱해야 한다는 점을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "분모의 유리화",
+      "근호",
+      "분수"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_004"
+    ],
+    "examples_of_use": [
+      "1/√2를 유리화하는 상황",
+      "분모가 a+√b 꼴인 식을 정리하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PD_006",
+    "node_type": "PD",
+    "title": "지수법칙",
+    "definition": "a≠0인 수와 자연수 m,n에 대하여 a^m·a^n=a^(m+n), a^m/a^n=a^(m-n), (a^m)^n=a^(mn) 등이 성립한다.",
+    "description": "지수법칙을 덧셈이나 서로 다른 밑에도 무분별하게 적용하거나, 곱·나눗셈·거듭제곱 규칙을 섞어 쓸 때 검색되어야 한다.",
+    "keywords": [
+      "지수법칙",
+      "거듭제곱",
+      "지수"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "a^2·a^3을 정리하는 상황",
+      "(x^2)^3을 계산하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PD_007",
+    "node_type": "PD",
+    "title": "근호를 포함한 식의 덧셈과 뺄셈",
+    "definition": "동류근호끼리만 계수를 더하거나 빼어 근호를 포함한 식의 덧셈과 뺄셈을 계산할 수 있다.",
+    "description": "근호가 같지 않은데도 무조건 합치거나, 동류근호를 먼저 찾지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "동류근호",
+      "근호의 덧셈",
+      "근호의 뺄셈"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_002"
+    ],
+    "examples_of_use": [
+      "2√3+5√3을 계산하는 상황",
+      "√2+√8을 먼저 정리하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PP_001",
+    "node_type": "PP",
+    "title": "제곱근과 근호의 구분",
+    "definition": "a의 제곱근은 ±를 포함하지만, √a는 a의 양의 제곱근만을 나타낸다.",
+    "description": "제곱근의 개수와 √a의 의미를 섞어 이해할 때 검색되어야 한다.",
+    "keywords": [
+      "제곱근",
+      "근호",
+      "±",
+      "양의 제곱근"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_001",
+      "MD3_REAL_PD_002"
+    ],
+    "examples_of_use": [
+      "16의 제곱근과 √16을 구분하는 상황",
+      "표기 의미를 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PP_002",
+    "node_type": "PP",
+    "title": "실수의 분류 관계",
+    "definition": "실수는 유리수와 무리수로 이루어지며, 무리수는 소수로 나타내면 순환하지 않는 무한소수이다.",
+    "description": "유한소수·순환소수·무한소수의 관계를 실수 분류와 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "실수 분류",
+      "유리수",
+      "무리수",
+      "무한소수"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_003"
+    ],
+    "examples_of_use": [
+      "수를 실수 체계로 분류하는 상황",
+      "유리수와 무리수 관계 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PP_003",
+    "node_type": "PP",
+    "title": "근호 식의 간단한 꼴",
+    "definition": "제곱인 수를 근호 밖으로 꺼내고 동류근호를 정리하면 근호 식을 간단히 나타낼 수 있다.",
+    "description": "√12를 2√3으로 바꾸는 구조를 놓치거나, 제곱인 인수를 찾지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "근호 간단히",
+      "제곱인 인수",
+      "동류근호"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_002",
+      "MD3_REAL_PD_007"
+    ],
+    "examples_of_use": [
+      "√18을 3√2로 바꾸는 상황",
+      "근호 식을 간단히 하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PP_004",
+    "node_type": "PP",
+    "title": "유리화의 보존 원리",
+    "definition": "분자와 분모에 같은 0이 아닌 수를 곱해도 분수의 값은 변하지 않는다.",
+    "description": "유리화를 식 변형 과정으로만 외우고, 값이 보존되는 이유를 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "유리화 원리",
+      "분수의 값 보존",
+      "같은 수 곱하기"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_005"
+    ],
+    "examples_of_use": [
+      "유리화가 가능한 이유를 설명하는 상황",
+      "유리화 원리 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PP_005",
+    "node_type": "PP",
+    "title": "지수법칙의 적용 범위",
+    "definition": "지수법칙은 같은 밑의 거듭제곱 사이에서 적용되며, 연산 종류에 따라 지수의 처리 방식이 달라진다.",
+    "description": "밑이 다른데 지수를 합치거나, 합·차를 곱처럼 처리할 때 검색되어야 한다.",
+    "keywords": [
+      "지수법칙 적용 범위",
+      "같은 밑",
+      "연산 종류"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_006"
+    ],
+    "examples_of_use": [
+      "x^2+y^2를 x^(2+2)처럼 잘못 쓰는 상황",
+      "적용 가능 여부를 판단하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PC_001",
+    "node_type": "PC",
+    "title": "제곱근 구하기 계산",
+    "definition": "주어진 수의 제곱근을 찾아 ±까지 포함해 나타내는 계산 단위이다.",
+    "description": "양의 제곱근 하나만 쓰고 끝내거나, 음수의 제곱근을 실수 범위에서 찾으려 할 때 검색되어야 한다.",
+    "keywords": [
+      "제곱근 계산",
+      "±",
+      "실수 범위"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_001",
+      "MD3_REAL_PP_001"
+    ],
+    "examples_of_use": [
+      "25의 제곱근을 구하는 상황",
+      "제곱근 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PC_002",
+    "node_type": "PC",
+    "title": "수를 유리수와 무리수로 분류하기 계산",
+    "definition": "주어진 수를 유리수, 무리수, 실수의 관계에 따라 분류하는 계산 단위이다.",
+    "description": "소수 표현과 분수 표현 가능성을 연결하지 못해 분류를 틀릴 때 검색되어야 한다.",
+    "keywords": [
+      "유리수 분류",
+      "무리수 분류",
+      "실수"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_003",
+      "MD3_REAL_PP_002"
+    ],
+    "examples_of_use": [
+      "0.121212…, √3, -5를 분류하는 상황",
+      "실수 분류 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PC_003",
+    "node_type": "PC",
+    "title": "근호를 포함한 식 간단히 하기 계산",
+    "definition": "제곱인 수를 근호 밖으로 꺼내고 동류근호를 정리하여 식을 간단히 하는 계산 단위이다.",
+    "description": "인수분해를 못 하거나, 동류근호 정리를 잘못할 때 검색되어야 한다.",
+    "keywords": [
+      "근호 간단히 계산",
+      "동류근호",
+      "제곱인 수"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_007",
+      "MD3_REAL_PP_003"
+    ],
+    "examples_of_use": [
+      "√50-2√8을 간단히 하는 상황",
+      "근호 식 정리 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PC_004",
+    "node_type": "PC",
+    "title": "근호의 곱셈과 나눗셈 계산",
+    "definition": "근호의 곱셈과 나눗셈 공식을 이용해 식을 계산하는 단위이다.",
+    "description": "곱셈과 덧셈을 혼동하거나, 분모의 근호를 계산한 뒤 정리를 마치지 않을 때 검색되어야 한다.",
+    "keywords": [
+      "근호 곱셈 계산",
+      "근호 나눗셈 계산"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_004"
+    ],
+    "examples_of_use": [
+      "√6×√24를 계산하는 상황",
+      "√15/√3 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PC_005",
+    "node_type": "PC",
+    "title": "분모의 유리화 계산",
+    "definition": "분모에 근호가 있는 분수식의 분자와 분모에 적절한 식을 곱해 분모를 유리수로 바꾸는 계산 단위이다.",
+    "description": "분자·분모에 서로 다른 식을 곱하거나, 유리화 후 정리를 마치지 않을 때 검색되어야 한다.",
+    "keywords": [
+      "유리화 계산",
+      "분모의 근호",
+      "정리"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_005",
+      "MD3_REAL_PP_004"
+    ],
+    "examples_of_use": [
+      "3/√5를 유리화하는 상황",
+      "분모 유리화 문제"
+    ]
+  },
+  {
+    "concept_code": "MD3_REAL_PC_006",
+    "node_type": "PC",
+    "title": "지수법칙 계산",
+    "definition": "지수법칙을 이용해 거듭제곱 식을 간단히 정리하거나 계산하는 단위이다.",
+    "description": "지수를 더하거나 빼는 규칙을 잘못 적용하거나, 괄호 전체의 거듭제곱을 제대로 처리하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "지수법칙 계산",
+      "거듭제곱 정리"
+    ],
+    "prerequisites": [
+      "MD3_REAL_PD_006",
+      "MD3_REAL_PP_005"
+    ],
+    "examples_of_use": [
+      "a^3·a^5를 정리하는 상황",
+      "(x^2)^4 문제"
+    ]
+  }
+]

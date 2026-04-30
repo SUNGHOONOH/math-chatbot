@@ -276,7 +276,8 @@ export default function Sidebar({
       {/* ── 모바일 햄버거 버튼 ── */}
       <button
         onClick={() => setIsMobileOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white text-zinc-900 border border-zinc-200 rounded-lg shadow-lg"
+        className="md:hidden fixed left-4 top-[max(42px,calc(env(safe-area-inset-top)+24px))] z-50 flex h-11 w-11 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-900 shadow-lg"
+        aria-label="대화 목록 열기"
       >
         <Menu size={20} />
       </button>
@@ -291,7 +292,7 @@ export default function Sidebar({
 
       {/* ── 모바일 사이드바 ── */}
       <div
-        className={`md:hidden fixed inset-y-0 left-0 z-50 w-72 transform transition-transform duration-300 ease-out ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`safe-top safe-bottom md:hidden fixed inset-y-0 left-0 z-50 w-[82vw] max-w-72 transform overflow-hidden overscroll-x-none transition-transform duration-300 ease-out ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
         {sidebarContent}

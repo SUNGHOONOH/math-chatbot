@@ -1,0 +1,282 @@
+[
+  {
+    "concept_code": "MD2_SIM_PD_001",
+    "node_type": "PD",
+    "title": "닮음",
+    "definition": "대응각의 크기가 각각 같고 대응변의 길이의 비가 모두 같은 두 도형의 관계를 닮음이라고 한다.",
+    "description": "합동과 닮음을 혼동하거나, 모양만 비슷하면 닮음이라고 생각할 때 검색되어야 한다.",
+    "keywords": [
+      "닮음",
+      "대응각",
+      "대응변의 비"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "두 도형이 닮음인지 판단하는 상황",
+      "닮음의 뜻을 묻는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_SIM_PD_002",
+    "node_type": "PD",
+    "title": "삼각형의 닮음 조건",
+    "definition": "삼각형에서는 두 각의 크기가 각각 같을 때(AA), 두 변의 길이의 비와 그 끼인각이 각각 같을 때(SAS), 세 변의 길이의 비가 각각 같을 때(SSS) 닮음이다.",
+    "description": "합동 조건과 섞어 외우거나, 닮음 조건에서 '비'를 비교해야 한다는 점을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "삼각형 닮음",
+      "AA",
+      "SAS",
+      "SSS"
+    ],
+    "prerequisites": [
+      "MD2_SIM_PD_001"
+    ],
+    "examples_of_use": [
+      "삼각형 닮음을 판정하는 상황",
+      "닮음 조건 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_SIM_PD_003",
+    "node_type": "PD",
+    "title": "평행선과 선분의 길이의 비",
+    "definition": "삼각형에서 한 변에 평행한 직선이 다른 두 변을 자르면 대응하는 선분의 길이의 비가 같다.",
+    "description": "평행선 조건 없이 길이의 비를 사용하거나, 대응하는 선분을 잘못 짝지을 때 검색되어야 한다.",
+    "keywords": [
+      "평행선",
+      "선분의 비",
+      "대응"
+    ],
+    "prerequisites": [
+      "MD2_SIM_PD_002"
+    ],
+    "examples_of_use": [
+      "평행선이 있을 때 선분의 비를 구하는 상황",
+      "길이 비 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_SIM_PD_004",
+    "node_type": "PD",
+    "title": "닮은 도형의 성질",
+    "definition": "닮은 도형에서 대응변의 길이의 비는 일정하며, 둘레의 비는 닮음비와 같고 넓이의 비는 닮음비의 제곱이다.",
+    "description": "길이의 비, 둘레의 비, 넓이의 비를 구분하지 못하거나, 넓이의 비를 길이의 비와 같게 생각할 때 검색되어야 한다.",
+    "keywords": [
+      "닮음비",
+      "둘레의 비",
+      "넓이의 비"
+    ],
+    "prerequisites": [
+      "MD2_SIM_PD_001"
+    ],
+    "examples_of_use": [
+      "닮은 도형의 넓이 비를 구하는 상황",
+      "둘레와 넓이 비 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_SIM_PD_005",
+    "node_type": "PD",
+    "title": "직각삼각형과 피타고라스 정리",
+    "definition": "직각삼각형에서 빗변의 제곱은 다른 두 변의 제곱의 합과 같다.",
+    "description": "피타고라스 정리를 직각삼각형이 아닌 도형에 적용하거나, 빗변을 가장 긴 변과 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "피타고라스 정리",
+      "직각삼각형",
+      "빗변"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "직각삼각형의 한 변을 구하는 상황",
+      "피타고라스 정리 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_SIM_PP_001",
+    "node_type": "PP",
+    "title": "닮음과 합동의 관계",
+    "definition": "합동은 닮음비가 1인 닮음이다.",
+    "description": "합동과 닮음을 전혀 다른 관계로만 보고, 닮음비 1의 의미를 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "합동",
+      "닮음비 1",
+      "닮음"
+    ],
+    "prerequisites": [
+      "MD2_SIM_PD_001"
+    ],
+    "examples_of_use": [
+      "합동과 닮음을 비교하는 상황",
+      "닮음비 1을 해석하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_SIM_PP_002",
+    "node_type": "PP",
+    "title": "닮은 삼각형의 대응변의 비",
+    "definition": "닮은 삼각형에서는 대응변의 길이의 비가 모두 같다.",
+    "description": "대응변을 잘못 정하거나, 한 쌍의 변 비만 보고 끝낼 때 검색되어야 한다.",
+    "keywords": [
+      "대응변의 비",
+      "닮은 삼각형"
+    ],
+    "prerequisites": [
+      "MD2_SIM_PD_002"
+    ],
+    "examples_of_use": [
+      "닮은 삼각형의 미지 길이를 구하는 상황",
+      "비를 세우는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_SIM_PP_003",
+    "node_type": "PP",
+    "title": "둘레의 비와 넓이의 비",
+    "definition": "닮은 도형에서 둘레의 비는 닮음비와 같고, 넓이의 비는 닮음비의 제곱이다.",
+    "description": "둘레의 비와 넓이의 비를 같은 방식으로 계산하거나, 제곱 관계를 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "둘레의 비",
+      "넓이의 비",
+      "닮음비의 제곱"
+    ],
+    "prerequisites": [
+      "MD2_SIM_PD_004"
+    ],
+    "examples_of_use": [
+      "넓이 비를 구하는 상황",
+      "둘레와 넓이 비교 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_SIM_PP_004",
+    "node_type": "PP",
+    "title": "피타고라스 정리의 역",
+    "definition": "한 삼각형에서 가장 긴 변의 제곱이 나머지 두 변의 제곱의 합과 같으면 그 삼각형은 직각삼각형이다.",
+    "description": "직각삼각형인지 판정해야 하는 상황에서 피타고라스 정리의 역을 떠올리지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "피타고라스 정리의 역",
+      "직각삼각형 판정"
+    ],
+    "prerequisites": [
+      "MD2_SIM_PD_005"
+    ],
+    "examples_of_use": [
+      "직각삼각형인지 판정하는 상황",
+      "세 변의 길이로 판정하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_SIM_PC_001",
+    "node_type": "PC",
+    "title": "삼각형 닮음 판정 계산",
+    "definition": "AA, SAS, SSS 조건을 이용해 두 삼각형의 닮음을 판정하는 계산 단위이다.",
+    "description": "닮음 조건을 합동 조건처럼 적용하거나, 대응 관계를 잘못 잡을 때 검색되어야 한다.",
+    "keywords": [
+      "닮음 판정",
+      "AA",
+      "SAS",
+      "SSS"
+    ],
+    "prerequisites": [
+      "MD2_SIM_PD_002"
+    ],
+    "examples_of_use": [
+      "두 삼각형이 닮음인지 판단하는 상황",
+      "닮음 조건 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_SIM_PC_002",
+    "node_type": "PC",
+    "title": "닮음비를 이용한 길이 계산",
+    "definition": "닮은 도형의 대응변의 비를 이용해 미지의 길이를 구하는 계산 단위이다.",
+    "description": "대응변을 잘못 짝지어 비를 세우거나, 닮음비 방향을 거꾸로 쓸 때 검색되어야 한다.",
+    "keywords": [
+      "닮음비 계산",
+      "길이 구하기",
+      "대응변"
+    ],
+    "prerequisites": [
+      "MD2_SIM_PP_002"
+    ],
+    "examples_of_use": [
+      "닮은 삼각형의 한 변을 구하는 상황",
+      "비례식 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_SIM_PC_003",
+    "node_type": "PC",
+    "title": "평행선이 만든 선분의 비 계산",
+    "definition": "평행선이 자른 선분의 길이 비 성질을 이용해 미지의 길이를 구하는 계산 단위이다.",
+    "description": "평행한 선과 대응 선분 관계를 정확히 보지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "평행선",
+      "선분의 비",
+      "길이 계산"
+    ],
+    "prerequisites": [
+      "MD2_SIM_PD_003"
+    ],
+    "examples_of_use": [
+      "평행선 사이 선분 길이를 구하는 상황",
+      "비례식 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_SIM_PC_004",
+    "node_type": "PC",
+    "title": "둘레의 비와 넓이의 비 계산",
+    "definition": "닮음비를 이용해 둘레의 비 또는 넓이의 비를 계산하는 단위이다.",
+    "description": "넓이의 비를 닮음비 그대로 계산하거나, 둘레와 넓이의 공식을 뒤섞을 때 검색되어야 한다.",
+    "keywords": [
+      "둘레의 비 계산",
+      "넓이의 비 계산",
+      "닮음비"
+    ],
+    "prerequisites": [
+      "MD2_SIM_PP_003"
+    ],
+    "examples_of_use": [
+      "넓이의 비를 구하는 상황",
+      "닮은 도형 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_SIM_PC_005",
+    "node_type": "PC",
+    "title": "피타고라스 정리로 길이 계산",
+    "definition": "직각삼각형에서 피타고라스 정리를 이용해 한 변의 길이를 계산하는 단위이다.",
+    "description": "빗변을 잘못 잡거나, 제곱과 제곱근 처리를 틀릴 때 검색되어야 한다.",
+    "keywords": [
+      "피타고라스 정리 계산",
+      "빗변",
+      "제곱근"
+    ],
+    "prerequisites": [
+      "MD2_SIM_PD_005"
+    ],
+    "examples_of_use": [
+      "직각삼각형의 한 변을 구하는 상황",
+      "길이 계산 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_SIM_PC_006",
+    "node_type": "PC",
+    "title": "피타고라스 정리의 역으로 직각 판정 계산",
+    "definition": "세 변의 길이를 이용해 가장 긴 변의 제곱과 나머지 두 변의 제곱의 합을 비교하여 직각삼각형인지 판정하는 계산 단위이다.",
+    "description": "가장 긴 변을 기준으로 잡지 않거나, 제곱 계산을 틀릴 때 검색되어야 한다.",
+    "keywords": [
+      "피타고라스 정리의 역 계산",
+      "직각 판정"
+    ],
+    "prerequisites": [
+      "MD2_SIM_PP_004"
+    ],
+    "examples_of_use": [
+      "세 변 길이로 직각삼각형인지 판단하는 상황",
+      "판정 문제"
+    ]
+  }
+]

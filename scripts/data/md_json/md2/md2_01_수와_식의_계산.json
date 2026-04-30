@@ -1,0 +1,405 @@
+[
+  {
+    "concept_code": "MD2_CALC_PD_001",
+    "node_type": "PD",
+    "title": "유리수와 순환소수",
+    "definition": "유리수는 분수 a/b(b≠0) 꼴로 나타낼 수 있는 수이며, 소수로 나타내면 유한소수 또는 순환소수로 나타난다.",
+    "description": "순환소수를 무한소수 전체와 혼동하거나, 유리수와 순환소수의 관계를 이해하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "유리수",
+      "순환소수",
+      "유한소수",
+      "분수"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "주어진 소수가 유리수인지 판단하는 상황",
+      "순환소수를 분수와 연결하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PD_002",
+    "node_type": "PD",
+    "title": "순환소수를 분수로 나타내기",
+    "definition": "순환마디를 이용해 식을 세우고 소수 부분을 없애면 순환소수를 분수로 나타낼 수 있다.",
+    "description": "순환마디 길이에 맞게 10의 거듭제곱을 곱하지 못하거나, 식을 세운 뒤 소수 부분 제거를 연결하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "순환소수",
+      "분수로 나타내기",
+      "순환마디",
+      "10의 거듭제곱"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_001"
+    ],
+    "examples_of_use": [
+      "0.3̇, 0.1̇2̇를 분수로 나타내는 상황",
+      "순환소수를 분수로 바꾸는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PD_003",
+    "node_type": "PD",
+    "title": "단항식의 곱셈과 나눗셈",
+    "definition": "단항식의 곱셈과 나눗셈은 계수끼리 계산하고, 문자는 지수법칙에 따라 정리한다.",
+    "description": "문자의 지수를 더하고 빼는 규칙을 혼동하거나, 계수 계산과 문자 계산을 분리하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "단항식",
+      "곱셈",
+      "나눗셈",
+      "지수법칙"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "2a^2b와 -3ab^3의 곱을 계산하는 상황",
+      "단항식의 나눗셈을 정리하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PD_004",
+    "node_type": "PD",
+    "title": "다항식의 계산",
+    "definition": "다항식의 덧셈과 뺄셈은 동류항끼리 정리하고, 곱셈은 분배법칙을 이용해 전개한 뒤 정리한다.",
+    "description": "동류항을 잘못 묶거나, 전개 후 정리를 하지 않아 계산이 멈출 때 검색되어야 한다.",
+    "keywords": [
+      "다항식",
+      "동류항",
+      "분배법칙",
+      "전개"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_003"
+    ],
+    "examples_of_use": [
+      "(2x+3)+(x-5)를 계산하는 상황",
+      "(x+2)(x-3)을 전개하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PD_005",
+    "node_type": "PD",
+    "title": "다항식의 곱셈 공식",
+    "definition": "(a+b)^2, (a-b)^2, (a+b)(a-b) 등은 전개 결과를 공식으로 간단히 나타낼 수 있다.",
+    "description": "곱셈 공식의 부호를 잘못 기억하거나, 공식 적용이 가능한 형태를 인식하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "곱셈 공식",
+      "완전제곱식",
+      "합차공식"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_004"
+    ],
+    "examples_of_use": [
+      "(x+3)^2을 전개하는 상황",
+      "(2a-b)(2a+b)를 계산하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PD_006",
+    "node_type": "PD",
+    "title": "인수분해",
+    "definition": "하나의 다항식을 두 개 이상의 다항식의 곱으로 나타내는 것을 인수분해라고 한다.",
+    "description": "인수분해를 전개의 역과정으로 보지 못하거나, 공통인수와 공식 적용 구조를 찾지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "인수분해",
+      "전개의 역",
+      "다항식의 곱"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_004",
+      "MD2_CALC_PD_005"
+    ],
+    "examples_of_use": [
+      "x^2-5x+6을 인수분해하는 상황",
+      "공통인수를 묶는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PD_007",
+    "node_type": "PD",
+    "title": "일차식과 연립방정식 활용을 위한 문자식",
+    "definition": "문자식을 이용하면 수량 관계와 일반적인 계산 규칙을 간단하게 나타낼 수 있다.",
+    "description": "문자식을 특정 값으로만 해석하거나, 관계를 식으로 옮기는 과정에서 항의 구조를 잘못 만들 때 검색되어야 한다.",
+    "keywords": [
+      "문자식",
+      "수량 관계",
+      "일반화"
+    ],
+    "prerequisites": [],
+    "examples_of_use": [
+      "연속한 짝수를 식으로 나타내는 상황",
+      "문장제를 식으로 만드는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PP_001",
+    "node_type": "PP",
+    "title": "지수법칙의 곱셈·나눗셈 규칙",
+    "definition": "같은 문자의 곱셈에서는 지수를 더하고, 나눗셈에서는 지수를 뺀다.",
+    "description": "지수법칙을 덧셈에도 적용하거나, 서로 다른 문자에도 같은 규칙을 기계적으로 적용할 때 검색되어야 한다.",
+    "keywords": [
+      "지수법칙",
+      "지수의 합",
+      "지수의 차"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_003"
+    ],
+    "examples_of_use": [
+      "x^2·x^3을 계산하는 상황",
+      "a^5÷a^2를 정리하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PP_002",
+    "node_type": "PP",
+    "title": "동류항 정리 원리",
+    "definition": "문자와 각 문자의 지수가 같은 항만 동류항이며, 동류항끼리만 계수를 계산할 수 있다.",
+    "description": "문자만 같으면 동류항이라고 생각하거나, 지수가 다름에도 같은 항으로 합칠 때 검색되어야 한다.",
+    "keywords": [
+      "동류항",
+      "계수",
+      "지수"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_004"
+    ],
+    "examples_of_use": [
+      "3x와 5x를 합치는 상황",
+      "x와 x^2를 구분하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PP_003",
+    "node_type": "PP",
+    "title": "곱셈 공식의 구조 인식",
+    "definition": "다항식의 곱셈에서 특정 형태를 인식하면 분배법칙 대신 곱셈 공식을 이용해 빠르게 계산할 수 있다.",
+    "description": "전개는 가능하지만 공식 형태를 인식하지 못해 계산이 길어지거나, 공식과 실제 식의 대응을 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "곱셈 공식 구조",
+      "형태 인식",
+      "빠른 계산"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_005"
+    ],
+    "examples_of_use": [
+      "(x-4)^2을 공식으로 처리하는 상황",
+      "합차공식을 인식하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PP_004",
+    "node_type": "PP",
+    "title": "인수분해와 공통인수",
+    "definition": "모든 항에 공통으로 들어 있는 인수는 먼저 묶어서 인수분해할 수 있다.",
+    "description": "공통인수를 찾지 못하거나, 부호를 포함한 공통인수 정리를 놓칠 때 검색되어야 한다.",
+    "keywords": [
+      "공통인수",
+      "인수분해",
+      "묶기"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_006"
+    ],
+    "examples_of_use": [
+      "3x^2-6x에서 3x를 묶는 상황",
+      "공통인수 인수분해 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PP_005",
+    "node_type": "PP",
+    "title": "인수분해 공식의 역이용",
+    "definition": "곱셈 공식을 거꾸로 이용하면 다항식을 빠르게 인수분해할 수 있다.",
+    "description": "전개 공식은 기억하지만 역으로 인수분해하는 연결을 못 하거나, 부호를 잘못 대응할 때 검색되어야 한다.",
+    "keywords": [
+      "인수분해 공식",
+      "완전제곱식",
+      "합차공식"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_005",
+      "MD2_CALC_PD_006"
+    ],
+    "examples_of_use": [
+      "x^2-9를 인수분해하는 상황",
+      "x^2+6x+9를 인수분해하는 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PC_001",
+    "node_type": "PC",
+    "title": "순환소수를 분수로 바꾸기 계산",
+    "definition": "순환소수를 x로 두고 순환마디 길이에 맞게 10의 거듭제곱을 곱한 뒤 빼서 분수로 바꾸는 계산 단위이다.",
+    "description": "순환마디 길이를 잘못 잡거나, 빼는 과정에서 정수부와 소수부를 잘못 정리할 때 검색되어야 한다.",
+    "keywords": [
+      "순환소수 계산",
+      "분수 변환",
+      "식 세우기"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_002"
+    ],
+    "examples_of_use": [
+      "0.2̇7̇을 분수로 나타내는 상황",
+      "순환소수 변환 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PC_002",
+    "node_type": "PC",
+    "title": "단항식의 곱셈 계산",
+    "definition": "계수끼리 곱하고 같은 문자의 지수를 더해 단항식의 곱을 계산하는 단위이다.",
+    "description": "계수 부호를 놓치거나, 문자의 지수를 합쳐야 하는 상황에서 그대로 두거나 곱할 때 검색되어야 한다.",
+    "keywords": [
+      "단항식 곱셈",
+      "계수",
+      "지수 더하기"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_003",
+      "MD2_CALC_PP_001"
+    ],
+    "examples_of_use": [
+      "-2x^2y·3xy^2를 계산하는 상황",
+      "단항식 곱셈 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PC_003",
+    "node_type": "PC",
+    "title": "단항식의 나눗셈 계산",
+    "definition": "계수를 나누고 같은 문자의 지수를 빼서 단항식의 나눗셈을 계산하는 단위이다.",
+    "description": "지수를 빼는 규칙을 거꾸로 적용하거나, 약분을 정리하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "단항식 나눗셈",
+      "지수 빼기",
+      "약분"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_003",
+      "MD2_CALC_PP_001"
+    ],
+    "examples_of_use": [
+      "6x^4y^2÷(-2xy)를 계산하는 상황",
+      "단항식 나눗셈 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PC_004",
+    "node_type": "PC",
+    "title": "다항식의 덧셈·뺄셈 계산",
+    "definition": "괄호를 풀고 동류항끼리 묶어 다항식의 덧셈과 뺄셈을 계산하는 단위이다.",
+    "description": "빼는 식의 괄호 뒤 부호를 바꾸지 못하거나, 동류항끼리 정리하지 못할 때 검색되어야 한다.",
+    "keywords": [
+      "다항식 덧셈",
+      "다항식 뺄셈",
+      "괄호",
+      "동류항"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_004",
+      "MD2_CALC_PP_002"
+    ],
+    "examples_of_use": [
+      "(3x-2)+(x+5)를 계산하는 상황",
+      "A-(B-C) 형태의 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PC_005",
+    "node_type": "PC",
+    "title": "다항식의 곱셈 전개 계산",
+    "definition": "분배법칙을 이용해 다항식의 곱을 전개한 뒤 동류항을 정리하는 계산 단위이다.",
+    "description": "전개 과정에서 항을 빠뜨리거나, 곱셈 후 동류항 정리를 하지 않을 때 검색되어야 한다.",
+    "keywords": [
+      "전개",
+      "분배법칙",
+      "다항식 곱셈"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_004"
+    ],
+    "examples_of_use": [
+      "(x+2)(x-3)을 전개하는 상황",
+      "다항식 곱셈 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PC_006",
+    "node_type": "PC",
+    "title": "곱셈 공식 적용 계산",
+    "definition": "다항식의 형태를 보고 적절한 곱셈 공식을 선택해 계산하는 단위이다.",
+    "description": "공식 선택을 잘못하거나, 공식의 부호를 틀릴 때 검색되어야 한다.",
+    "keywords": [
+      "곱셈 공식 계산",
+      "형태 인식",
+      "부호"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_005",
+      "MD2_CALC_PP_003"
+    ],
+    "examples_of_use": [
+      "(2x-1)^2을 계산하는 상황",
+      "합차공식 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PC_007",
+    "node_type": "PC",
+    "title": "공통인수 인수분해 계산",
+    "definition": "다항식에서 공통으로 들어 있는 인수를 먼저 묶어 인수분해하는 계산 단위이다.",
+    "description": "공통인수를 빠뜨리거나, 최대공통인수가 아니라 일부만 묶을 때 검색되어야 한다.",
+    "keywords": [
+      "공통인수 인수분해",
+      "묶기"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PP_004"
+    ],
+    "examples_of_use": [
+      "4x^2-8x를 인수분해하는 상황",
+      "공통인수 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PC_008",
+    "node_type": "PC",
+    "title": "공식 인수분해 계산",
+    "definition": "완전제곱식, 합차공식 등을 역이용하여 다항식을 인수분해하는 계산 단위이다.",
+    "description": "공식 형태를 못 찾거나, 전개형과 인수분해형의 대응을 잘못 잡을 때 검색되어야 한다.",
+    "keywords": [
+      "공식 인수분해",
+      "완전제곱",
+      "합차"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PP_005"
+    ],
+    "examples_of_use": [
+      "x^2-16을 인수분해하는 상황",
+      "x^2+10x+25 문제"
+    ]
+  },
+  {
+    "concept_code": "MD2_CALC_PC_009",
+    "node_type": "PC",
+    "title": "문장제를 문자식으로 나타내기 계산",
+    "definition": "문장 속 수량 관계를 문자와 연산으로 나타내는 계산 단위이다.",
+    "description": "관계를 뒤집어 쓰거나, 증가량·배수 관계를 잘못 식으로 옮길 때 검색되어야 한다.",
+    "keywords": [
+      "문자식",
+      "문장제",
+      "수량 관계"
+    ],
+    "prerequisites": [
+      "MD2_CALC_PD_007"
+    ],
+    "examples_of_use": [
+      "연속한 홀수를 식으로 나타내는 상황",
+      "문장을 식으로 바꾸는 문제"
+    ]
+  }
+]

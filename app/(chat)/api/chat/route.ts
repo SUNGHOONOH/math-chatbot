@@ -147,9 +147,9 @@ export async function POST(req: Request) {
     }
 
     // 3. 답변 완성을 기다리기 위한 Promise 설정
-    let resolveAssistantMessage!: (text: string) => void;
-    const assistantMessagePromise = new Promise<string>((resolve) => {
-      resolveAssistantMessage = resolve;
+    let resolveAssistantResult!: (result: { rawText: string; sanitizedText: string }) => void;
+    const assistantResultPromise = new Promise<{ rawText: string; sanitizedText: string }>((resolve) => {
+      resolveAssistantResult = resolve;
     });
 
     const generationStartedAt = Date.now();
@@ -168,7 +168,7 @@ export async function POST(req: Request) {
           totalDuration: formatDurationMs(requestStartedAt),
           responseChars: sanitizedText.length,
         });
-        resolveAssistantMessage(sanitizedText);
+        resolveAssistantResult({ rawText: text.trim(), sanitizedText });
       }
     });
 
@@ -181,7 +181,8 @@ export async function POST(req: Request) {
     // 4. after()를 사용하여 스트리밍 완료 후 백그라운드 저장/감지 처리
     after(async () => {
       try {
-        const assistantMessage = await assistantMessagePromise;
+        const assistantResult = await assistantResultPromise;
+        const assistantMessage = assistantResult.sanitizedText;
         const backgroundStartedAt = Date.now();
         console.log('[chat/route] 백그라운드 저장/감지 시작:', {
           sessionId,
@@ -201,8 +202,7 @@ export async function POST(req: Request) {
 
         if (session.session_status === 'in_progress') {
           // TEXT_MODEL 신호 기반 병목 감지: Gate LLM 호출 없이 신호가 있을 때만 진단
-          const rawAssistantText = await assistantMessagePromise; // sanitize 전 원본에서 추출
-          const bottleneckSummary = extractBottleneckSignal(rawAssistantText);
+          const bottleneckSummary = extractBottleneckSignal(assistantResult.rawText);
 
           if (bottleneckSummary) {
             const recentContext = fullMessages

@@ -52,6 +52,7 @@ function sanitizeAssistantText(text: string): string {
     .replace(/<think>[\s\S]*?<\/think>/gi, '')
     .replace(/<\/?think>/gi, '')
     .replace(/\[PROBLEM_SOLVED\]/g, '')
+    .replace(/\[BOTTLENECK:[^\]]*\]/g, '')
     .trim();
 }
 
@@ -77,17 +78,17 @@ export function ChatMessageItem({ message, isStreaming = false }: ChatMessageIte
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className={cn('flex gap-4', message.role === 'user' ? 'justify-end' : 'justify-start')}
+      className={cn('flex gap-2.5 sm:gap-4', message.role === 'user' ? 'justify-end' : 'justify-start')}
     >
       {message.role !== 'user' && (
-        <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm">
+        <div className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 text-emerald-600 shadow-sm sm:flex">
           <Bot size={18} />
         </div>
       )}
 
       <div
         className={cn(
-          'max-w-[85%] rounded-2xl px-5 py-3.5 shadow-sm overflow-x-auto',
+          'max-w-[92%] overflow-x-auto rounded-2xl px-4 py-3 shadow-sm sm:max-w-[85%] sm:px-5 sm:py-3.5',
           message.role === 'user'
             ? 'bg-zinc-900 text-white rounded-tr-sm'
             : 'bg-white border border-zinc-100 text-zinc-800 rounded-tl-sm'
@@ -121,7 +122,7 @@ export function ChatMessageItem({ message, isStreaming = false }: ChatMessageIte
       </div>
 
       {message.role === 'user' && (
-        <div className="w-8 h-8 rounded-full bg-zinc-200 text-zinc-600 flex items-center justify-center shrink-0">
+        <div className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-zinc-600 sm:flex">
           <User size={18} />
         </div>
       )}
